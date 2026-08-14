@@ -1,340 +1,882 @@
 /* ==========================================================================
-   7X Imoveis - Detalhe do Imovel (properties/detail.html)
+   7X Patrimonial - Detalhe do Imóvel (Produto) — Luxury Architectural Editorial
    ========================================================================== */
 
-/* Page Section */
-.detail-section {
-    padding: 3rem 0;
+/* ── Container & Global Page Layout ──────────────────────────────────────── */
+.detail-page {
+    padding: 2rem 0 6rem 0;
+    background: var(--bg-body);
+    color: var(--text-primary);
 }
 
-/* Breadcrumb */
-.detail-breadcrumb {
-    font-size: 0.9rem;
-    color: var(--text-muted);
-    margin-bottom: 0.5rem;
-}
-
-.detail-breadcrumb a {
-    color: var(--text-muted);
-}
-
-.detail-breadcrumb a:hover {
-    color: var(--primary);
-}
-
-/* Title Bar */
-.detail-title-bar {
+/* ── Breadcrumb & Top Bar ────────────────────────────────────────────────── */
+.detail-nav-bar {
     display: flex;
     align-items: center;
     justify-content: space-between;
     flex-wrap: wrap;
     gap: 1rem;
-    margin-bottom: 2rem;
-}
-
-.detail-badges {
-    display: flex;
-    gap: 0.5rem;
-    margin-bottom: 0.5rem;
-}
-
-.detail-title-bar h1 {
-    font-size: clamp(1.8rem, 3vw, 2.5rem);
-}
-
-.detail-address {
-    color: var(--text-secondary);
-    margin-top: 0.25rem;
-}
-
-.detail-price-block {
-    text-align: right;
-}
-
-.detail-price-label {
-    font-size: 0.85rem;
-    color: var(--text-muted);
+    padding-bottom: 1.25rem;
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+    font-size: 0.78rem;
+    letter-spacing: 0.04em;
     text-transform: uppercase;
 }
 
-.detail-price-value {
-    font-size: 2.5rem;
-    color: var(--primary);
-    font-family: var(--font-heading);
-    font-weight: 800;
-}
-
-.detail-condo-fee {
-    font-size: 0.85rem;
-    color: var(--text-secondary);
-}
-
-/* Photo Grid */
-.detail-photo-grid {
-    display: grid;
-    grid-template-columns: 2fr 1fr;
-    gap: 1rem;
-    height: 480px;
-    margin-bottom: 3rem;
-    border-radius: var(--radius-lg);
-    overflow: hidden;
-}
-
-.detail-photo-main {
-    height: 100%;
-    position: relative;
-}
-
-.detail-photo-main img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-.detail-photo-side {
-    display: grid;
-    grid-template-rows: 1fr 1fr;
-    gap: 1rem;
-    height: 100%;
-}
-
-.detail-photo-side div {
-    height: 100%;
-    position: relative;
-    overflow: hidden;
-}
-
-.detail-photo-side img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: transform 0.5s ease;
-}
-
-.detail-photo-side div:hover img {
-    transform: scale(1.04);
-}
-
-/* Content Layout */
-.detail-content-grid {
-    display: grid;
-    grid-template-columns: 1fr 360px;
-    gap: 3rem;
-    align-items: start;
-}
-
-/* Key Specs Card */
-.detail-specs-card {
-    background: var(--bg-card);
-    padding: 2rem;
-    border-radius: var(--radius-lg);
-    border: 1px solid var(--border-color);
-    margin-bottom: 2.5rem;
-}
-
-.detail-specs-card h3 {
-    margin-bottom: 1.5rem;
-    border-bottom: 1px solid var(--border-color);
-    padding-bottom: 0.75rem;
-}
-
-.detail-specs-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
-    gap: 1.5rem;
-    text-align: center;
-}
-
-.detail-spec-item {
-    background: var(--bg-surface);
-    padding: 1rem;
-    border-radius: var(--radius-md);
-}
-
-.detail-spec-icon {
-    font-size: 1.5rem;
-}
-
-.detail-spec-value {
-    font-weight: 700;
-    font-size: 1.1rem;
-    margin-top: 0.25rem;
-}
-
-.detail-spec-label {
-    font-size: 0.8rem;
+.detail-nav-breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
     color: var(--text-muted);
 }
 
-/* Description */
-.detail-description {
-    margin-bottom: 2.5rem;
-}
-
-.detail-description h3 {
-    margin-bottom: 1rem;
-}
-
-.detail-description p {
+.detail-nav-breadcrumb a {
     color: var(--text-secondary);
-    line-height: 1.8;
-    font-size: 1.05rem;
+    text-decoration: none;
+    transition: color 0.2s ease;
 }
 
-/* Amenities */
-.detail-amenities {
-    margin-bottom: 2.5rem;
-}
-
-.detail-amenities h3 {
-    margin-bottom: 1.25rem;
-}
-
-.amenities-list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.75rem;
-}
-
-.amenity-tag {
-    background: var(--bg-surface);
-    border: 1px solid var(--border-color);
-    padding: 0.6rem 1.25rem;
-    border-radius: var(--radius-full);
-    font-size: 0.9rem;
-    color: var(--text-primary);
-    transition: var(--transition);
-}
-
-.amenity-tag:hover {
-    border-color: var(--primary);
+.detail-nav-breadcrumb a:hover {
     color: var(--primary);
 }
 
-/* Agent Sidebar */
-.agent-sidebar {
-    position: sticky;
-    top: 100px;
+.detail-nav-breadcrumb .separator {
+    color: var(--border-color);
 }
 
-.agent-card {
-    background: var(--bg-card);
+.detail-nav-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+.detail-nav-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    background: transparent;
     border: 1px solid var(--border-color);
-    border-radius: var(--radius-lg);
-    padding: 2rem;
-    margin-bottom: 2rem;
+    color: var(--text-secondary);
+    padding: 0.45rem 0.9rem;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
 }
 
-.agent-card h4 {
-    margin-bottom: 1.25rem;
-    font-size: 1.1rem;
+.detail-nav-btn:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+    background: rgba(201, 172, 119, 0.06);
 }
 
-.agent-profile {
+/* ── Header Title & Pricing Block ────────────────────────────────────────── */
+.detail-main-header {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 2.5rem;
+    align-items: flex-end;
+    margin-bottom: 2.2rem;
+}
+
+.detail-header-eyebrow {
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--primary);
     display: flex;
     align-items: center;
-    gap: 1rem;
-    margin-bottom: 1.5rem;
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
 }
 
-.agent-avatar {
-    width: 56px;
-    height: 56px;
-    border-radius: 0;
+.detail-header-eyebrow::before {
+    content: '';
+    display: inline-block;
+    width: 20px;
+    height: 1px;
     background: var(--primary);
+}
+
+.detail-property-title {
+    font-size: clamp(2rem, 3.8vw, 3.2rem);
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -1px;
+    margin-bottom: 0.75rem;
+    color: var(--text-primary);
+}
+
+.detail-header-location {
     display: flex;
     align-items: center;
-    justify-content: center;
-    font-weight: 800;
-    color: #000;
-    font-size: 1.2rem;
+    gap: 0.5rem;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    font-weight: 400;
+}
+
+.detail-header-location svg {
+    color: var(--primary);
     flex-shrink: 0;
 }
 
-.agent-name {
-    font-weight: 700;
-    font-size: 1.05rem;
+/* Price Box */
+.detail-price-box {
+    text-align: right;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    justify-content: flex-end;
 }
 
-.agent-role {
+.detail-price-badge {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 0.3rem;
+}
+
+.detail-price-display {
+    font-size: clamp(2.4rem, 4.2vw, 3.6rem);
+    font-weight: 900;
+    font-family: var(--font-heading);
+    color: var(--primary);
+    line-height: 1;
+    letter-spacing: -0.5px;
+    margin-bottom: 0.4rem;
+}
+
+.detail-sqm-rate {
     font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    letter-spacing: 0.04em;
+}
+
+/* ── Cinema Gallery Viewer ───────────────────────────────────────────────── */
+.detail-cinema-gallery {
+    margin-bottom: 2.5rem;
+}
+
+.cinema-stage {
+    position: relative;
+    width: 100%;
+    height: 540px;
+    background: #000;
+    overflow: hidden;
+    cursor: pointer;
+}
+
+.cinema-stage img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.cinema-stage:hover img {
+    transform: scale(1.025);
+}
+
+.cinema-overlay-badges {
+    position: absolute;
+    top: 1.5rem;
+    left: 1.5rem;
+    display: flex;
+    gap: 0.5rem;
+    z-index: 3;
+}
+
+.cinema-badge {
+    background: rgba(11, 15, 25, 0.82);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: #fff;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 0.4rem 0.85rem;
+}
+
+.cinema-badge.gold {
+    background: var(--primary);
+    color: #0b0f19;
+    border-color: var(--primary);
+}
+
+.cinema-expand-btn {
+    position: absolute;
+    bottom: 1.5rem;
+    right: 1.5rem;
+    background: rgba(11, 15, 25, 0.85);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #fff;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 0.65rem 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    z-index: 3;
+}
+
+.cinema-expand-btn:hover {
+    background: var(--primary);
+    color: #000;
+    border-color: var(--primary);
+}
+
+/* Thumbs Strip */
+.cinema-thumbs-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+    gap: 0.6rem;
+    margin-top: 0.6rem;
+}
+
+.cinema-thumb-slot {
+    height: 84px;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+    background: #111;
+    border: 2px solid transparent;
+    transition: border-color 0.2s ease, opacity 0.2s ease;
+    opacity: 0.65;
+}
+
+.cinema-thumb-slot img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.cinema-thumb-slot:hover,
+.cinema-thumb-slot.active {
+    opacity: 1;
+    border-color: var(--primary);
+}
+
+/* ── Luxury Specs Ribbon Bar ─────────────────────────────────────────────── */
+.detail-specs-ribbon {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-left: 3px solid var(--primary);
+    margin-bottom: 3.5rem;
+}
+
+.spec-ribbon-item {
+    padding: 1.4rem 1.1rem;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.35rem;
+    border-right: 1px solid var(--border-color);
+    transition: background 0.2s ease;
+}
+
+.spec-ribbon-item:last-child {
+    border-right: none;
+}
+
+.spec-ribbon-item:hover {
+    background: var(--bg-surface);
+}
+
+.spec-ribbon-icon {
+    width: 22px;
+    height: 22px;
+    color: var(--primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.spec-ribbon-val {
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    line-height: 1;
+}
+
+.spec-ribbon-lbl {
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
     color: var(--text-muted);
 }
 
-.agent-actions {
+/* ── Main Layout (2 Columns) ─────────────────────────────────────────────── */
+.detail-columns {
+    display: grid;
+    grid-template-columns: 1fr 380px;
+    gap: 3.5rem;
+    align-items: start;
+}
+
+.detail-body-col {
+    min-width: 0;
+}
+
+/* ── Architectural Section Blocks ────────────────────────────────────────── */
+.editorial-block {
+    margin-bottom: 3.5rem;
+    padding-bottom: 3rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.editorial-block:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.editorial-section-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 1.8rem;
+}
+
+.editorial-section-title {
+    font-size: 1.35rem;
+    font-weight: 800;
+    letter-spacing: -0.3px;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.editorial-number {
+    font-size: 0.85rem;
+    font-weight: 800;
+    color: var(--primary);
+    letter-spacing: 0.1em;
+    font-family: var(--font-heading);
+}
+
+.editorial-tag {
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+}
+
+/* 01. Description text */
+.editorial-text {
+    font-size: 1.05rem;
+    line-height: 1.9;
+    color: var(--text-secondary);
+    font-weight: 400;
+}
+
+/* 02. Tecimob Specs Table */
+.tecimob-data-table {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0 2.5rem;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    padding: 1.75rem 2rem;
+}
+
+.data-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.85rem 0;
+    border-bottom: 1px solid var(--border-color);
+    font-size: 0.88rem;
+}
+
+.data-row:last-child,
+.data-row:nth-last-child(2) {
+    border-bottom: none;
+}
+
+.data-key {
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+.data-value {
+    font-weight: 700;
+    color: var(--text-primary);
+    text-align: right;
+}
+
+.data-value.accent {
+    color: var(--primary);
+}
+
+/* 03. Amenities Panels */
+.amenities-split {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+}
+
+.amenity-panel {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    padding: 1.8rem;
+}
+
+.amenity-panel-heading {
+    font-size: 0.82rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--primary);
+    margin-bottom: 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding-bottom: 0.6rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.amenity-checklist {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.amenity-checklist li {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    font-size: 0.88rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.amenity-checklist li svg {
+    color: var(--primary);
+    flex-shrink: 0;
+}
+
+/* 05. Bank Financing Links */
+.fin-sim-box {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    padding: 2.2rem;
+}
+
+.bank-sim-card {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-color);
+    padding: 1.25rem 1.4rem;
+    text-decoration: none;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    transition: all 0.25s ease;
+}
+
+.bank-sim-card:hover {
+    border-color: var(--primary);
+    transform: translateY(-2px);
+    background: rgba(201, 172, 119, 0.04);
+}
+
+.bank-sim-card strong {
+    transition: color 0.2s ease;
+}
+
+.bank-sim-card:hover strong {
+    color: var(--primary);
+}
+
+/* 05. Map */
+.map-embed-wrapper {
+    width: 100%;
+    height: 340px;
+    background: #111;
+    border: 1px solid var(--border-color);
+    overflow: hidden;
+    position: relative;
+}
+
+.map-embed-wrapper iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+    filter: grayscale(80%) invert(90%) contrast(120%);
+}
+
+[data-theme="light"] .map-embed-wrapper iframe {
+    filter: none;
+}
+
+/* ── Sticky Sidebar ──────────────────────────────────────────────────────── */
+.detail-sidebar-col {
+    position: sticky;
+    top: 90px;
+}
+
+.sidebar-luxury-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    padding: 2.2rem 2rem;
+    margin-bottom: 1.5rem;
+}
+
+.sidebar-price-header {
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.sidebar-price-label {
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+}
+
+.sidebar-price-val {
+    font-size: 2.4rem;
+    font-weight: 900;
+    color: var(--primary);
+    font-family: var(--font-heading);
+    margin: 0.35rem 0 1rem 0;
+    line-height: 1;
+}
+
+.monthly-cost-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+    font-size: 0.85rem;
+}
+
+.cost-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    color: var(--text-secondary);
+}
+
+.cost-row.sum-total {
+    border-top: 1px dashed var(--border-color);
+    padding-top: 0.65rem;
+    margin-top: 0.35rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+/* Agent Card */
+.sidebar-agent-row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.sidebar-agent-avatar {
+    width: 64px;
+    height: 64px;
+    background: var(--primary);
+    color: #0b0f19;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 900;
+    font-size: 1.35rem;
+    flex-shrink: 0;
+    overflow: hidden;
+}
+
+.sidebar-agent-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.sidebar-agent-name {
+    font-weight: 800;
+    font-size: 1.05rem;
+    color: var(--text-primary);
+    margin-bottom: 0.15rem;
+}
+
+.sidebar-agent-creci {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--primary);
+    letter-spacing: 0.05em;
+}
+
+.sidebar-agent-spec {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+}
+
+/* Sidebar CTA Buttons */
+.sidebar-cta-stack {
     display: flex;
     flex-direction: column;
     gap: 0.75rem;
     margin-bottom: 1.5rem;
 }
 
-.agent-contacts {
-    border-top: 1px solid var(--border-color);
-    padding-top: 1rem;
+.btn-luxury-wa {
+    background: #25D366;
+    color: #fff;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.65rem;
+    padding: 0.95rem 1.25rem;
     font-size: 0.85rem;
-    color: var(--text-secondary);
+    font-weight: 800;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    box-shadow: 0 4px 20px rgba(37, 211, 102, 0.3);
 }
 
-.agent-contacts p {
-    margin-bottom: 0.5rem;
+.btn-luxury-wa:hover {
+    background: #1eb857;
+    box-shadow: 0 6px 28px rgba(37, 211, 102, 0.55);
+    color: #fff;
 }
 
-/* Related Properties */
-.related-section {
-    margin-top: 5rem;
+.sidebar-contact-direct {
     border-top: 1px solid var(--border-color);
-    padding-top: 3rem;
+    padding-top: 1.1rem;
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
 }
 
-.related-section h3 {
+.sidebar-contact-direct a {
+    color: var(--text-secondary);
+    text-decoration: none;
+}
+
+.sidebar-contact-direct a:hover {
+    color: var(--primary);
+}
+
+/* ── Fullscreen Lightbox ─────────────────────────────────────────────────── */
+.lightbox-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 99999;
+    background: rgba(5, 7, 12, 0.96);
+    backdrop-filter: blur(15px);
+    display: none;
+    flex-direction: column;
+    justify-content: space-between;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.lightbox-modal.active {
+    display: flex;
+    opacity: 1;
+}
+
+.lightbox-topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.25rem 2.5rem;
+    z-index: 10;
+    color: #fff;
+}
+
+.lightbox-counter {
+    font-size: 0.85rem;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    color: var(--primary);
+}
+
+.lightbox-close-btn {
+    background: none;
+    border: none;
+    color: #fff;
     font-size: 1.8rem;
-    margin-bottom: 2rem;
+    cursor: pointer;
+    padding: 0.25rem;
+    line-height: 1;
+    transition: color 0.2s ease, transform 0.2s ease;
 }
 
-/* Financing Calc */
-.calc-form-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1rem;
+.lightbox-close-btn:hover {
+    color: var(--primary);
+    transform: rotate(90deg);
 }
 
-/* Responsive */
+.lightbox-stage {
+    flex: 1;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem 5rem;
+    min-height: 0;
+}
+
+.lightbox-stage img {
+    max-width: 90vw;
+    max-height: 75vh;
+    object-fit: contain;
+    transition: opacity 0.25s ease;
+    box-shadow: 0 12px 48px rgba(0, 0, 0, 0.9);
+}
+
+.lightbox-nav-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #fff;
+    width: 52px;
+    height: 52px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    z-index: 10;
+}
+
+.lightbox-nav-btn:hover {
+    background: var(--primary);
+    color: #000;
+    border-color: var(--primary);
+}
+
+.lightbox-nav-prev { left: 1.5rem; }
+.lightbox-nav-next { right: 1.5rem; }
+
+.lightbox-thumbs-bar {
+    padding: 1.25rem 2rem;
+    display: flex;
+    gap: 0.6rem;
+    overflow-x: auto;
+    justify-content: center;
+    z-index: 10;
+}
+
+.lightbox-thumb-btn {
+    width: 68px;
+    height: 48px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: #000;
+    cursor: pointer;
+    padding: 0;
+    flex-shrink: 0;
+    opacity: 0.45;
+    transition: all 0.2s ease;
+}
+
+.lightbox-thumb-btn img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.lightbox-thumb-btn.active,
+.lightbox-thumb-btn:hover {
+    opacity: 1;
+    border-color: var(--primary);
+}
+
+/* ── Responsive Queries ──────────────────────────────────────────────────── */
 @media (max-width: 1024px) {
-    .detail-content-grid {
+    .detail-columns {
         grid-template-columns: 1fr;
+        gap: 3rem;
     }
 
-    .agent-sidebar {
+    .detail-sidebar-col {
         position: static;
     }
 }
 
 @media (max-width: 768px) {
-    .detail-photo-grid {
+    .detail-main-header {
         grid-template-columns: 1fr;
-        height: auto;
+        gap: 1.5rem;
     }
 
-    .detail-photo-main {
-        height: 280px;
-    }
-
-    .detail-photo-side {
-        grid-template-rows: auto;
-        grid-template-columns: 1fr 1fr;
-        height: 160px;
-    }
-
-    .detail-title-bar {
-        flex-direction: column;
+    .detail-price-box {
+        text-align: left;
         align-items: flex-start;
     }
 
-    .detail-price-block {
-        text-align: left;
+    .cinema-stage {
+        height: 320px;
     }
 
-    .calc-form-grid {
+    .detail-specs-ribbon {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .spec-ribbon-item {
+        border-right: 1px solid var(--border-color);
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .tecimob-data-table {
+        grid-template-columns: 1fr;
+        gap: 0;
+        padding: 1.25rem;
+    }
+
+    .amenities-split {
         grid-template-columns: 1fr;
     }
+
+    .sim-input-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .lightbox-stage {
+        padding: 0.5rem 1rem;
+    }
+
+    .lightbox-nav-btn {
+        width: 40px;
+        height: 40px;
+    }
+
+    .lightbox-nav-prev { left: 0.5rem; }
+    .lightbox-nav-next { right: 0.5rem; }
 }

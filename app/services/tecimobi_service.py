@@ -306,20 +306,30 @@ class TecimobService:
 
         # ── Comodidades (características + condomínio) ──
         condo_chars = item.get('condo_characteristics') or []
+        amenities_property = [c['title'] for c in characteristics if c.get('title') and not c.get('quantity')]
+        amenities_condo = [c['title'] for c in condo_chars if c.get('title') and not c.get('quantity')]
         all_chars = characteristics + condo_chars
         amenities = [c['title'] for c in all_chars if c.get('title') and not c.get('quantity')]
         if not amenities:
             amenities = ['Portaria 24h', 'Garagem Coberta']
+        if not amenities_property:
+            amenities_property = amenities[:4]
+        if not amenities_condo:
+            amenities_condo = amenities[4:] or ['Portaria 24h', 'Segurança']
 
         # ── Dados exclusivos do detalhe ───────────────
         description = ''
         condominium_price = 0.0
         iptu_price = 0.0
         is_financeable = False
+        accepts_exchange = False
         latitude = None
         longitude = None
         situation = ''
         condominium_name = ''
+        solar_position = item.get('solar_position') or ''
+        furnished = item.get('furniture_note') or ('Mobiliado' if item.get('has_furniture') else 'Não Mobiliado')
+        floor_number = item.get('floor') or ''
 
         if detailed:
             raw_desc = item.get('description') or ''
@@ -341,6 +351,7 @@ class TecimobService:
                 iptu_price = 0.0
 
             is_financeable = bool(item.get('is_financeable'))
+            accepts_exchange = bool(item.get('accepts_exchange') or item.get('permuta'))
             latitude = item.get('maps_latitude')
             longitude = item.get('maps_longitude')
             situation = item.get('situation') or ''
@@ -358,6 +369,7 @@ class TecimobService:
 
             # Tipologia
             'type': prop_type,
+            'subtype': item.get('subtype') or prop_type,
             'purpose': purpose,
             'status': item.get('status') or 'Disponível',
             'badge': situation or '',
@@ -371,24 +383,32 @@ class TecimobService:
             'latitude': latitude,
             'longitude': longitude,
 
-            # Preços
+            # Preços e Condições
             'price': numeric_price,
             'price_formatted': raw_price,
             'condo_fee': condominium_price,
             'iptu': iptu_price,
             'is_financeable': is_financeable,
+            'accepts_exchange': accepts_exchange,
             'condominium_name': condominium_name,
+            'furnished': furnished,
+            'solar_position': solar_position,
+            'floor_number': floor_number,
 
             # Características
             'area': area,
+            'area_total': area_total or area,
             'bedrooms': bedrooms,
             'suites': suites,
             'bathrooms': bathrooms,
             'garage': garage,
+            'garage_type': f"{garage} vaga{'s' if garage != 1 else ''}" if garage else 'Sem vaga',
 
             # Conteúdo
             'description': description,
             'amenities': amenities,
+            'amenities_property': amenities_property,
+            'amenities_condo': amenities_condo,
             'featured': False,
 
             # Imagens

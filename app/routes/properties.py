@@ -48,14 +48,30 @@ def list_properties():
         }
     )
 
-@properties_bp.route('/<int:property_id>')
+@properties_bp.route('/<property_id>')
 def detail(property_id):
     prop = PropertyRepository.get_by_id(property_id)
     if not prop:
         abort(404)
     
-    # Related properties (same type or neighborhood)
-    all_props = PropertyRepository.get_all()
-    related = [p for p in all_props if p['id'] != prop['id'] and (p['type'] == prop['type'] or p['city'] == prop['city'])][:3]
+    # Calculate price per square meter
+    price = prop.get('price', 0)
+    area = prop.get('area', 0)
+    price_per_sqm = (price / area) if (price and area and area > 0) else 0
 
-    return render_template('properties/detail.html', property=prop, related_properties=related)
+    # Total monthly cost estimation (Condomínio + IPTU)
+    condo = prop.get('condo_fee', 0) or 0
+    iptu = prop.get('iptu', 0) or 0
+    monthly_cost = condo + iptu
+
+    # Related properties (same type, city or purpose)
+    all_props = PropertyRepository.get_all()
+    related = [p for p in all_props if str(p.get('id')) != str(prop.get('id')) and (p.get('type') == prop.get('type') or p.get('city') == prop.get('city'))][:3]
+
+    return render_template(
+        'properties/detail.html',
+        property=prop,
+        related_properties=related,
+        price_per_sqm=price_per_sqm,
+        monthly_cost=monthly_cost
+    )
