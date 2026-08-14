@@ -1,0 +1,128 @@
+{% extends 'base.html' %}
+
+{% block title %}Contato | {{ site_name }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/pages/contact.css') }}">
+{% endblock %}
+
+{% block content %}
+
+<!-- ══ Contact Hero ═════════════════════════════════════════════════════ -->
+<section class="contact-hero section">
+    <div class="container">
+        <div class="section-header reveal">
+            <span class="badge badge-gold">FALE CONOSCO</span>
+            <h1>Estamos Prontos para Atendê-lo</h1>
+            <p>Preencha o formulário abaixo ou entre em contato direto pelo WhatsApp com nossos consultores.</p>
+            <div class="accent-line"></div>
+        </div>
+    </div>
+</section>
+
+<!-- ══ Contact Grid ════════════════════════════════════════════════════ -->
+<section class="section section-surface">
+    <div class="container">
+        <div class="contact-grid">
+
+            <!-- Contact Form -->
+            <div class="contact-form-card glass-card reveal">
+                <h3>Envie uma Mensagem</h3>
+                <form action="{{ url_for('main.contact') }}" method="POST">
+                    <div class="form-group">
+                        <label class="form-label">Nome Completo *</label>
+                        <input type="text" name="name" class="form-control" placeholder="Seu nome" required>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">E-mail *</label>
+                            <input type="email" name="email" class="form-control" placeholder="seuemail@exemplo.com" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Telefone / WhatsApp *</label>
+                            <input type="tel" name="phone" class="form-control" placeholder="(11) 99999-9999" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Assunto</label>
+                        <select name="subject" class="form-select">
+                            <option value="compra">Quero Comprar um Imóvel</option>
+                            <option value="venda">Quero Vender meu Imóvel</option>
+                            <option value="aluguel">Interesse em Locação</option>
+                            <option value="outros">Outros Assuntos</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Mensagem *</label>
+                        <textarea name="message" class="form-control" rows="4" placeholder="Como podemos ajudar você?" required></textarea>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-full btn-lg">
+                        📩 Enviar Mensagem
+                    </button>
+                </form>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="contact-sidebar">
+                <!-- Direct Channels -->
+                <div class="contact-info-card glass-card reveal">
+                    <h3>Nossos Canais</h3>
+                    <ul class="contact-channels">
+                        <li>
+                            <span class="channel-icon">📞</span>
+                            <div>
+                                <strong>Telefone</strong>
+                                <span>{{ contact_phone }}</span>
+                            </div>
+                        </li>
+                        <li>
+                            <span class="channel-icon">💬</span>
+                            <div>
+                                <strong>WhatsApp</strong>
+                                <span>{{ contact_phone }}</span>
+                            </div>
+                        </li>
+                        <li>
+                            <span class="channel-icon">✉️</span>
+                            <div>
+                                <strong>E-mail</strong>
+                                <span>{{ contact_email }}</span>
+                            </div>
+                        </li>
+                        <li>
+                            <span class="channel-icon">📍</span>
+                            <div>
+                                <strong>Endereço</strong>
+                                <span>{{ contact_address }}</span>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Schedule Card -->
+                <div class="contact-schedule-card glass-card reveal">
+                    <div class="schedule-icon">🕐</div>
+                    <h4>Horário de Atendimento</h4>
+                    <ul class="schedule-list">
+                        <li><strong>Seg – Sex:</strong> 9h às 19h</li>
+                        <li><strong>Sábado:</strong> 9h às 14h</li>
+                        <li><strong>Domingo:</strong> Fechado</li>
+                    </ul>
+                </div>
+
+                <!-- Map placeholder -->
+                <div class="contact-map-card glass-card reveal">
+                    <div class="map-icon">🗺️</div>
+                    <h4>Nosso Escritório</h4>
+                    <p>Atendimento presencial com agendamento prévio e estacionamento com manobrista.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}

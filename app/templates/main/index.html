@@ -1,0 +1,294 @@
+{% extends 'base.html' %}
+
+{% block title %}Início | {{ site_name }} - {{ site_slogan }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/pages/home.css') }}">
+{% endblock %}
+
+{% block content %}
+
+<!-- ══ Hero Section - Video Carousel ════════════════════════════════════ -->
+<section class="hero-section" id="hero-slider">
+    <div class="hero-video-wrapper">
+        <video class="hero-video active" autoplay muted playsinline preload="auto" data-index="0"
+               poster="{{ url_for('static', filename='img/hero-poster.jpg') }}">
+            <source src="{{ url_for('static', filename='video/hero.mp4') }}" type="video/mp4">
+        </video>
+        <video class="hero-video" muted playsinline preload="auto" data-index="1">
+            <source src="{{ url_for('static', filename='video/hero2.mp4') }}" type="video/mp4">
+        </video>
+        <video class="hero-video" muted playsinline preload="auto" data-index="2">
+            <source src="{{ url_for('static', filename='video/hero3.mp4') }}" type="video/mp4">
+        </video>
+    </div>
+
+    <div class="hero-overlay"></div>
+
+    <div class="hero-content">
+        <div class="container">
+
+            <div class="hero-text-block">
+                <p class="hero-eyebrow">Imobiliária de Alto Padrão — São Paulo</p>
+
+                <h1 class="hero-title">
+                    Exclusividade.<br>
+                    <span class="hero-title-accent">Patrimônio.</span><br>
+                    Sofisticação.
+                </h1>
+
+                <p class="hero-subtitle">
+                    Imóveis selecionados nas regiões mais valorizadas.<br>
+                    Atendimento discreto. Negociação com inteligência.
+                </p>
+            </div>
+
+            <!-- Search Bar compacta e limpa -->
+            <div class="hero-search-bar">
+                <form action="{{ url_for('properties.list_properties') }}" method="GET" class="hero-form">
+
+                    <div class="hero-tab-row">
+                        <button type="button" class="hero-tab active" onclick="setSearchPurpose('Comprar', this)">Comprar</button>
+                        <button type="button" class="hero-tab"        onclick="setSearchPurpose('Alugar', this)">Alugar</button>
+                        <input type="hidden" name="purpose" id="search-purpose" value="Venda">
+                    </div>
+
+                    <div class="hero-fields">
+                        <div class="hero-field">
+                            <label>Localização</label>
+                            <input type="text" name="q" placeholder="Bairro, cidade ou condomínio...">
+                        </div>
+                        <div class="hero-divider"></div>
+                        <div class="hero-field">
+                            <label>Tipo</label>
+                            <select name="type">
+                                <option value="">Qualquer tipo</option>
+                                {% for t in types %}
+                                    <option value="{{ t }}">{{ t }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="hero-divider"></div>
+                        <div class="hero-field">
+                            <label>Cidade</label>
+                            <select name="city">
+                                <option value="">Todas</option>
+                                {% for c in cities %}
+                                    <option value="{{ c }}">{{ c }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <button type="submit" class="hero-search-btn">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="square"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                            Buscar
+                        </button>
+                    </div>
+
+                </form>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Video Carousel Controls -->
+    <div class="hero-video-controls">
+        <div class="hero-indicators">
+            <button class="indicator-btn active" data-slide="0" aria-label="Vídeo 1" title="Vídeo 1">
+                <span class="indicator-number">01</span>
+                <span class="indicator-bar"><span class="indicator-progress"></span></span>
+            </button>
+            <button class="indicator-btn" data-slide="1" aria-label="Vídeo 2" title="Vídeo 2">
+                <span class="indicator-number">02</span>
+                <span class="indicator-bar"><span class="indicator-progress"></span></span>
+            </button>
+            <button class="indicator-btn" data-slide="2" aria-label="Vídeo 3" title="Vídeo 3">
+                <span class="indicator-number">03</span>
+                <span class="indicator-bar"><span class="indicator-progress"></span></span>
+            </button>
+        </div>
+
+        <div class="hero-nav-actions">
+            <button class="hero-ctrl-btn" id="hero-prev-btn" aria-label="Vídeo anterior" title="Vídeo anterior">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="square"><polyline points="15 18 9 12 15 6"></polyline></svg>
+            </button>
+            <button class="hero-ctrl-btn" id="hero-play-pause-btn" aria-label="Pausar vídeo" title="Pausar vídeo">
+                <svg class="icon-pause" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><rect x="5" y="4" width="4" height="16"/><rect x="15" y="4" width="4" height="16"/></svg>
+                <svg class="icon-play" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="display:none;"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            </button>
+            <button class="hero-ctrl-btn" id="hero-next-btn" aria-label="Próximo vídeo" title="Próximo vídeo">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="square"><polyline points="9 18 15 12 9 6"></polyline></svg>
+            </button>
+        </div>
+    </div>
+
+    <div class="hero-scroll-hint">
+        <span class="scroll-line"></span>
+        <span class="scroll-label">Role</span>
+    </div>
+</section>
+
+
+<!-- ══ Featured Properties ══════════════════════════════════════════════ -->
+<section class="section">
+    <div class="container">
+        <div class="section-header-flex reveal">
+            <div>
+                <span class="badge badge-emerald">SELEÇÃO EXCLUSIVA</span>
+                <h2>Imóveis em Destaque</h2>
+            </div>
+            <a href="{{ url_for('properties.list_properties') }}" class="btn btn-outline">Ver Todo o Catálogo &rarr;</a>
+        </div>
+
+        <div class="properties-grid">
+            {% for p in featured_properties %}
+                <div class="property-card reveal">
+                    <div class="card-img-wrapper">
+                        <div class="card-badges">
+                            <span class="badge badge-gold">{{ p.purpose }}</span>
+                            {% if p.badge %}
+                                <span class="badge badge-blue">{{ p.badge }}</span>
+                            {% endif %}
+                        </div>
+                        <button class="card-favorite-btn" data-id="{{ p.id }}" title="Salvar Favorito">❤️</button>
+                        <img src="{{ url_for('static', filename='img/' + p.image) }}" alt="{{ p.title }}" loading="lazy">
+                    </div>
+                    <div class="card-body">
+                        <div class="card-location">📍 {{ p.neighborhood }}, {{ p.city }} - {{ p.state }}</div>
+                        <h3 class="card-title">
+                            <a href="{{ url_for('properties.detail', property_id=p.id) }}">{{ p.title }}</a>
+                        </h3>
+                        <div class="card-specs">
+                            <div class="card-spec-item">📐 {{ p.area|area_format }}</div>
+                            <div class="card-spec-item">🛏️ {{ p.bedrooms }} dorms</div>
+                            <div class="card-spec-item">🛁 {{ p.bathrooms }} banhos</div>
+                            <div class="card-spec-item">🚗 {{ p.garage }} vagas</div>
+                        </div>
+                        <div class="card-footer">
+                            <div class="card-price-box">
+                                <span class="card-price-label">Valor</span>
+                                <span class="card-price-val">{{ p.price|currency }}</span>
+                            </div>
+                            <a href="{{ url_for('properties.detail', property_id=p.id) }}" class="btn btn-primary btn-sm">Ver Detalhes</a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- ══ Differentials Section ════════════════════════════════════════════ -->
+<section class="section section-surface" id="diff-three-section">
+    <div class="container">
+        <div class="section-header reveal">
+            <span class="badge badge-gold">POR QUE A 7X IMÓVEIS?</span>
+            <h2>Diferenciais que Garantem o Melhor Negócio</h2>
+            <div class="accent-line"></div>
+        </div>
+
+        <div class="differentials-grid">
+            <div class="differential-card glass-card reveal">
+                <div class="differential-icon">🏛️</div>
+                <h3>Curadoria Rigorosa</h3>
+                <p>Analisamos minuciosamente a documentação, infraestrutura e potencial de valorização de cada imóvel do portfólio.</p>
+            </div>
+
+            <div class="differential-card glass-card reveal">
+                <div class="differential-icon">🤝</div>
+                <h3>Atendimento Personalizado</h3>
+                <p>Corretores especializados por região e perfil de imóvel para um acompanhamento discreto e sob medida.</p>
+            </div>
+
+            <div class="differential-card glass-card reveal">
+                <div class="differential-icon">⚡</div>
+                <h3>Agilidade Jurídica</h3>
+                <p>Depto. jurídico interno dedicado para garantir segurança em todas as fases da negociação contratual.</p>
+            </div>
+
+            <div class="differential-card glass-card reveal">
+                <div class="differential-icon">📊</div>
+                <h3>Análise de Mercado</h3>
+                <p>Relatórios exclusivos de valorização e rentabilidade para investidores exigentes e informados.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ══ Testimonials Section ═════════════════════════════════════════════ -->
+<section class="section">
+    <div class="container">
+        <div class="section-header reveal">
+            <span class="badge badge-gold">DEPOIMENTOS</span>
+            <h2>O Que Nossos Clientes Dizem</h2>
+            <div class="accent-line"></div>
+        </div>
+
+        <div class="testimonials-grid">
+            <div class="testimonial-card reveal">
+                <div class="stars">★★★★★</div>
+                <p class="testimonial-text">Comprei meu apartamento no Itaim com a 7X e a experiência foi excepcional. O Ricardo entendeu exatamente o que procurávamos e encontrou o imóvel perfeito.</p>
+                <div class="testimonial-author">
+                    <div class="testimonial-avatar">M</div>
+                    <div>
+                        <div class="testimonial-name">Marina Santos</div>
+                        <div class="testimonial-role">Compradora – Itaim Bibi</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="testimonial-card reveal">
+                <div class="stars">★★★★★</div>
+                <p class="testimonial-text">A equipe jurídica da 7X foi impecável na negociação da minha cobertura. Tudo foi resolvido de forma rápida, transparente e profissional.</p>
+                <div class="testimonial-author">
+                    <div class="testimonial-avatar">P</div>
+                    <div>
+                        <div class="testimonial-name">Paulo Vieira</div>
+                        <div class="testimonial-role">Investidor – Pinheiros</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="testimonial-card reveal">
+                <div class="stars">★★★★★</div>
+                <p class="testimonial-text">Vendemos nossa casa em Alphaville em tempo recorde. A 7X Imóveis trouxe compradores qualificados e o processo foi conduzido com total sigilo e seriedade.</p>
+                <div class="testimonial-author">
+                    <div class="testimonial-avatar">C</div>
+                    <div>
+                        <div class="testimonial-name">Carla Duarte</div>
+                        <div class="testimonial-role">Vendedora – Alphaville</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ══ CTA Section ══════════════════════════════════════════════════════ -->
+<section class="cta-section" id="cta-three-section">
+    <div class="container">
+        <div class="cta-inner reveal">
+            <span class="badge badge-gold">PRONTO PARA COMEÇAR?</span>
+            <h2>Encontre Seu Próximo Investimento Imobiliário</h2>
+            <p>Agende uma conversa exclusiva com nossos consultores e descubra oportunidades selecionadas para o seu perfil.</p>
+            <div class="cta-buttons">
+                <a href="{{ url_for('main.contact') }}" class="btn btn-primary btn-lg">📩 Fale com um Consultor</a>
+                <a href="{{ url_for('properties.list_properties') }}" class="btn btn-outline btn-lg">Ver Catálogo Completo</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}
+
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/hero_slider.js') }}"></script>
+<script>
+function setSearchPurpose(purposeLabel, btnElement) {
+    document.querySelectorAll('.hero-tab').forEach(btn => btn.classList.remove('active'));
+    btnElement.classList.add('active');
+    document.getElementById('search-purpose').value = purposeLabel === 'Comprar' ? 'Venda' : 'Aluguel';
+}
+</script>
+{% endblock %}
+

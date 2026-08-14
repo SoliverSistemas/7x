@@ -1,0 +1,230 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ property.title }} | {{ site_name }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/pages/property_detail.css') }}">
+{% endblock %}
+
+{% block content %}
+<section style="padding: 3rem 0;">
+    <div class="container">
+        <!-- Breadcrumb & Title Bar -->
+        <div style="margin-bottom: 2rem;">
+            <div style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 0.5rem;">
+                <a href="{{ url_for('main.index') }}">Início</a> / 
+                <a href="{{ url_for('properties.list_properties') }}">Imóveis</a> / 
+                <span>{{ property.title }}</span>
+            </div>
+            <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+                <div>
+                    <div style="display: flex; gap: 0.5rem; margin-bottom: 0.5rem;">
+                        <span class="badge badge-gold">{{ property.purpose }}</span>
+                        <span class="badge badge-blue">{{ property.type }}</span>
+                        {% if property.badge %}
+                            <span class="badge badge-emerald">{{ property.badge }}</span>
+                        {% endif %}
+                    </div>
+                    <h1 style="font-size: clamp(1.8rem, 3vw, 2.5rem);">{{ property.title }}</h1>
+                    <p style="color: var(--text-secondary); margin-top: 0.25rem;">📍 {{ property.address }} - {{ property.neighborhood }}, {{ property.city }}/{{ property.state }}</p>
+                </div>
+                <div style="text-align: right;">
+                    <span style="font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase;">Valor de {{ property.purpose }}</span>
+                    <h2 style="font-size: 2.5rem; color: var(--primary);">{{ property.price|currency }}</h2>
+                    {% if property.condo_fee > 0 %}
+                        <p style="font-size: 0.85rem; color: var(--text-secondary);">Condomínio: {{ property.condo_fee|currency }} / mês</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Photo Showcase -->
+        <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1rem; height: 480px; margin-bottom: 3rem; border-radius: var(--radius-lg); overflow: hidden;">
+            <div style="height: 100%; position: relative;">
+                <img src="{{ url_for('static', filename='img/' + property.image) }}" alt="{{ property.title }}" style="width: 100%; height: 100%; object-fit: cover;">
+            </div>
+            <div style="display: grid; grid-template-rows: 1fr 1fr; gap: 1rem; height: 100%;">
+                {% for img in property.gallery[1:3] %}
+                    <div style="height: 100%; position: relative; overflow: hidden;">
+                        <img src="{{ url_for('static', filename='img/' + img) }}" alt="Galeria" style="width: 100%; height: 100%; object-fit: cover;">
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Content Layout: Details + Sidebar -->
+        <div style="display: grid; grid-template-columns: 1fr 360px; gap: 3rem; align-items: start;">
+            <div>
+                <!-- Key Specs Grid -->
+                <div style="background: var(--bg-card); padding: 2rem; border-radius: var(--radius-lg); border: 1px solid var(--border-color); margin-bottom: 2.5rem;">
+                    <h3 style="margin-bottom: 1.5rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.75rem;">Ficha Técnica do Imóvel</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 1.5rem; text-align: center;">
+                        <div style="background: var(--bg-surface); padding: 1rem; border-radius: var(--radius-md);">
+                            <span style="font-size: 1.5rem;">📐</span>
+                            <div style="font-weight: 700; font-size: 1.1rem; margin-top: 0.25rem;">{{ property.area|area_format }}</div>
+                            <span style="font-size: 0.8rem; color: var(--text-muted);">Área Útil</span>
+                        </div>
+                        <div style="background: var(--bg-surface); padding: 1rem; border-radius: var(--radius-md);">
+                            <span style="font-size: 1.5rem;">🛏️</span>
+                            <div style="font-weight: 700; font-size: 1.1rem; margin-top: 0.25rem;">{{ property.bedrooms }}</div>
+                            <span style="font-size: 0.8rem; color: var(--text-muted);">Dormitórios</span>
+                        </div>
+                        <div style="background: var(--bg-surface); padding: 1rem; border-radius: var(--radius-md);">
+                            <span style="font-size: 1.5rem;">🚿</span>
+                            <div style="font-weight: 700; font-size: 1.1rem; margin-top: 0.25rem;">{{ property.suites }}</div>
+                            <span style="font-size: 0.8rem; color: var(--text-muted);">Suítes</span>
+                        </div>
+                        <div style="background: var(--bg-surface); padding: 1rem; border-radius: var(--radius-md);">
+                            <span style="font-size: 1.5rem;">🛁</span>
+                            <div style="font-weight: 700; font-size: 1.1rem; margin-top: 0.25rem;">{{ property.bathrooms }}</div>
+                            <span style="font-size: 0.8rem; color: var(--text-muted);">Banheiros</span>
+                        </div>
+                        <div style="background: var(--bg-surface); padding: 1rem; border-radius: var(--radius-md);">
+                            <span style="font-size: 1.5rem;">🚗</span>
+                            <div style="font-weight: 700; font-size: 1.1rem; margin-top: 0.25rem;">{{ property.garage }}</div>
+                            <span style="font-size: 0.8rem; color: var(--text-muted);">Vagas de Garagem</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Description -->
+                <div style="margin-bottom: 2.5rem;">
+                    <h3 style="margin-bottom: 1rem;">Descrição Detalhada</h3>
+                    <p style="color: var(--text-secondary); line-height: 1.8; font-size: 1.05rem;">
+                        {{ property.description }}
+                    </p>
+                </div>
+
+                <!-- Amenities List -->
+                <div style="margin-bottom: 2.5rem;">
+                    <h3 style="margin-bottom: 1.25rem;">Comodidades & Infraestrutura</h3>
+                    <div style="display: flex; flex-wrap: wrap; gap: 0.75rem;">
+                        {% for item in property.amenities %}
+                            <span style="background: var(--bg-surface); border: 1px solid var(--border-color); padding: 0.6rem 1.25rem; border-radius: var(--radius-full); font-size: 0.9rem; color: var(--text-primary);">
+                                ✓ {{ item }}
+                            </span>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Mortgage Calculator Component -->
+                <div class="mortgage-box">
+                    <h3 style="margin-bottom: 1rem;">Simulador de Financiamento Habitação</h3>
+                    <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 1.5rem;">Calcule uma estimativa de parcelas para este imóvel.</p>
+                    
+                    <form id="financing-calc-form">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                            <div class="form-group">
+                                <label class="form-label">Valor do Imóvel (R$)</label>
+                                <input type="number" id="calc-prop-val" class="form-control" value="{{ property.price }}" readonly>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Valor de Entrada (R$)</label>
+                                <input type="number" id="calc-down-payment" class="form-control" value="{{ property.price * 0.20 }}" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Prazo de Financiamento</label>
+                            <select id="calc-years" class="form-select">
+                                <option value="30">30 Anos (360 meses)</option>
+                                <option value="20">20 Anos (240 meses)</option>
+                                <option value="15">15 Anos (180 meses)</option>
+                            </select>
+                        </div>
+
+                        <button type="submit" class="btn btn-secondary btn-full">
+                            🧮 Simular Financiamento
+                        </button>
+                    </form>
+
+                    <div id="calc-results-box" class="calc-results" style="display: none;">
+                        <h4 style="color: var(--primary); margin-bottom: 1rem;">Resultado da Simulação</h4>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; font-size: 0.95rem;">
+                            <div>
+                                <span style="color: var(--text-muted); font-size: 0.8rem;">Parcela Mensal Estimada:</span>
+                                <div id="res-installment" style="font-weight: 800; font-size: 1.3rem; color: #34d399;">R$ 0,00</div>
+                            </div>
+                            <div>
+                                <span style="color: var(--text-muted); font-size: 0.8rem;">Valor Financiado:</span>
+                                <div id="res-financed" style="font-weight: 700;">R$ 0,00</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar Agent & Actions -->
+            <aside style="position: sticky; top: 100px;">
+                <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 2rem; margin-bottom: 2rem;">
+                    <h4 style="margin-bottom: 1.25rem; font-size: 1.1rem;">Corretor Responsável</h4>
+                    
+                    <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem;">
+                        <div style="width: 56px; height: 56px; border-radius: 50%; background: var(--primary); display: flex; align-items: center; justify-content: center; font-weight: 800; color: #000; font-size: 1.2rem;">
+                            {{ property.agent.name[0] }}
+                        </div>
+                        <div>
+                            <div style="font-weight: 700; font-size: 1.05rem;">{{ property.agent.name }}</div>
+                            <span style="font-size: 0.85rem; color: var(--text-muted);">Especialista de Região</span>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 1.5rem;">
+                        <a href="https://wa.me/5511999997777?text=Olá,%20tenho%20interesse%20no%20imóvel%20{{ property.title }}" target="_blank" class="btn btn-primary btn-full">
+                            💬 Falar no WhatsApp
+                        </a>
+                        <button class="btn btn-outline btn-full" data-modal-target="scheduleVisitModal" onclick="document.getElementById('modal-property-id').value='{{ property.id }}'">
+                            📅 Agendar Visita Guiada
+                        </button>
+                    </div>
+
+                    <div style="border-top: 1px solid var(--border-color); padding-top: 1rem; font-size: 0.85rem; color: var(--text-secondary);">
+                        <p style="margin-bottom: 0.5rem;">📞 {{ property.agent.phone }}</p>
+                        <p>✉️ {{ property.agent.email }}</p>
+                    </div>
+                </div>
+            </aside>
+        </div>
+
+        <!-- Related Properties Section -->
+        {% if related_properties %}
+            <div style="margin-top: 5rem; border-top: 1px solid var(--border-color); padding-top: 3rem;">
+                <h3 style="font-size: 1.8rem; margin-bottom: 2rem;">Imóveis Semelhantes</h3>
+                <div class="properties-grid">
+                    {% for p in related_properties %}
+                        <div class="property-card">
+                            <div class="card-img-wrapper">
+                                <div class="card-badges">
+                                    <span class="badge badge-gold">{{ p.purpose }}</span>
+                                </div>
+                                <img src="{{ url_for('static', filename='img/' + p.image) }}" alt="{{ p.title }}" loading="lazy">
+                            </div>
+                            <div class="card-body">
+                                <div class="card-location">📍 {{ p.neighborhood }}, {{ p.city }}</div>
+                                <h3 class="card-title">
+                                    <a href="{{ url_for('properties.detail', property_id=p.id) }}">{{ p.title }}</a>
+                                </h3>
+                                <div class="card-specs">
+                                    <div class="card-spec-item">📐 {{ p.area|area_format }}</div>
+                                    <div class="card-spec-item">🛏️ {{ p.bedrooms }} dorms</div>
+                                    <div class="card-spec-item">🚗 {{ p.garage }} vagas</div>
+                                </div>
+                                <div class="card-footer">
+                                    <div class="card-price-box">
+                                        <span class="card-price-val">{{ p.price|currency }}</span>
+                                    </div>
+                                    <a href="{{ url_for('properties.detail', property_id=p.id) }}" class="btn btn-primary btn-sm">Ver</a>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/properties.js') }}"></script>
+{% endblock %}

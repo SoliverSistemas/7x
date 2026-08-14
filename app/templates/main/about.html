@@ -1,0 +1,135 @@
+{% extends 'base.html' %}
+
+{% block title %}Sobre Nós | {{ site_name }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/pages/about.css') }}">
+{% endblock %}
+
+{% block content %}
+
+<!-- ══ Page Hero ════════════════════════════════════════════════════════ -->
+<section class="about-hero section">
+    <div class="container">
+        <div class="about-hero-inner reveal">
+            <span class="badge badge-gold">NOSSA HISTÓRIA</span>
+            <h1>Excelência &amp; Inteligência no Mercado Imobiliário</h1>
+            <p class="about-hero-text">
+                Fundada com o propósito de transformar a experiência de compra, venda e locação de imóveis de alto padrão, a <strong>7X Imóveis</strong> une tecnologia, inteligência de mercado e atendimento verdadeiramente humano.
+            </p>
+            <div class="accent-line"></div>
+        </div>
+    </div>
+</section>
+
+<!-- ══ Missão & Valores ════════════════════════════════════════════════ -->
+<section class="section section-surface">
+    <div class="container">
+        <div class="about-grid">
+            <div class="about-text reveal">
+                <span class="badge badge-emerald">NOSSO PROPÓSITO</span>
+                <h2>Missão &amp; Visão</h2>
+                <p>
+                    Nossa missão é proporcionar tranquilidade e máxima rentabilidade aos nossos clientes através de um atendimento transparente, sigiloso e eficiente.
+                </p>
+                <p>
+                    Buscamos ser referência nacional no mercado imobiliário premium, conectando compradores exigentes às propriedades mais exclusivas do país.
+                </p>
+            </div>
+
+            <div class="values-card glass-card reveal">
+                <h3>Nossos Valores</h3>
+                <ul class="values-list">
+                    <li>
+                        <span class="values-icon">✨</span>
+                        <div>
+                            <strong>Ética &amp; Transparência</strong>
+                            <span>Informações claras em cada etapa.</span>
+                        </div>
+                    </li>
+                    <li>
+                        <span class="values-icon">🏅</span>
+                        <div>
+                            <strong>Excelência no Atendimento</strong>
+                            <span>Consultores especializados por região.</span>
+                        </div>
+                    </li>
+                    <li>
+                        <span class="values-icon">🔐</span>
+                        <div>
+                            <strong>Segurança Jurídica</strong>
+                            <span>Garantia total em todas as transações.</span>
+                        </div>
+                    </li>
+                    <li>
+                        <span class="values-icon">💡</span>
+                        <div>
+                            <strong>Inovação Tecnológica</strong>
+                            <span>Plataforma moderna e responsiva.</span>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ══ Timeline ═════════════════════════════════════════════════════════ -->
+<section class="section">
+    <div class="container">
+        <div class="section-header reveal">
+            <span class="badge badge-gold">NOSSA TRAJETÓRIA</span>
+            <h2>Uma Jornada de Crescimento</h2>
+            <div class="accent-line"></div>
+        </div>
+
+        <div class="timeline">
+            <div class="timeline-item reveal">
+                <div class="timeline-marker"></div>
+                <div class="timeline-content glass-card">
+                    <span class="timeline-year">2018</span>
+                    <h3>Fundação</h3>
+                    <p>Início das operações com foco exclusivo no mercado de imóveis de alto padrão em São Paulo.</p>
+                </div>
+            </div>
+            <div class="timeline-item reveal">
+                <div class="timeline-marker"></div>
+                <div class="timeline-content glass-card">
+                    <span class="timeline-year">2020</span>
+                    <h3>Expansão Digital</h3>
+                    <p>Lançamento da plataforma digital com tour virtual 360° e atendimento omnichannel.</p>
+                </div>
+            </div>
+            <div class="timeline-item reveal">
+                <div class="timeline-marker"></div>
+                <div class="timeline-content glass-card">
+                    <span class="timeline-year">2022</span>
+                    <h3>R$ 500M em Vendas</h3>
+                    <p>Marco histórico de meio bilhão em transações, consolidando a marca no segmento premium.</p>
+                </div>
+            </div>
+            <div class="timeline-item reveal">
+                <div class="timeline-marker"></div>
+                <div class="timeline-content glass-card">
+                    <span class="timeline-year">2024</span>
+                    <h3>Referência Nacional</h3>
+                    <p>Expansão para novas regiões com rede de corretores especializados em todo o estado.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ══ CTA ══════════════════════════════════════════════════════════════ -->
+<section class="cta-section">
+    <div class="container">
+        <div class="cta-inner reveal">
+            <span class="badge badge-gold">JUNTE-SE A NÓS</span>
+            <h2>Quer Trabalhar com os Melhores?</h2>
+            <p>Conheça nossa cultura de excelência e faça parte de uma equipe que transforma vidas através do mercado imobiliário.</p>
+            <a href="{{ url_for('main.contact') }}" class="btn btn-primary btn-lg">📩 Entre em Contato</a>
+        </div>
+    </div>
+</section>
+
+{% endblock %}

@@ -1,0 +1,119 @@
+/* ==========================================================================
+   7X Imoveis - Dark / Light Theme
+   ORDEM IMPORTA: :root primeiro (dark padrao), light depois (sobrescreve)
+   ========================================================================== */
+
+/* ── DARK (padrao via :root) ─────────────────────────────────────────────── */
+:root,
+[data-theme="dark"] {
+    --bg-main:           #0f1113;
+    --bg-surface:        #171a1c;
+    --bg-surface-hover:  #1f2327;
+    --bg-card:           #131618;
+    --bg-glass:          rgba(23, 26, 28, 0.82);
+
+    --primary:           #c9ac77;
+    --primary-hover:     #b0935e;
+    --primary-glow:      rgba(201, 172, 119, 0.22);
+
+    --text-primary:      #ffffff;
+    --text-secondary:    #c4baa8;
+    --text-muted:        #6b6560;
+
+    --border-color:      rgba(201, 172, 119, 0.08);
+    --border-highlight:  rgba(201, 172, 119, 0.35);
+
+    --shadow-sm:         0 4px 6px -1px   rgba(0, 0, 0, 0.50);
+    --shadow-md:         0 10px 25px -5px rgba(0, 0, 0, 0.60);
+    --shadow-lg:         0 20px 40px -10px rgba(0, 0, 0, 0.80);
+    --shadow-glow:       0 0 28px rgba(201, 172, 119, 0.18);
+
+    --accent-blue:       #1f2327;
+    --accent-emerald:    #10b981;
+}
+
+/* ── LIGHT (sobrescreve dark — deve ficar DEPOIS no arquivo) ─────────────── */
+[data-theme="light"] {
+    --bg-main:           #ffffff;
+    --bg-surface:        #f2f5f7;
+    --bg-surface-hover:  #e6ebee;
+    --bg-card:           #ffffff;
+    --bg-glass:          rgba(255, 255, 255, 0.90);
+
+    --primary:           #c9ac77;
+    --primary-hover:     #b0935e;
+    --primary-glow:      rgba(201, 172, 119, 0.20);
+
+    --text-primary:      #000000;
+    --text-secondary:    #171a1c;
+    --text-muted:        #6b6560;
+
+    --border-color:      rgba(23, 26, 28, 0.10);
+    --border-highlight:  rgba(201, 172, 119, 0.50);
+
+    --shadow-sm:         0 4px 6px -1px   rgba(23, 26, 28, 0.06);
+    --shadow-md:         0 10px 25px -5px rgba(23, 26, 28, 0.10);
+    --shadow-lg:         0 20px 40px -10px rgba(23, 26, 28, 0.14);
+    --shadow-glow:       0 0 28px rgba(201, 172, 119, 0.18);
+
+    --accent-blue:       #171a1c;
+    --accent-emerald:    #2a6b4a;
+}
+
+/* ── Botao Toggle ───────────────────────────────────────────────────────── */
+.theme-toggle-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    background: transparent;
+    border: 1px solid var(--border-color);
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: border-color 0.25s ease, color 0.25s ease, background 0.25s ease;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.theme-toggle-btn:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+    background: rgba(201,172,119,0.08);
+}
+
+.theme-toggle-btn:active { transform: scale(0.92); }
+
+/* SVG icons crossfade */
+.theme-toggle-btn .icon-sun,
+.theme-toggle-btn .icon-moon {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin-top: -8px;
+    margin-left: -8px;
+    transition: opacity 0.3s ease, transform 0.35s cubic-bezier(0.34,1.56,0.64,1);
+}
+
+/* Dark mode: lua visível */
+[data-theme="dark"] .theme-toggle-btn .icon-moon,
+:root:not([data-theme]) .theme-toggle-btn .icon-moon {
+    opacity: 1;
+    transform: rotate(0deg) scale(1);
+}
+[data-theme="dark"] .theme-toggle-btn .icon-sun,
+:root:not([data-theme]) .theme-toggle-btn .icon-sun {
+    opacity: 0;
+    transform: rotate(90deg) scale(0.5);
+}
+
+/* Light mode: sol visível */
+[data-theme="light"] .theme-toggle-btn .icon-sun {
+    opacity: 1;
+    transform: rotate(0deg) scale(1);
+}
+[data-theme="light"] .theme-toggle-btn .icon-moon {
+    opacity: 0;
+    transform: rotate(-90deg) scale(0.5);
+}

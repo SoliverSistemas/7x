@@ -1,0 +1,60 @@
+/* ==========================================================================
+   7X Imoveis - Catalogo de Imoveis (properties/index.html)
+   ========================================================================== */
+
+/* ── Catalog Layout ─────────────────────────────────────────────────────── */
+.catalog-section {
+    padding-top: 3rem;
+}
+
+.catalog-header {
+    margin-bottom: 2rem;
+}
+
+.catalog-header h1 {
+    font-size: clamp(1.8rem, 3vw, 2.4rem);
+}
+
+.catalog-layout {
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    gap: 2rem;
+    align-items: start;
+}
+
+/* ── Filter Sidebar ─────────────────────────────────────────────────────── */
+.filter-sidebar h3 {
+    font-size: 1.15rem;
+}
+
+.price-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+}
+
+.mt-filter {
+    margin-top: 1rem;
+}
+
+/* ── Empty State ────────────────────────────────────────────────────────── */
+.empty-state {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 4rem 1rem;
+}
+
+.empty-state p {
+    color: var(--text-secondary);
+    margin-top: 0.5rem;
+}
+
+/* ── Responsive ─────────────────────────────────────────────────────────── */
+@media (max-width: 992px) {
+    .catalog-layout {
+        grid-template-columns: 1fr;
+    }
+    .filter-sidebar {
+        position: static;
+    }
+}

@@ -1,0 +1,150 @@
+{% extends 'base.html' %}
+
+{% block title %}Catálogo de Imóveis | {{ site_name }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/pages/properties.css') }}">
+{% endblock %}
+
+{% block content %}
+<section class="section catalog-section">
+    <div class="container">
+        <div class="catalog-header reveal">
+            <div>
+                <h1>Catálogo de Imóveis</h1>
+                <p class="text-secondary" id="results-count">{{ properties|length }} imóveis encontrados</p>
+            </div>
+        </div>
+
+        <div class="catalog-layout">
+            <!-- Filter Sidebar -->
+            <aside class="filter-sidebar reveal">
+                <div class="filter-sidebar-header">
+                    <h3>Filtros de Busca</h3>
+                    <a href="{{ url_for('properties.list_properties') }}" class="btn-ghost">Limpar</a>
+                </div>
+
+                <form id="catalog-filter-form" action="{{ url_for('properties.list_properties') }}" method="GET">
+                    <div class="form-group">
+                        <label class="form-label">Buscar por palavra-chave</label>
+                        <input type="text" name="q" class="form-control" placeholder="Ex: Vista, Suíte, Piscina..." value="{{ current_filters.query }}">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Finalidade</label>
+                        <select name="purpose" class="form-select">
+                            <option value="">Todas</option>
+                            <option value="Venda" {% if current_filters.purpose == 'Venda' %}selected{% endif %}>Venda</option>
+                            <option value="Aluguel" {% if current_filters.purpose == 'Aluguel' %}selected{% endif %}>Aluguel</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Tipo de Imóvel</label>
+                        <select name="type" class="form-select">
+                            <option value="">Todos</option>
+                            {% for t in types %}
+                                <option value="{{ t }}" {% if current_filters.type == t %}selected{% endif %}>{{ t }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Cidade</label>
+                        <select name="city" class="form-select">
+                            <option value="">Todas</option>
+                            {% for c in cities %}
+                                <option value="{{ c }}" {% if current_filters.city == c %}selected{% endif %}>{{ c }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="price-row">
+                        <div class="form-group">
+                            <label class="form-label">Preço Mín (R$)</label>
+                            <input type="number" name="min_price" class="form-control" placeholder="0" value="{{ current_filters.min_price }}">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Preço Máx (R$)</label>
+                            <input type="number" name="max_price" class="form-control" placeholder="Sem máx" value="{{ current_filters.max_price }}">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Mínimo de Dormitórios</label>
+                        <select name="bedrooms" class="form-select">
+                            <option value="">Qualquer</option>
+                            <option value="1" {% if current_filters.bedrooms == '1' %}selected{% endif %}>1+ Quartos</option>
+                            <option value="2" {% if current_filters.bedrooms == '2' %}selected{% endif %}>2+ Quartos</option>
+                            <option value="3" {% if current_filters.bedrooms == '3' %}selected{% endif %}>3+ Quartos</option>
+                            <option value="4" {% if current_filters.bedrooms == '4' %}selected{% endif %}>4+ Quartos</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Ordenar Por</label>
+                        <select name="sort" class="form-select">
+                            <option value="recent" {% if current_filters.sort == 'recent' %}selected{% endif %}>Mais Recentes</option>
+                            <option value="price-asc" {% if current_filters.sort == 'price-asc' %}selected{% endif %}>Menor Preço</option>
+                            <option value="price-desc" {% if current_filters.sort == 'price-desc' %}selected{% endif %}>Maior Preço</option>
+                            <option value="area-desc" {% if current_filters.sort == 'area-desc' %}selected{% endif %}>Maior Área</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-full mt-filter">
+                        🔍 Filtrar Imóveis
+                    </button>
+                </form>
+            </aside>
+
+            <!-- Properties Grid Container -->
+            <div class="properties-grid" id="properties-container">
+                {% if properties %}
+                    {% for p in properties %}
+                        <div class="property-card">
+                            <div class="card-img-wrapper">
+                                <div class="card-badges">
+                                    <span class="badge badge-gold">{{ p.purpose }}</span>
+                                    {% if p.badge %}
+                                        <span class="badge badge-blue">{{ p.badge }}</span>
+                                    {% endif %}
+                                </div>
+                                <button class="card-favorite-btn" data-id="{{ p.id }}" title="Salvar Favorito">❤️</button>
+                                <img src="{{ url_for('static', filename='img/' + p.image) }}" alt="{{ p.title }}" loading="lazy">
+                            </div>
+                            <div class="card-body">
+                                <div class="card-location">📍 {{ p.neighborhood }}, {{ p.city }} - {{ p.state }}</div>
+                                <h3 class="card-title">
+                                    <a href="{{ url_for('properties.detail', property_id=p.id) }}">{{ p.title }}</a>
+                                </h3>
+                                <div class="card-specs">
+                                    <div class="card-spec-item">📐 {{ p.area|area_format }}</div>
+                                    <div class="card-spec-item">🛏️ {{ p.bedrooms }} dorms</div>
+                                    <div class="card-spec-item">🛁 {{ p.bathrooms }} banhos</div>
+                                    <div class="card-spec-item">🚗 {{ p.garage }} vagas</div>
+                                </div>
+                                <div class="card-footer">
+                                    <div class="card-price-box">
+                                        <span class="card-price-label">Valor</span>
+                                        <span class="card-price-val">{{ p.price|currency }}</span>
+                                    </div>
+                                    <a href="{{ url_for('properties.detail', property_id=p.id) }}" class="btn btn-primary btn-sm">Ver Detalhes</a>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="empty-state">
+                        <h3>Nenhum imóvel encontrado</h3>
+                        <p>Tente ajustar os filtros ou pesquisar por outro termo.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/properties.js') }}"></script>
+{% endblock %}
