@@ -53,40 +53,88 @@ function renderProperties(properties, container) {
         return;
     }
 
+    const formatCurrency = (val) => {
+        if (!val && val !== 0) return '—';
+        return 'R$ ' + Number(val).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+    };
+
     container.innerHTML = properties.map(p => `
-        <div class="property-card">
+        <div class="property-card" data-href="/imoveis/${p.id}">
             <div class="card-img-wrapper">
                 <div class="card-badges">
-                    <span class="badge badge-gold">${p.purpose}</span>
+                    <span class="badge badge-gold">${p.purpose || ''}</span>
                     ${p.badge ? `<span class="badge badge-blue">${p.badge}</span>` : ''}
                 </div>
-                <button class="card-favorite-btn" data-id="${p.id}" title="Salvar Favorito">❤️</button>
+                <button class="card-favorite-btn" data-id="${p.id}" title="Salvar Favorito" aria-label="Salvar nos favoritos">
+                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                </button>
                 <img src="/static/img/${p.image}" alt="${p.title}" loading="lazy">
+                <div class="card-price-overlay">
+                    <span class="card-price-label">${p.purpose === 'Aluguel' ? 'Aluguel / mês' : 'Valor'}</span>
+                    <span class="card-price-val">${formatCurrency(p.price)}</span>
+                </div>
             </div>
             <div class="card-body">
-                <div class="card-location">📍 ${p.neighborhood}, ${p.city} - ${p.state}</div>
+                <div class="card-location">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                    ${p.neighborhood || ''}, ${p.city || ''}
+                </div>
                 <h3 class="card-title">
                     <a href="/imoveis/${p.id}">${p.title}</a>
                 </h3>
                 <div class="card-specs">
-                    <div class="card-spec-item">📐 ${p.area} m²</div>
-                    <div class="card-spec-item">🛏️ ${p.bedrooms} dorms</div>
-                    <div class="card-spec-item">🛁 ${p.bathrooms} banheiros</div>
-                    <div class="card-spec-item">🚗 ${p.garage} vagas</div>
+                    ${p.area ? `
+                    <div class="card-spec-item">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="14" height="14"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg>
+                        <span>${p.area} m²</span>
+                    </div>` : ''}
+                    ${p.bedrooms ? `
+                    <div class="card-spec-item">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="14" height="14"><path d="M3 14h18v6H3z"/><path d="M3 14V8a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v6"/><path d="M7 10h10"/></svg>
+                        <span>${p.bedrooms} dorms</span>
+                    </div>` : ''}
+                    ${p.suites ? `
+                    <div class="card-spec-item">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="14" height="14"><path d="M5 12H3l9-9 9 9h-2"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg>
+                        <span>${p.suites} suítes</span>
+                    </div>` : ''}
+                    ${p.garage ? `
+                    <div class="card-spec-item">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="14" height="14"><rect x="2" y="7" width="20" height="14"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+                        <span>${p.garage} vagas</span>
+                    </div>` : ''}
+                </div>
+                <div class="card-info-chips">
+                    ${p.is_financeable ? '<span class="card-chip">Financiável</span>' : ''}
+                    ${p.accepts_exchange ? '<span class="card-chip">Aceita Troca</span>' : ''}
+                    ${p.furnished && p.furnished !== 'Não mobiliado' ? '<span class="card-chip">Mobiliado</span>' : ''}
                 </div>
                 <div class="card-footer">
-                    <div class="card-price-box">
-                        <span class="card-price-label">Valor</span>
-                        <span class="card-price-val">R$ ${p.price.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</span>
-                    </div>
-                    <a href="/imoveis/${p.id}" class="btn btn-primary btn-sm">Ver Detalhes</a>
+                    ${p.condo_fee ? `
+                    <div style="font-size:0.72rem; color:var(--text-muted); line-height:1.3;">
+                        <span style="display:block; text-transform:uppercase; letter-spacing:0.05em;">Condomínio</span>
+                        <span style="font-weight:600; color:var(--text-secondary);">${formatCurrency(p.condo_fee)}</span>
+                    </div>` : '<div></div>'}
+                    <a href="/imoveis/${p.id}" class="card-cta-btn">
+                        Ver detalhes
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="12" height="12"><polyline points="9 18 15 12 9 6"/></svg>
+                    </a>
                 </div>
             </div>
         </div>
     `).join('');
 
-    // Re-bind favorite icons
-    initFavorites();
+    // Re-bind favorites & clickable cards after DOM update
+    if (typeof restoreAllFavoriteButtons === 'function') restoreAllFavoriteButtons();
+    if (typeof initFavorites === 'function') {
+        document.querySelectorAll('.card-favorite-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                if (typeof toggleFavorite === 'function') toggleFavorite(btn);
+            });
+        });
+    }
 }
 
 // Financing / Mortgage Calculator

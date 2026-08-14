@@ -83,14 +83,16 @@ function initScrollReveal() {
             gsap.from(cards, {
                 scrollTrigger: {
                     trigger: grid,
-                    start: 'top 85%',
-                    toggleActions: 'play none none none'
+                    start: 'top 95%',   // dispara cedo o suficiente para cards visíveis
+                    toggleActions: 'play none none none',
+                    once: true
                 },
-                y: 60,
+                y: 40,
                 opacity: 0,
-                duration: 0.7,
-                stagger: 0.15,
-                ease: 'power2.out'
+                duration: 0.6,
+                stagger: 0.1,
+                ease: 'power2.out',
+                clearProps: 'opacity,transform'  // libera estilos inline após animar
             });
         }
     });
