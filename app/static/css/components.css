@@ -123,6 +123,8 @@
     position: relative;
     box-shadow: 0 2px 12px rgba(0,0,0,0.08);
     will-change: transform;
+    cursor: pointer;
+    user-select: none;
 }
 
 /* Card-sheen — reflexo de luz injetado via JS */

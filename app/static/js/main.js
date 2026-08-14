@@ -7,6 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initFavorites();
     initModalEvents();
     autoHideAlerts();
+    initClickableCards();
 });
 
 // Mobile Navigation Toggle
@@ -142,5 +143,29 @@ function autoHideAlerts() {
     setTimeout(() => {
         document.querySelectorAll('.alert-toast').forEach(el => el.remove());
     }, 5000);
+}
+
+// Clickable Property Cards (Torna todo o card clicável)
+function initClickableCards() {
+    document.addEventListener('click', (e) => {
+        const card = e.target.closest('.property-card');
+        if (!card) return;
+
+        // Se clicou no botão de favoritar, não redireciona
+        if (e.target.closest('.card-favorite-btn')) {
+            return;
+        }
+
+        // Obtém o link de detalhes do imóvel
+        const detailLink = card.querySelector('.card-title a, .card-footer a, a[href*="/imoveis/"]');
+        if (detailLink && detailLink.href) {
+            // Suporte para Ctrl/Cmd/Botão do meio para abrir em nova aba
+            if (e.ctrlKey || e.metaKey || e.button === 1) {
+                window.open(detailLink.href, '_blank');
+            } else {
+                window.location.href = detailLink.href;
+            }
+        }
+    });
 }
 

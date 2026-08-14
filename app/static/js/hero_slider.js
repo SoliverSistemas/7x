@@ -4,6 +4,7 @@
 
 document.addEventListener('DOMContentLoaded', () => {
     initHeroVideoSlider();
+    initStickySearchBar();
 });
 
 function initHeroVideoSlider() {
@@ -193,4 +194,40 @@ function initHeroVideoSlider() {
             }
         }
     });
+}
+
+/* ── 2. Sticky Hero Search Bar (Docks under Header on Scroll) ───────────── */
+function initStickySearchBar() {
+    const searchWrapper = document.getElementById('heroSearchWrapper');
+    const searchBar = document.getElementById('heroSearchBar');
+    const header = document.querySelector('.site-header');
+    if (!searchWrapper || !searchBar) return;
+
+    let isDocked = false;
+
+    function handleScroll() {
+        const headerBottom = header ? header.getBoundingClientRect().bottom : 58;
+        const wrapperRect = searchWrapper.getBoundingClientRect();
+
+        // Check if search wrapper reached the header bottom
+        if (wrapperRect.top <= headerBottom) {
+            if (!isDocked) {
+                isDocked = true;
+                searchWrapper.style.minHeight = `${searchBar.offsetHeight}px`;
+                searchBar.classList.add('is-docked');
+            }
+            searchBar.style.top = `${Math.max(headerBottom, 0)}px`;
+        } else {
+            if (isDocked) {
+                isDocked = false;
+                searchBar.classList.remove('is-docked');
+                searchBar.style.top = '';
+                searchWrapper.style.minHeight = '';
+            }
+        }
+    }
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    window.addEventListener('resize', handleScroll, { passive: true });
+    handleScroll();
 }

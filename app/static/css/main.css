@@ -4,7 +4,7 @@
    Cores gerenciadas por themes.css
    ========================================================================== */
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;800&family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600;1,700&family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap');
 
 :root {
     /* Typography */
@@ -299,7 +299,7 @@ p {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    height: 72px;
+    height: 90px;
     gap: 2rem;
     transition: height 0.3s ease;
 }
@@ -317,8 +317,8 @@ p {
 
 .brand-mark {
     font-family: var(--font-heading);
-    font-size: 1.85rem;
-    font-weight: 800;
+    font-size: 2.5rem;
+    font-weight: 1000;
     line-height: 1;
     /* Animated shimmer gradient */
     background: linear-gradient(105deg,
@@ -337,7 +337,7 @@ p {
 
 .brand-name {
     font-family: var(--font-heading);
-    font-size: 1.05rem;
+    font-size: 1.5rem;
     font-weight: 300;
     color: var(--text-secondary);
     letter-spacing: 0.18em;
@@ -768,7 +768,7 @@ a.whatsapp-float:hover::before {
 .top-bar {
     width: 100%;
     background: linear-gradient(90deg,
-        rgba(11, 15, 25, 0.98) 0%,
+        rgba(74, 81, 99, 0.98) 0%,
         rgba(20, 22, 32, 0.98) 100%
     );
     border-bottom: 1px solid rgba(201, 172, 119, 0.2);
@@ -850,4 +850,4 @@ a.whatsapp-float:hover::before {
 *, *::before, *::after {
     border-radius: 0 !important;
 }
-
+

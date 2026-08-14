@@ -101,7 +101,7 @@
             <div class="properties-grid" id="properties-container">
                 {% if properties %}
                     {% for p in properties %}
-                        <div class="property-card">
+                        <div class="property-card" data-href="{{ url_for('properties.detail', property_id=p.id) }}">
                             <div class="card-img-wrapper">
                                 <div class="card-badges">
                                     <span class="badge badge-gold">{{ p.purpose }}</span>
