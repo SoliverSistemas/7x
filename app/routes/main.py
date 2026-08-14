@@ -34,3 +34,15 @@ def contact():
         return redirect(url_for('main.contact'))
 
     return render_template('main/contact.html')
+
+@main_bp.route('/links')
+def links():
+    import os
+    from flask import current_app
+    links_data = {
+        'site': os.environ.get('LINK_SITE_URL') or current_app.config.get('LINK_SITE_URL', '/'),
+        'instagram': os.environ.get('LINK_INSTAGRAM_URL') or current_app.config.get('LINK_INSTAGRAM_URL', 'https://instagram.com/7xpatrimonial'),
+        'tiktok': os.environ.get('LINK_TIKTOK_URL') or current_app.config.get('LINK_TIKTOK_URL', 'https://tiktok.com/@7xpatrimonial'),
+        'whatsapp': os.environ.get('LINK_WHATSAPP_URL') or current_app.config.get('LINK_WHATSAPP_URL', 'https://wa.me/5511999997777')
+    }
+    return render_template('main/links.html', links=links_data)

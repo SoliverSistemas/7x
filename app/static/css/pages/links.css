@@ -1,0 +1,344 @@
+/* ==========================================================================
+   7X Patrimonial - Links Hub Page (/links)
+   Luxury Bio Link Page matching 7X Black & Gold Design System
+   ========================================================================== */
+
+.links-hub-page {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    padding: 3.5rem 1.5rem 2.5rem 1.5rem;
+    position: relative;
+    background: var(--bg-body, #0b0f19);
+    color: var(--text-primary, #ffffff);
+    overflow-x: hidden;
+}
+
+/* Ambient luxury background glow */
+.links-hub-page::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 600px;
+    height: 400px;
+    background: radial-gradient(circle, rgba(201, 172, 119, 0.12) 0%, rgba(11, 15, 25, 0) 70%);
+    pointer-events: none;
+    z-index: 0;
+}
+
+.links-hub-container {
+    width: 100%;
+    max-width: 520px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* ── Profile Header ──────────────────────────────────────────────────────── */
+.links-profile-header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.links-logo-wrapper {
+    margin-bottom: 1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.links-logo-img {
+    max-width: 130px;
+    height: auto;
+    object-fit: contain;
+    filter: drop-shadow(0 4px 16px rgba(0, 0, 0, 0.5));
+    transition: transform 0.3s ease;
+}
+
+.links-logo-img:hover {
+    transform: scale(1.04);
+}
+
+.links-brand-title {
+    font-size: 1.6rem;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    color: var(--text-primary, #ffffff);
+    margin-bottom: 0.35rem;
+}
+
+.links-brand-title span {
+    color: var(--primary, #c9ac77);
+}
+
+.links-verified-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--primary, #c9ac77);
+    background: rgba(201, 172, 119, 0.08);
+    border: 1px solid rgba(201, 172, 119, 0.25);
+    padding: 0.25rem 0.65rem;
+    margin-bottom: 0.75rem;
+}
+
+.links-bio-text {
+    font-size: 0.88rem;
+    line-height: 1.6;
+    color: var(--text-secondary, rgba(255, 255, 255, 0.7));
+    max-width: 420px;
+    margin: 0 auto;
+}
+
+/* ── Links Action Stack ──────────────────────────────────────────────────── */
+.links-stack {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+    margin-bottom: 2.5rem;
+}
+
+.link-action-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 1.1rem 1.4rem;
+    background: rgba(18, 22, 34, 0.75);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--text-primary, #ffffff);
+    text-decoration: none;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1),
+                border-color 0.25s ease,
+                background 0.25s ease,
+                box-shadow 0.25s ease;
+}
+
+[data-theme="light"] .link-action-card {
+    background: rgba(255, 255, 255, 0.9);
+    border-color: rgba(0, 0, 0, 0.1);
+    color: #0b0f19;
+}
+
+.link-action-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 3px;
+    height: 100%;
+    background: var(--primary, #c9ac77);
+    opacity: 0;
+    transition: opacity 0.25s ease;
+}
+
+/* Light shimmer on hover */
+.link-action-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg,
+            transparent 0%,
+            rgba(201, 172, 119, 0.08) 50%,
+            transparent 100%);
+    background-size: 200% 100%;
+    transform: translateX(-100%);
+    transition: transform 0.6s ease;
+    pointer-events: none;
+}
+
+.link-action-card:hover::after {
+    transform: translateX(100%);
+}
+
+.link-action-card:hover {
+    transform: translateY(-2px);
+    border-color: var(--primary, #c9ac77);
+    background: rgba(26, 32, 48, 0.9);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3), 0 0 15px rgba(201, 172, 119, 0.1);
+}
+
+[data-theme="light"] .link-action-card:hover {
+    background: #ffffff;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+.link-action-card:hover::before {
+    opacity: 1;
+}
+
+/* Featured link card (WhatsApp / Site) */
+.link-action-card.featured {
+    background: rgba(201, 172, 119, 0.08);
+    border-color: rgba(201, 172, 119, 0.4);
+}
+
+.link-action-card.featured::before {
+    opacity: 1;
+}
+
+.link-card-left {
+    display: flex;
+    align-items: center;
+    gap: 1.1rem;
+    min-width: 0;
+}
+
+.link-icon-box {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--primary, #c9ac77);
+    flex-shrink: 0;
+    transition: all 0.25s ease;
+}
+
+[data-theme="light"] .link-icon-box {
+    background: rgba(0, 0, 0, 0.04);
+    border-color: rgba(0, 0, 0, 0.08);
+}
+
+.link-action-card:hover .link-icon-box {
+    background: var(--primary, #c9ac77);
+    color: #0b0f19;
+    border-color: var(--primary, #c9ac77);
+    transform: scale(1.05);
+}
+
+.link-card-texts {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.link-card-title {
+    font-size: 0.95rem;
+    font-weight: 800;
+    letter-spacing: -0.2px;
+    color: var(--text-primary, #ffffff);
+    margin-bottom: 0.15rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+[data-theme="light"] .link-card-title {
+    color: #0b0f19;
+}
+
+.link-card-subtitle {
+    font-size: 0.76rem;
+    color: var(--text-muted, rgba(255, 255, 255, 0.5));
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+[data-theme="light"] .link-card-subtitle {
+    color: #64748b;
+}
+
+.link-card-arrow {
+    color: var(--text-muted, rgba(255, 255, 255, 0.4));
+    transition: transform 0.25s ease, color 0.25s ease;
+    flex-shrink: 0;
+}
+
+.link-action-card:hover .link-card-arrow {
+    color: var(--primary, #c9ac77);
+    transform: translateX(4px);
+}
+
+/* Online Pulse Indicator for WhatsApp */
+.online-pulse {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    background: #25D366;
+    border-radius: 50% !important;
+    margin-left: 0.4rem;
+    box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.7);
+    animation: onlinePulseAnim 1.8s infinite;
+}
+
+@keyframes onlinePulseAnim {
+    0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.7); }
+    70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(37, 211, 102, 0); }
+    100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(37, 211, 102, 0); }
+}
+
+/* ── Footer ──────────────────────────────────────────────────────────────── */
+.links-hub-footer {
+    text-align: center;
+    position: relative;
+    z-index: 1;
+    font-size: 0.75rem;
+    color: var(--text-muted, rgba(255, 255, 255, 0.45));
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.links-social-mini {
+    display: flex;
+    gap: 0.75rem;
+}
+
+.social-mini-btn {
+    width: 34px;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
+    color: var(--text-secondary, rgba(255, 255, 255, 0.7));
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.social-mini-btn:hover {
+    border-color: var(--primary, #c9ac77);
+    color: var(--primary, #c9ac77);
+    transform: translateY(-2px);
+}
+
+@media (max-width: 480px) {
+    .links-hub-page {
+        padding: 2.5rem 1rem 2rem 1rem;
+    }
+
+    .link-action-card {
+        padding: 0.95rem 1.1rem;
+    }
+
+    .link-icon-box {
+        width: 36px;
+        height: 36px;
+    }
+}
