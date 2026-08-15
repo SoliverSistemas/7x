@@ -130,15 +130,18 @@
     <div class="container">
         <div class="section-header-flex reveal">
             <div>
-                <span class="badge badge-emerald">SELEÇÃO EXCLUSIVA</span>
-                <h2>Imóveis em Destaque</h2>
+                <div class="section-eyebrow">
+                    <span class="eyebrow-line"></span>
+                    <span>SELEÇÃO EXCLUSIVA</span>
+                </div>
+                <h2>Imóveis em <em style="font-style: italic; font-weight: 400;">Destaque</em></h2>
             </div>
             <a href="{{ url_for('properties.list_properties') }}" class="btn btn-outline">Ver Todo o Catálogo &rarr;</a>
         </div>
 
         <div class="properties-grid">
             {% for p in featured_properties %}
-                <div class="property-card reveal" data-href="{{ url_for('properties.detail', property_id=p.id) }}">
+                <div class="property-card" data-href="{{ url_for('properties.detail', property_id=p.id) }}">
                     <div class="card-img-wrapper">
                         <div class="card-badges">
                             <span class="badge badge-gold">{{ p.purpose }}</span>
@@ -146,26 +149,75 @@
                                 <span class="badge badge-blue">{{ p.badge }}</span>
                             {% endif %}
                         </div>
-                        <button class="card-favorite-btn" data-id="{{ p.id }}" title="Salvar Favorito">❤️</button>
+
+                        <button class="card-favorite-btn" data-id="{{ p.id }}" title="Salvar Favorito" aria-label="Salvar nos favoritos">
+                            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                        </button>
+
                         <img src="{{ url_for('static', filename='img/' + p.image) }}" alt="{{ p.title }}" loading="lazy">
+
+                        <div class="card-price-overlay">
+                            <span class="card-price-label">{{ p.purpose == 'Aluguel' and 'Aluguel / mês' or 'Valor' }}</span>
+                            <span class="card-price-val">{{ p.price|currency }}</span>
+                        </div>
                     </div>
+
                     <div class="card-body">
-                        <div class="card-location">📍 {{ p.neighborhood }}, {{ p.city }} - {{ p.state }}</div>
+                        <div class="card-location">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                            {{ p.neighborhood }}, {{ p.city }}
+                        </div>
+
                         <h3 class="card-title">
                             <a href="{{ url_for('properties.detail', property_id=p.id) }}">{{ p.title }}</a>
                         </h3>
+
                         <div class="card-specs">
-                            <div class="card-spec-item">📐 {{ p.area|area_format }}</div>
-                            <div class="card-spec-item">🛏️ {{ p.bedrooms }} dorms</div>
-                            <div class="card-spec-item">🛁 {{ p.bathrooms }} banhos</div>
-                            <div class="card-spec-item">🚗 {{ p.garage }} vagas</div>
-                        </div>
-                        <div class="card-footer">
-                            <div class="card-price-box">
-                                <span class="card-price-label">Valor</span>
-                                <span class="card-price-val">{{ p.price|currency }}</span>
+                            {% if p.area %}
+                            <div class="card-spec-item">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg>
+                                <span>{{ p.area|area_format }}</span>
                             </div>
-                            <a href="{{ url_for('properties.detail', property_id=p.id) }}" class="btn btn-primary btn-sm">Ver Detalhes</a>
+                            {% endif %}
+                            {% if p.bedrooms %}
+                            <div class="card-spec-item">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 14h18v6H3z"/><path d="M3 14V8a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v6"/><path d="M7 10h10"/></svg>
+                                <span>{{ p.bedrooms }} dorms</span>
+                            </div>
+                            {% endif %}
+                            {% if p.suites %}
+                            <div class="card-spec-item">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 12H3l9-9 9 9h-2"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg>
+                                <span>{{ p.suites }} suítes</span>
+                            </div>
+                            {% endif %}
+                            {% if p.garage %}
+                            <div class="card-spec-item">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="7" width="20" height="14"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+                                <span>{{ p.garage }} vagas</span>
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="card-info-chips">
+                            {% if p.is_financeable %}<span class="card-chip">Financiável</span>{% endif %}
+                            {% if p.accepts_exchange %}<span class="card-chip">Aceita Troca</span>{% endif %}
+                            {% if p.furnished and p.furnished != 'Não mobiliado' %}<span class="card-chip">Mobiliado</span>{% endif %}
+                        </div>
+
+                        <div class="card-footer">
+                            {% if p.condo_fee %}
+                            <div style="font-size:0.72rem; color:var(--text-muted); line-height:1.3;">
+                                <span style="display:block; text-transform:uppercase; letter-spacing:0.05em;">Condomínio</span>
+                                <span style="font-weight:600; color:var(--text-secondary);">{{ p.condo_fee|currency }}</span>
+                            </div>
+                            {% else %}
+                            <div></div>
+                            {% endif %}
+                            <a href="{{ url_for('properties.detail', property_id=p.id) }}" class="card-cta-btn">
+                                Ver detalhes
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -174,45 +226,439 @@
     </div>
 </section>
 
-<!-- ══ Differentials Section ════════════════════════════════════════════ -->
-<section class="section section-surface" id="diff-three-section">
+
+<!-- ══ Lançamentos ═══════════════════════════════════════════════════════ -->
+<section class="section lancamentos-section" id="lancamentos">
     <div class="container">
-        <div class="section-header reveal">
-            <span class="badge badge-gold">POR QUE A 7X IMÓVEIS?</span>
-            <h2>Diferenciais que Garantem o Melhor Negócio</h2>
-            <div class="accent-line"></div>
+        <div class="lancamentos-header">
+            <div class="lancamentos-header-text">
+                <div class="section-eyebrow">
+                    <span class="eyebrow-line"></span>
+                    <span>CURADORIA EXCLUSIVA</span>
+                </div>
+                <h2 class="lancamentos-title">Lançamentos</h2>
+                <p class="lancamentos-subtitle">Empreendimentos selecionados com atenção extrema para uma clientela que não aceita menos que o extraordinário.</p>
+            </div>
+            <a href="{{ url_for('main.lancamentos') }}" class="lancamentos-all-link">
+                Ver todos
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </a>
         </div>
 
-        <div class="differentials-grid">
-            <div class="differential-card glass-card reveal">
-                <div class="differential-icon">🏛️</div>
-                <h3>Curadoria Rigorosa</h3>
-                <p>Analisamos minuciosamente a documentação, infraestrutura e potencial de valorização de cada imóvel do portfólio.</p>
-            </div>
+        <div class="lancamentos-grid">
+            {% for item in lancamentos %}
+            <a href="{{ url_for('main.lancamento_detail', slug=item.slug) }}"
+               class="lancamento-card"
+               data-delay="{{ loop.index0 * 120 }}">
 
-            <div class="differential-card glass-card reveal">
-                <div class="differential-icon">🤝</div>
-                <h3>Atendimento Personalizado</h3>
-                <p>Corretores especializados por região e perfil de imóvel para um acompanhamento discreto e sob medida.</p>
-            </div>
+                <div class="lancamento-cover">
+                    <img src="{{ url_for('static', filename=item.cover) }}"
+                         alt="{{ item.name }}"
+                         loading="lazy">
+                    <div class="lancamento-cover-overlay"></div>
 
-            <div class="differential-card glass-card reveal">
-                <div class="differential-icon">⚡</div>
-                <h3>Agilidade Jurídica</h3>
-                <p>Depto. jurídico interno dedicado para garantir segurança em todas as fases da negociação contratual.</p>
-            </div>
+                    <!-- Tudo posicionado DENTRO da cover (overflow:hidden correto) -->
+                    <div class="lancamento-status-pill">{{ item.status }}</div>
 
-            <div class="differential-card glass-card reveal">
-                <div class="differential-icon">📊</div>
-                <h3>Análise de Mercado</h3>
-                <p>Relatórios exclusivos de valorização e rentabilidade para investidores exigentes e informados.</p>
+                    <div class="lancamento-info">
+                        <div class="lancamento-location">
+                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                            {{ item.location }}
+                        </div>
+                        <h3 class="lancamento-name">{{ item.name }}</h3>
+                        <p class="lancamento-tagline">{{ item.tagline }}</p>
+                        <div class="lancamento-footer">
+                            <span class="lancamento-type">{{ item.type }}</span>
+                            <span class="lancamento-units">{{ item.units }}</span>
+                        </div>
+                    </div>
+
+                    <div class="lancamento-arrow">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                    </div>
+                </div>
+
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+
+<!-- ══ Coleção Exclusiva (Fullscreen Cinematic Carousel) ══════════════════════════ -->
+<section class="cinematic-section" id="cinematic-section">
+    <!-- Grain overlay -->
+    <div class="cine-grain"></div>
+
+    <!-- Slides Container -->
+    <div class="cine-track" id="cine-track">
+
+        <!-- Slide 1 -->
+        <div class="cine-slide active" data-index="1">
+            <div class="cine-slide-bg" style="background-image: url('https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=2400&q=90');"></div>
+            <div class="cinematic-overlay"></div>
+            <div class="cine-slide-content">
+                <div class="cine-badge">Venda Off-Market</div>
+                <h3 class="cine-prop-title">Cobertura Duplex<br>Ibirapuera</h3>
+                <div class="cine-prop-meta">
+                    <span>524 m²</span><span class="cine-meta-sep">·</span>
+                    <span>4 Suítes</span><span class="cine-meta-sep">·</span>
+                    <span>Piscina Infinita</span>
+                </div>
+                <p class="cine-prop-desc">Vista eterna para o parque. Arquitetura autoral com pé-direito duplo e skyline definitivo de São Paulo.</p>
+                <a href="#" class="btn btn-primary cine-btn">
+                    Visualizar Imóvel
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+                </a>
+            </div>
+        </div>
+
+        <!-- Slide 2 -->
+        <div class="cine-slide" data-index="2">
+            <div class="cine-slide-bg" style="background-image: url('https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=2400&q=90');"></div>
+            <div class="cinematic-overlay"></div>
+            <div class="cine-slide-content">
+                <div class="cine-badge">Exclusividade 7X</div>
+                <h3 class="cine-prop-title">Villa Fasano<br>Fazenda Boa Vista</h3>
+                <div class="cine-prop-meta">
+                    <span>1.200 m²</span><span class="cine-meta-sep">·</span>
+                    <span>6 Suítes</span><span class="cine-meta-sep">·</span>
+                    <span>Piquete Privativo</span>
+                </div>
+                <p class="cine-prop-desc">O refúgio definitivo de alto luxo no interior. Natureza exuberante com acabamentos de padrão internacional.</p>
+                <a href="#" class="btn btn-primary cine-btn">
+                    Visualizar Imóvel
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+                </a>
+            </div>
+        </div>
+
+        <!-- Slide 3 -->
+        <div class="cine-slide" data-index="3">
+            <div class="cine-slide-bg" style="background-image: url('https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=2400&q=90');"></div>
+            <div class="cinematic-overlay"></div>
+            <div class="cine-slide-content">
+                <div class="cine-badge">Novo Lançamento</div>
+                <h3 class="cine-prop-title">Mansão<br>Jardim Europa</h3>
+                <div class="cine-prop-meta">
+                    <span>860 m²</span><span class="cine-meta-sep">·</span>
+                    <span>5 Suítes</span><span class="cine-meta-sep">·</span>
+                    <span>Automação Total</span>
+                </div>
+                <p class="cine-prop-desc">Terreno raro em um dos endereços mais valorizados do país. Design contemporâneo e paisagismo assinado.</p>
+                <a href="#" class="btn btn-primary cine-btn">
+                    Visualizar Imóvel
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+                </a>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- UI Overlay (Header + Controls) -->
+    <div class="cine-ui">
+
+        <!-- Header (Canto Sup. Esq.) -->
+        <div class="cinematic-header">
+            <div class="section-eyebrow">
+                <span class="eyebrow-line"></span>
+                <span>O ÁPICE DO DESIGN</span>
+            </div>
+            <h2 class="cinematic-title">A Coleção<br><span class="cinematic-title-gold">Exclusiva</span></h2>
+        </div>
+
+        <!-- Contador (Canto Sup. Dir.) -->
+        <div class="cine-counter">
+            <span class="cine-counter-current" id="cine-counter-current">01</span>
+            <span class="cine-counter-sep">/</span>
+            <span class="cine-counter-total">03</span>
+        </div>
+
+        <!-- Setas de Navegação -->
+        <button class="cine-arrow cine-arrow-prev" id="cine-prev" aria-label="Slide anterior">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+        <button class="cine-arrow cine-arrow-next" id="cine-next" aria-label="Próximo slide">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+
+        <!-- Dots de Progresso (Rodapé) -->
+        <div class="cine-dots" id="cine-dots">
+            <button class="cine-dot active" data-slide="0" aria-label="Slide 1"></button>
+            <button class="cine-dot" data-slide="1" aria-label="Slide 2"></button>
+            <button class="cine-dot" data-slide="2" aria-label="Slide 3"></button>
+        </div>
+
+        <!-- CTA do portfólio completo (Rodapé Direito) -->
+        <a href="{{ url_for('properties.list_properties') }}" class="cine-portfolio-link">
+            Ver portfólio completo
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+        </a>
+
+    </div>
+</section>
+
+
+
+
+
+<!-- ══ Parceiros (Í cone-logos) ═════════════════════════════════════════ -->
+<section class="section partners-logos-section">
+    <div class="container">
+        <div class="partners-logos-header">
+            <div class="section-eyebrow">
+                <span class="eyebrow-line"></span>
+                <span>PARCEIROS &amp; COLABORADORES</span>
+            </div>
+            <h2 class="partners-logos-title">Quem confia na 7X</h2>
+        </div>
+
+        <!-- Marquee com logos -->
+        <div class="partners-marquee-outer">
+            <div class="partners-marquee-track" id="partners-track">
+                <!-- Grupo original -->
+                <div class="partners-logo-group">
+                    <div class="plogo-card">
+                        <img src="{{ url_for('static', filename='img/partners/jll.jpg') }}" alt="JLL" loading="lazy">
+                        <div class="plogo-glow"></div>
+                    </div>
+                    <div class="plogo-card">
+                        <img src="{{ url_for('static', filename='img/partners/cushman.jpg') }}" alt="Cushman" loading="lazy">
+                        <div class="plogo-glow"></div>
+                    </div>
+                    <div class="plogo-card">
+                        <img src="{{ url_for('static', filename='img/partners/sothebys.jpg') }}" alt="Sotheby's" loading="lazy">
+                        <div class="plogo-glow"></div>
+                    </div>
+                    <div class="plogo-card">
+                        <img src="{{ url_for('static', filename='img/partners/cbre.jpg') }}" alt="CBRE" loading="lazy">
+                        <div class="plogo-glow"></div>
+                    </div>
+                    <div class="plogo-card">
+                        <img src="{{ url_for('static', filename='img/partners/knightfrank.jpg') }}" alt="Knight Frank" loading="lazy">
+                        <div class="plogo-glow"></div>
+                    </div>
+                    <div class="plogo-card">
+                        <img src="{{ url_for('static', filename='img/partners/savills.jpg') }}" alt="Savills" loading="lazy">
+                        <div class="plogo-glow"></div>
+                    </div>
+                    <div class="plogo-card">
+                        <img src="{{ url_for('static', filename='img/partners/engelvolkers.jpg') }}" alt="Engel &amp; Völkers" loading="lazy">
+                        <div class="plogo-glow"></div>
+                    </div>
+                    <div class="plogo-card">
+                        <img src="{{ url_for('static', filename='img/partners/btg.jpg') }}" alt="BTG" loading="lazy">
+                        <div class="plogo-glow"></div>
+                    </div>
+                </div>
+                <!-- Duplicado para loop seamless -->
+                <div class="partners-logo-group" aria-hidden="true">
+                    <div class="plogo-card">
+                        <img src="{{ url_for('static', filename='img/partners/jll.jpg') }}" alt="JLL" loading="lazy">
+                        <div class="plogo-glow"></div>
+                    </div>
+                    <div class="plogo-card">
+                        <img src="{{ url_for('static', filename='img/partners/cushman.jpg') }}" alt="Cushman" loading="lazy">
+                        <div class="plogo-glow"></div>
+                    </div>
+                    <div class="plogo-card">
+                        <img src="{{ url_for('static', filename='img/partners/sothebys.jpg') }}" alt="Sotheby's" loading="lazy">
+                        <div class="plogo-glow"></div>
+                    </div>
+                    <div class="plogo-card">
+                        <img src="{{ url_for('static', filename='img/partners/cbre.jpg') }}" alt="CBRE" loading="lazy">
+                        <div class="plogo-glow"></div>
+                    </div>
+                    <div class="plogo-card">
+                        <img src="{{ url_for('static', filename='img/partners/knightfrank.jpg') }}" alt="Knight Frank" loading="lazy">
+                        <div class="plogo-glow"></div>
+                    </div>
+                    <div class="plogo-card">
+                        <img src="{{ url_for('static', filename='img/partners/savills.jpg') }}" alt="Savills" loading="lazy">
+                        <div class="plogo-glow"></div>
+                    </div>
+                    <div class="plogo-card">
+                        <img src="{{ url_for('static', filename='img/partners/engelvolkers.jpg') }}" alt="Engel &amp; Völkers" loading="lazy">
+                        <div class="plogo-glow"></div>
+                    </div>
+                    <div class="plogo-card">
+                        <img src="{{ url_for('static', filename='img/partners/btg.jpg') }}" alt="BTG" loading="lazy">
+                        <div class="plogo-glow"></div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </section>
 
+<!-- ══ Brand Cinema ═══════════════════════════════════════════════════════ -->
+<section class="brand-cinema" id="brand-section">
+
+    <!-- Imagem de fundo full-bleed -->
+    <div class="brand-bg">
+        <img src="{{ url_for('static', filename='img/editorial_luxury.jpg') }}"
+             alt="Imóvel de alto padrão em São Paulo"
+             loading="lazy">
+        <div class="brand-overlay"></div>
+    </div>
+
+    <!-- Conteúdo central -->
+    <div class="brand-body">
+        <div class="brand-eyebrow">
+            <span class="brand-eyebrow-dot"></span>
+            7X PATRIMONIAL
+        </div>
+
+        <h2 class="brand-headline">
+            Referência em<br>
+            <em>imóveis de alto padrão</em><br>
+            no Brasil.
+        </h2>
+
+        <p class="brand-sub">Discrição absoluta. Curadoria incomparável. Atendimento exclusivo nos principais endereços nobres de São Paulo.</p>
+
+        <a href="{{ url_for('main.about') }}" class="brand-btn">
+            <span>Conheça a 7X</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
+    </div>
+
+    <!-- Faixa de stats na base -->
+    <div class="brand-stats">
+        <div class="container brand-stats-inner">
+            <div class="brand-stat">
+                <div class="brand-stat-top">
+                    <span class="brand-stat-n" data-target="850">0</span>
+                    <span class="brand-stat-suffix">+</span>
+                </div>
+                <span class="brand-stat-label">Imóveis Negociados</span>
+            </div>
+            <div class="brand-stat-divider"></div>
+            <div class="brand-stat">
+                <div class="brand-stat-top">
+                    <span class="brand-stat-n" data-target="14">0</span>
+                    <span class="brand-stat-suffix">anos</span>
+                </div>
+                <span class="brand-stat-label">de Mercado Imobiliário</span>
+            </div>
+            <div class="brand-stat-divider"></div>
+            <div class="brand-stat">
+                <div class="brand-stat-top">
+                    <span class="brand-stat-n" data-target="98">0</span>
+                    <span class="brand-stat-suffix">%</span>
+                </div>
+                <span class="brand-stat-label">de Clientes Satisfeitos</span>
+            </div>
+            <div class="brand-stat-divider"></div>
+            <div class="brand-stat">
+                <div class="brand-stat-top">
+                    <span class="brand-stat-n" data-target="320">0</span>
+                    <span class="brand-stat-suffix">M+</span>
+                </div>
+                <span class="brand-stat-label">em Patrimônio Gerido</span>
+            </div>
+        </div>
+    </div>
+
+</section>
+
+
+
+<!-- ══ Stats Bar ═════════════════════════════════════════════════════════ -->
+<section class="stats-bar-section">
+    <div class="container">
+        <div class="stats-bar">
+            <div class="stat-item reveal">
+                <span class="stat-number" data-target="850">0</span>
+                <span class="stat-label">Imóveis Negociados</span>
+            </div>
+            <div class="stat-divider"></div>
+            <div class="stat-item reveal">
+                <span class="stat-number" data-target="14">0</span>
+                <span class="stat-label">Anos de Mercado</span>
+            </div>
+            <div class="stat-divider"></div>
+            <div class="stat-item reveal">
+                <span class="stat-number" data-target="98">0</span>
+                <span class="stat-suffix">%</span>
+                <span class="stat-label">Clientes Satisfeitos</span>
+            </div>
+            <div class="stat-divider"></div>
+            <div class="stat-item reveal">
+                <span class="stat-number" data-target="320">0</span>
+                <span class="stat-suffix">M+</span>
+                <span class="stat-label">Em Patrimônio Gerido</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ══ Processo / Jornada do Cliente ════════════════════════════════════ -->
+<section class="section journey-section" id="journey-section">
+    <div class="container">
+
+        <div class="journey-header reveal">
+            <div class="section-eyebrow">
+                <span class="eyebrow-line"></span>
+                <span>COMO TRABALHAMOS</span>
+            </div>
+            <h2 class="journey-title">A jornada <em>7X</em></h2>
+            <p class="journey-subtitle">Da primeira conversa à entrega das chaves — conduzido com discrição, expertise e atenção absoluta ao detalhe.</p>
+        </div>
+
+        <div class="journey-steps">
+
+            <div class="journey-step reveal">
+                <div class="journey-step-number">01</div>
+                <div class="journey-step-line"></div>
+                <div class="journey-step-body">
+                    <h3 class="journey-step-title">Briefing Confidencial</h3>
+                    <p class="journey-step-desc">Entendemos o seu perfil, preferências e objetivos em uma conversa privada com um consultor dedicado. Sem formulários. Sem pressão.</p>
+                </div>
+            </div>
+
+            <div class="journey-step reveal">
+                <div class="journey-step-number">02</div>
+                <div class="journey-step-line"></div>
+                <div class="journey-step-body">
+                    <h3 class="journey-step-title">Curadoria Exclusiva</h3>
+                    <p class="journey-step-desc">Selecionamos a mão, do nosso portfólio público e off-market, os imóveis que realmente correspondem ao que você busca.</p>
+                </div>
+            </div>
+
+            <div class="journey-step reveal">
+                <div class="journey-step-number">03</div>
+                <div class="journey-step-line"></div>
+                <div class="journey-step-body">
+                    <h3 class="journey-step-title">Negociação Estratégica</h3>
+                    <p class="journey-step-desc">Nossa equipe jurídica e financeira conduz a negociação com precisão cirúrgica, protegendo o seu patrimônio em cada cláusula.</p>
+                </div>
+            </div>
+
+            <div class="journey-step reveal">
+                <div class="journey-step-number">04</div>
+                <div class="journey-step-line journey-step-line--last"></div>
+                <div class="journey-step-body">
+                    <h3 class="journey-step-title">Entrega & Pós-Venda</h3>
+                    <p class="journey-step-desc">Acompanhamos todo o processo cartorário e oferecemos suporte contínuo mesmo após a conclusão. O relacionamento não termina na assinatura.</p>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="journey-cta reveal">
+            <a href="{{ url_for('main.contact') }}" class="btn btn-primary">
+                Iniciar minha jornada
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+            </a>
+        </div>
+
+    </div>
+</section>
+
+
 <!-- ══ Testimonials Section ═════════════════════════════════════════════ -->
-<section class="section">
+<section class="section testimonials-section">
     <div class="container">
         <div class="section-header reveal">
             <span class="badge badge-gold">DEPOIMENTOS</span>
@@ -222,37 +668,52 @@
 
         <div class="testimonials-grid">
             <div class="testimonial-card reveal">
-                <div class="stars">★★★★★</div>
-                <p class="testimonial-text">Comprei meu apartamento no Itaim com a 7X e a experiência foi excepcional. O Ricardo entendeu exatamente o que procurávamos e encontrou o imóvel perfeito.</p>
+                <div class="testimonial-quote-icon">
+                    <svg width="36" height="36" viewBox="0 0 24 24" fill="currentColor"><path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z"/></svg>
+                </div>
+                <p class="testimonial-text">Comprei meu apartamento no Itaim com a 7X e a experiência foi excepcional. O Ricardo entendeu exatamente o que procurávamos e encontrou o imóvel perfeito em tempo recorde.</p>
+                <div class="testimonial-rating">
+                    <span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span>
+                </div>
                 <div class="testimonial-author">
                     <div class="testimonial-avatar">M</div>
-                    <div>
+                    <div class="testimonial-author-info">
                         <div class="testimonial-name">Marina Santos</div>
-                        <div class="testimonial-role">Compradora – Itaim Bibi</div>
+                        <div class="testimonial-role">Compradora · Itaim Bibi, SP</div>
                     </div>
                 </div>
             </div>
 
             <div class="testimonial-card reveal">
-                <div class="stars">★★★★★</div>
-                <p class="testimonial-text">A equipe jurídica da 7X foi impecável na negociação da minha cobertura. Tudo foi resolvido de forma rápida, transparente e profissional.</p>
+                <div class="testimonial-quote-icon">
+                    <svg width="36" height="36" viewBox="0 0 24 24" fill="currentColor"><path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z"/></svg>
+                </div>
+                <p class="testimonial-text">A equipe jurídica da 7X foi impecável na negociação da minha cobertura. Tudo foi resolvido de forma rápida, transparente e absolutamente profissional.</p>
+                <div class="testimonial-rating">
+                    <span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span>
+                </div>
                 <div class="testimonial-author">
                     <div class="testimonial-avatar">P</div>
-                    <div>
+                    <div class="testimonial-author-info">
                         <div class="testimonial-name">Paulo Vieira</div>
-                        <div class="testimonial-role">Investidor – Pinheiros</div>
+                        <div class="testimonial-role">Investidor · Pinheiros, SP</div>
                     </div>
                 </div>
             </div>
 
             <div class="testimonial-card reveal">
-                <div class="stars">★★★★★</div>
-                <p class="testimonial-text">Vendemos nossa casa em Alphaville em tempo recorde. A 7X Imóveis trouxe compradores qualificados e o processo foi conduzido com total sigilo e seriedade.</p>
+                <div class="testimonial-quote-icon">
+                    <svg width="36" height="36" viewBox="0 0 24 24" fill="currentColor"><path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z"/></svg>
+                </div>
+                <p class="testimonial-text">Vendemos nossa casa em Alphaville em tempo recorde. A 7X trouxe compradores qualificados e o processo foi conduzido com total sigilo, seriedade e eficiência.</p>
+                <div class="testimonial-rating">
+                    <span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span>
+                </div>
                 <div class="testimonial-author">
                     <div class="testimonial-avatar">C</div>
-                    <div>
+                    <div class="testimonial-author-info">
                         <div class="testimonial-name">Carla Duarte</div>
-                        <div class="testimonial-role">Vendedora – Alphaville</div>
+                        <div class="testimonial-role">Vendedora · Alphaville, SP</div>
                     </div>
                 </div>
             </div>
@@ -262,24 +723,51 @@
 
 <!-- ══ CTA Section ══════════════════════════════════════════════════════ -->
 <section class="cta-section" id="cta-three-section">
+    <div class="cta-bg-pattern"></div>
     <div class="container">
         <div class="cta-inner reveal">
-            <span class="badge badge-gold">PRONTO PARA COMEÇAR?</span>
-            <h2>Encontre Seu Próximo Investimento Imobiliário</h2>
-            <p>Agende uma conversa exclusiva com nossos consultores e descubra oportunidades selecionadas para o seu perfil.</p>
+            <div class="cta-eyebrow">
+                <div class="cta-line"></div>
+                <span class="badge badge-gold">PRONTO PARA COMEÇAR?</span>
+                <div class="cta-line"></div>
+            </div>
+            <h2>Encontre Seu Próximo<br><em>Investimento Imobiliário</em></h2>
+            <p>Agende uma conversa exclusiva com nossos consultores e descubra oportunidades selecionadas para o seu perfil de investimento.</p>
             <div class="cta-buttons">
-                <a href="{{ url_for('main.contact') }}" class="btn btn-primary btn-lg">📩 Fale com um Consultor</a>
-                <a href="{{ url_for('properties.list_properties') }}" class="btn btn-outline btn-lg">Ver Catálogo Completo</a>
+                <a href="{{ url_for('main.contact') }}" class="btn btn-primary btn-lg cta-btn-primary">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                    Fale com um Consultor
+                </a>
+                <a href="{{ url_for('properties.list_properties') }}" class="btn btn-outline btn-lg cta-btn-secondary">
+                    Ver Catálogo Completo
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+                </a>
+            </div>
+            <div class="cta-trust-row">
+                <div class="cta-trust-item">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+                    Sem compromisso
+                </div>
+                <div class="cta-trust-item">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+                    100% confidencial
+                </div>
+                <div class="cta-trust-item">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+                    Resposta em 24h
+                </div>
             </div>
         </div>
     </div>
 </section>
+
 
 {% endblock %}
 
 
 {% block extra_js %}
 <script src="{{ url_for('static', filename='js/hero_slider.js') }}"></script>
+<script src="{{ url_for('static', filename='js/cinematic_scroll.js') }}" defer></script>
 <script>
 function setSearchPurpose(purposeLabel, btnElement) {
     document.querySelectorAll('.purpose-btn').forEach(btn => btn.classList.remove('active'));
