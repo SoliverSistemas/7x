@@ -1,7 +1,44 @@
-from flask import Blueprint, render_template, request, flash, redirect, url_for
+from flask import Blueprint, render_template, request, flash, redirect, url_for, abort
 from app.models.property_model import PropertyRepository
 
 main_bp = Blueprint('main', __name__)
+
+# ── Dados dos lançamentos (futuramente viram modelo/DB) ──────────────────
+LANCAMENTOS = [
+    {
+        'slug': 'eden-residences',
+        'name': 'Eden Residences',
+        'tagline': 'Onde a arquitetura encontra o céu',
+        'location': 'Itaim Bibi · São Paulo',
+        'type': 'Alto Padrão',
+        'status': 'Lançamento',
+        'units': '48 unidades',
+        'cover': 'img/lancamento_eden.jpg',
+        'accent': '#c9ac77',
+    },
+    {
+        'slug': 'sky-penthouse',
+        'name': 'Sky Penthouse',
+        'tagline': 'O topo redefinido',
+        'location': 'Jardins · São Paulo',
+        'type': 'Cobertura',
+        'status': 'Pré-lançamento',
+        'units': '12 unidades exclusivas',
+        'cover': 'img/lancamento_sky.jpg',
+        'accent': '#c9ac77',
+    },
+    {
+        'slug': 'villa-serena',
+        'name': 'Villa Serena',
+        'tagline': 'Privacidade absoluta. Sofisticação total.',
+        'location': 'Morumbi · São Paulo',
+        'type': 'Casa de Alto Padrão',
+        'status': 'Breve',
+        'units': '6 residências',
+        'cover': 'img/lancamento_villa.jpg',
+        'accent': '#c9ac77',
+    },
+]
 
 @main_bp.route('/')
 def index():
@@ -14,7 +51,8 @@ def index():
         featured_properties=featured_properties,
         total_properties=len(all_properties),
         cities=cities,
-        types=types
+        types=types,
+        lancamentos=LANCAMENTOS
     )
 
 @main_bp.route('/sobre')
@@ -28,11 +66,8 @@ def contact():
         email = request.form.get('email')
         phone = request.form.get('phone')
         message = request.form.get('message')
-        
-        # Flash feedback message
         flash(f'Obrigado, {name}! Sua mensagem foi enviada com sucesso. Nossa equipe entrará em contato em breve.', 'success')
         return redirect(url_for('main.contact'))
-
     return render_template('main/contact.html')
 
 @main_bp.route('/links')
@@ -46,3 +81,14 @@ def links():
         'whatsapp': os.environ.get('LINK_WHATSAPP_URL') or current_app.config.get('LINK_WHATSAPP_URL', 'https://wa.me/5511999997777')
     }
     return render_template('main/links.html', links=links_data)
+
+@main_bp.route('/lancamentos')
+def lancamentos():
+    return render_template('main/lancamentos.html', lancamentos=LANCAMENTOS)
+
+@main_bp.route('/lancamentos/<slug>')
+def lancamento_detail(slug):
+    item = next((l for l in LANCAMENTOS if l['slug'] == slug), None)
+    if not item:
+        abort(404)
+    return render_template('main/lancamento_detail.html', lancamento=item)
