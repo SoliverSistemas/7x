@@ -418,308 +418,44 @@
             <div class="partners-marquee-track" id="partners-track">
                 <!-- Grupo original -->
                 <div class="partners-logo-group">
-                    <div class="plogo-card">
-                        <img src="{{ url_for('static', filename='img/partners/jll.jpg') }}" alt="JLL" loading="lazy">
-                        <div class="plogo-glow"></div>
-                    </div>
-                    <div class="plogo-card">
-                        <img src="{{ url_for('static', filename='img/partners/cushman.jpg') }}" alt="Cushman" loading="lazy">
-                        <div class="plogo-glow"></div>
-                    </div>
-                    <div class="plogo-card">
-                        <img src="{{ url_for('static', filename='img/partners/sothebys.jpg') }}" alt="Sotheby's" loading="lazy">
-                        <div class="plogo-glow"></div>
-                    </div>
-                    <div class="plogo-card">
-                        <img src="{{ url_for('static', filename='img/partners/cbre.jpg') }}" alt="CBRE" loading="lazy">
-                        <div class="plogo-glow"></div>
-                    </div>
-                    <div class="plogo-card">
-                        <img src="{{ url_for('static', filename='img/partners/knightfrank.jpg') }}" alt="Knight Frank" loading="lazy">
-                        <div class="plogo-glow"></div>
-                    </div>
-                    <div class="plogo-card">
-                        <img src="{{ url_for('static', filename='img/partners/savills.jpg') }}" alt="Savills" loading="lazy">
-                        <div class="plogo-glow"></div>
-                    </div>
-                    <div class="plogo-card">
-                        <img src="{{ url_for('static', filename='img/partners/engelvolkers.jpg') }}" alt="Engel &amp; Völkers" loading="lazy">
-                        <div class="plogo-glow"></div>
-                    </div>
-                    <div class="plogo-card">
-                        <img src="{{ url_for('static', filename='img/partners/btg.jpg') }}" alt="BTG" loading="lazy">
-                        <div class="plogo-glow"></div>
-                    </div>
+                    <a class="plogo-card" href="https://artlarengenharia.com.br/" target="_blank" rel="noopener" title="Artlar Engenharia"><img src="{{ url_for('static', filename='img/partners/parceiro1.png') }}" alt="Artlar Engenharia" loading="lazy"><div class="plogo-glow"></div></a>
+                    <a class="plogo-card" href="https://construtoravitale.com.br/" target="_blank" rel="noopener" title="Construtora Vitale"><img src="{{ url_for('static', filename='img/partners/parceiro2.png') }}" alt="Construtora Vitale" loading="lazy"><div class="plogo-glow"></div></a>
+                    <a class="plogo-card" href="https://sigengenharia.com.br/" target="_blank" rel="noopener" title="SIG Engenharia"><img src="{{ url_for('static', filename='img/partners/parceiro3.png') }}" alt="SIG Engenharia" loading="lazy"><div class="plogo-glow"></div></a>
+                    <a class="plogo-card" href="https://prolotes.com.br/" target="_blank" rel="noopener" title="Pro Lotes"><img src="{{ url_for('static', filename='img/partners/parceiro4.png') }}" alt="Pro Lotes" loading="lazy"><div class="plogo-glow"></div></a>
+                    <a class="plogo-card" href="https://www.gafisa.com.br/" target="_blank" rel="noopener" title="Gafisa"><img src="{{ url_for('static', filename='img/partners/parceiro5.png') }}" alt="Gafisa" loading="lazy"><div class="plogo-glow"></div></a>
+                    <a class="plogo-card" href="https://www.calper.com.br/" target="_blank" rel="noopener" title="Calper"><img src="{{ url_for('static', filename='img/partners/parceiro6.png') }}" alt="Calper" loading="lazy"><div class="plogo-glow"></div></a>
+                    <a class="plogo-card" href="https://www.startinvestimentos.com.br/" target="_blank" rel="noopener" title="Start Investimentos"><img src="{{ url_for('static', filename='img/partners/parceiro7.png') }}" alt="Start Investimentos" loading="lazy"><div class="plogo-glow"></div></a>
+                    <a class="plogo-card" href="https://turn2c.com/" target="_blank" rel="noopener" title="Turn2C"><img src="{{ url_for('static', filename='img/partners/parceiro8.png') }}" alt="Turn2C" loading="lazy"><div class="plogo-glow"></div></a>
+                    <a class="plogo-card" href="https://www.cyrela.com.br/" target="_blank" rel="noopener" title="Cyrela"><img src="{{ url_for('static', filename='img/partners/parceiro9.png') }}" alt="Cyrela" loading="lazy"><div class="plogo-glow"></div></a>
+                    <a class="plogo-card" href="https://www.carvalhohosken.com.br/" target="_blank" rel="noopener" title="Carvalho Hosken"><img src="{{ url_for('static', filename='img/partners/parceiro10.png') }}" alt="Carvalho Hosken" loading="lazy"><div class="plogo-glow"></div></a>
+                    <a class="plogo-card" href="https://construtoraavanco.com/" target="_blank" rel="noopener" title="Construtora Avanço"><img src="{{ url_for('static', filename='img/partners/parceiro11.png') }}" alt="Construtora Avanço" loading="lazy"><div class="plogo-glow"></div></a>
+                    <a class="plogo-card" href="https://www.meusensia.com.br/" target="_blank" rel="noopener" title="Sensia"><img src="{{ url_for('static', filename='img/partners/parceiro12.png') }}" alt="Sensia" loading="lazy"><div class="plogo-glow"></div></a>
+                    <a class="plogo-card" href="https://www.tegraincorporadora.com.br/" target="_blank" rel="noopener" title="Tegra Incorporadora"><img src="{{ url_for('static', filename='img/partners/parceiro13.png') }}" alt="Tegra Incorporadora" loading="lazy"><div class="plogo-glow"></div></a>
+                    <a class="plogo-card" href="https://www.btgpactual.com/asset-management" target="_blank" rel="noopener" title="BTG Pactual Asset Management"><img src="{{ url_for('static', filename='img/partners/parceiro14.png') }}" alt="BTG Pactual Asset Management" loading="lazy"><div class="plogo-glow"></div></a>
                 </div>
-                <!-- Duplicado para loop seamless -->
+                <!-- Duplicado para loop seamless (aria-hidden: não precisa de links acessíveis) -->
                 <div class="partners-logo-group" aria-hidden="true">
-                    <div class="plogo-card">
-                        <img src="{{ url_for('static', filename='img/partners/jll.jpg') }}" alt="JLL" loading="lazy">
-                        <div class="plogo-glow"></div>
-                    </div>
-                    <div class="plogo-card">
-                        <img src="{{ url_for('static', filename='img/partners/cushman.jpg') }}" alt="Cushman" loading="lazy">
-                        <div class="plogo-glow"></div>
-                    </div>
-                    <div class="plogo-card">
-                        <img src="{{ url_for('static', filename='img/partners/sothebys.jpg') }}" alt="Sotheby's" loading="lazy">
-                        <div class="plogo-glow"></div>
-                    </div>
-                    <div class="plogo-card">
-                        <img src="{{ url_for('static', filename='img/partners/cbre.jpg') }}" alt="CBRE" loading="lazy">
-                        <div class="plogo-glow"></div>
-                    </div>
-                    <div class="plogo-card">
-                        <img src="{{ url_for('static', filename='img/partners/knightfrank.jpg') }}" alt="Knight Frank" loading="lazy">
-                        <div class="plogo-glow"></div>
-                    </div>
-                    <div class="plogo-card">
-                        <img src="{{ url_for('static', filename='img/partners/savills.jpg') }}" alt="Savills" loading="lazy">
-                        <div class="plogo-glow"></div>
-                    </div>
-                    <div class="plogo-card">
-                        <img src="{{ url_for('static', filename='img/partners/engelvolkers.jpg') }}" alt="Engel &amp; Völkers" loading="lazy">
-                        <div class="plogo-glow"></div>
-                    </div>
-                    <div class="plogo-card">
-                        <img src="{{ url_for('static', filename='img/partners/btg.jpg') }}" alt="BTG" loading="lazy">
-                        <div class="plogo-glow"></div>
-                    </div>
+                    <a class="plogo-card" href="https://artlarengenharia.com.br/" target="_blank" rel="noopener" tabindex="-1"><img src="{{ url_for('static', filename='img/partners/parceiro1.png') }}" alt="" loading="lazy"><div class="plogo-glow"></div></a>
+                    <a class="plogo-card" href="https://construtoravitale.com.br/" target="_blank" rel="noopener" tabindex="-1"><img src="{{ url_for('static', filename='img/partners/parceiro2.png') }}" alt="" loading="lazy"><div class="plogo-glow"></div></a>
+                    <a class="plogo-card" href="https://sigengenharia.com.br/" target="_blank" rel="noopener" tabindex="-1"><img src="{{ url_for('static', filename='img/partners/parceiro3.png') }}" alt="" loading="lazy"><div class="plogo-glow"></div></a>
+                    <a class="plogo-card" href="https://prolotes.com.br/" target="_blank" rel="noopener" tabindex="-1"><img src="{{ url_for('static', filename='img/partners/parceiro4.png') }}" alt="" loading="lazy"><div class="plogo-glow"></div></a>
+                    <a class="plogo-card" href="https://www.gafisa.com.br/" target="_blank" rel="noopener" tabindex="-1"><img src="{{ url_for('static', filename='img/partners/parceiro5.png') }}" alt="" loading="lazy"><div class="plogo-glow"></div></a>
+                    <a class="plogo-card" href="https://www.calper.com.br/" target="_blank" rel="noopener" tabindex="-1"><img src="{{ url_for('static', filename='img/partners/parceiro6.png') }}" alt="" loading="lazy"><div class="plogo-glow"></div></a>
+                    <a class="plogo-card" href="https://www.startinvestimentos.com.br/" target="_blank" rel="noopener" tabindex="-1"><img src="{{ url_for('static', filename='img/partners/parceiro7.png') }}" alt="" loading="lazy"><div class="plogo-glow"></div></a>
+                    <a class="plogo-card" href="https://turn2c.com/" target="_blank" rel="noopener" tabindex="-1"><img src="{{ url_for('static', filename='img/partners/parceiro8.png') }}" alt="" loading="lazy"><div class="plogo-glow"></div></a>
+                    <a class="plogo-card" href="https://www.cyrela.com.br/" target="_blank" rel="noopener" tabindex="-1"><img src="{{ url_for('static', filename='img/partners/parceiro9.png') }}" alt="" loading="lazy"><div class="plogo-glow"></div></a>
+                    <a class="plogo-card" href="https://www.carvalhohosken.com.br/" target="_blank" rel="noopener" tabindex="-1"><img src="{{ url_for('static', filename='img/partners/parceiro10.png') }}" alt="" loading="lazy"><div class="plogo-glow"></div></a>
+                    <a class="plogo-card" href="https://construtoraavanco.com/" target="_blank" rel="noopener" tabindex="-1"><img src="{{ url_for('static', filename='img/partners/parceiro11.png') }}" alt="" loading="lazy"><div class="plogo-glow"></div></a>
+                    <a class="plogo-card" href="https://www.meusensia.com.br/" target="_blank" rel="noopener" tabindex="-1"><img src="{{ url_for('static', filename='img/partners/parceiro12.png') }}" alt="" loading="lazy"><div class="plogo-glow"></div></a>
+                    <a class="plogo-card" href="https://www.tegraincorporadora.com.br/" target="_blank" rel="noopener" tabindex="-1"><img src="{{ url_for('static', filename='img/partners/parceiro13.png') }}" alt="" loading="lazy"><div class="plogo-glow"></div></a>
+                    <a class="plogo-card" href="https://www.btgpactual.com/asset-management" target="_blank" rel="noopener" tabindex="-1"><img src="{{ url_for('static', filename='img/partners/parceiro14.png') }}" alt="" loading="lazy"><div class="plogo-glow"></div></a>
                 </div>
             </div>
         </div>
     </div>
 </section>
 
-<!-- ══ Brand Cinema ═══════════════════════════════════════════════════════ -->
-<section class="brand-cinema" id="brand-section">
 
-    <!-- Imagem de fundo full-bleed -->
-    <div class="brand-bg">
-        <img src="{{ url_for('static', filename='img/editorial_luxury.jpg') }}"
-             alt="Imóvel de alto padrão em São Paulo"
-             loading="lazy">
-        <div class="brand-overlay"></div>
-    </div>
-
-    <!-- Conteúdo central -->
-    <div class="brand-body">
-        <div class="brand-eyebrow">
-            <span class="brand-eyebrow-dot"></span>
-            7X PATRIMONIAL
-        </div>
-
-        <h2 class="brand-headline">
-            Referência em<br>
-            <em>imóveis de alto padrão</em><br>
-            no Brasil.
-        </h2>
-
-        <p class="brand-sub">Discrição absoluta. Curadoria incomparável. Atendimento exclusivo nos principais endereços nobres de São Paulo.</p>
-
-        <a href="{{ url_for('main.about') }}" class="brand-btn">
-            <span>Conheça a 7X</span>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-        </a>
-    </div>
-
-    <!-- Faixa de stats na base -->
-    <div class="brand-stats">
-        <div class="container brand-stats-inner">
-            <div class="brand-stat">
-                <div class="brand-stat-top">
-                    <span class="brand-stat-n" data-target="850">0</span>
-                    <span class="brand-stat-suffix">+</span>
-                </div>
-                <span class="brand-stat-label">Imóveis Negociados</span>
-            </div>
-            <div class="brand-stat-divider"></div>
-            <div class="brand-stat">
-                <div class="brand-stat-top">
-                    <span class="brand-stat-n" data-target="14">0</span>
-                    <span class="brand-stat-suffix">anos</span>
-                </div>
-                <span class="brand-stat-label">de Mercado Imobiliário</span>
-            </div>
-            <div class="brand-stat-divider"></div>
-            <div class="brand-stat">
-                <div class="brand-stat-top">
-                    <span class="brand-stat-n" data-target="98">0</span>
-                    <span class="brand-stat-suffix">%</span>
-                </div>
-                <span class="brand-stat-label">de Clientes Satisfeitos</span>
-            </div>
-            <div class="brand-stat-divider"></div>
-            <div class="brand-stat">
-                <div class="brand-stat-top">
-                    <span class="brand-stat-n" data-target="320">0</span>
-                    <span class="brand-stat-suffix">M+</span>
-                </div>
-                <span class="brand-stat-label">em Patrimônio Gerido</span>
-            </div>
-        </div>
-    </div>
-
-</section>
-
-
-
-<!-- ══ Stats Bar ═════════════════════════════════════════════════════════ -->
-<section class="stats-bar-section">
-    <div class="container">
-        <div class="stats-bar">
-            <div class="stat-item reveal">
-                <span class="stat-number" data-target="850">0</span>
-                <span class="stat-label">Imóveis Negociados</span>
-            </div>
-            <div class="stat-divider"></div>
-            <div class="stat-item reveal">
-                <span class="stat-number" data-target="14">0</span>
-                <span class="stat-label">Anos de Mercado</span>
-            </div>
-            <div class="stat-divider"></div>
-            <div class="stat-item reveal">
-                <span class="stat-number" data-target="98">0</span>
-                <span class="stat-suffix">%</span>
-                <span class="stat-label">Clientes Satisfeitos</span>
-            </div>
-            <div class="stat-divider"></div>
-            <div class="stat-item reveal">
-                <span class="stat-number" data-target="320">0</span>
-                <span class="stat-suffix">M+</span>
-                <span class="stat-label">Em Patrimônio Gerido</span>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- ══ Processo / Jornada do Cliente ════════════════════════════════════ -->
-<section class="section journey-section" id="journey-section">
-    <div class="container">
-
-        <div class="journey-header reveal">
-            <div class="section-eyebrow">
-                <span class="eyebrow-line"></span>
-                <span>COMO TRABALHAMOS</span>
-            </div>
-            <h2 class="journey-title">A jornada <em>7X</em></h2>
-            <p class="journey-subtitle">Da primeira conversa à entrega das chaves — conduzido com discrição, expertise e atenção absoluta ao detalhe.</p>
-        </div>
-
-        <div class="journey-steps">
-
-            <div class="journey-step reveal">
-                <div class="journey-step-number">01</div>
-                <div class="journey-step-line"></div>
-                <div class="journey-step-body">
-                    <h3 class="journey-step-title">Briefing Confidencial</h3>
-                    <p class="journey-step-desc">Entendemos o seu perfil, preferências e objetivos em uma conversa privada com um consultor dedicado. Sem formulários. Sem pressão.</p>
-                </div>
-            </div>
-
-            <div class="journey-step reveal">
-                <div class="journey-step-number">02</div>
-                <div class="journey-step-line"></div>
-                <div class="journey-step-body">
-                    <h3 class="journey-step-title">Curadoria Exclusiva</h3>
-                    <p class="journey-step-desc">Selecionamos a mão, do nosso portfólio público e off-market, os imóveis que realmente correspondem ao que você busca.</p>
-                </div>
-            </div>
-
-            <div class="journey-step reveal">
-                <div class="journey-step-number">03</div>
-                <div class="journey-step-line"></div>
-                <div class="journey-step-body">
-                    <h3 class="journey-step-title">Negociação Estratégica</h3>
-                    <p class="journey-step-desc">Nossa equipe jurídica e financeira conduz a negociação com precisão cirúrgica, protegendo o seu patrimônio em cada cláusula.</p>
-                </div>
-            </div>
-
-            <div class="journey-step reveal">
-                <div class="journey-step-number">04</div>
-                <div class="journey-step-line journey-step-line--last"></div>
-                <div class="journey-step-body">
-                    <h3 class="journey-step-title">Entrega & Pós-Venda</h3>
-                    <p class="journey-step-desc">Acompanhamos todo o processo cartorário e oferecemos suporte contínuo mesmo após a conclusão. O relacionamento não termina na assinatura.</p>
-                </div>
-            </div>
-
-        </div>
-
-        <div class="journey-cta reveal">
-            <a href="{{ url_for('main.contact') }}" class="btn btn-primary">
-                Iniciar minha jornada
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
-            </a>
-        </div>
-
-    </div>
-</section>
-
-
-<!-- ══ Testimonials Section ═════════════════════════════════════════════ -->
-<section class="section testimonials-section">
-    <div class="container">
-        <div class="section-header reveal">
-            <span class="badge badge-gold">DEPOIMENTOS</span>
-            <h2>O Que Nossos Clientes Dizem</h2>
-            <div class="accent-line"></div>
-        </div>
-
-        <div class="testimonials-grid">
-            <div class="testimonial-card reveal">
-                <div class="testimonial-quote-icon">
-                    <svg width="36" height="36" viewBox="0 0 24 24" fill="currentColor"><path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z"/></svg>
-                </div>
-                <p class="testimonial-text">Comprei meu apartamento no Itaim com a 7X e a experiência foi excepcional. O Ricardo entendeu exatamente o que procurávamos e encontrou o imóvel perfeito em tempo recorde.</p>
-                <div class="testimonial-rating">
-                    <span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span>
-                </div>
-                <div class="testimonial-author">
-                    <div class="testimonial-avatar">M</div>
-                    <div class="testimonial-author-info">
-                        <div class="testimonial-name">Marina Santos</div>
-                        <div class="testimonial-role">Compradora · Itaim Bibi, SP</div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="testimonial-card reveal">
-                <div class="testimonial-quote-icon">
-                    <svg width="36" height="36" viewBox="0 0 24 24" fill="currentColor"><path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z"/></svg>
-                </div>
-                <p class="testimonial-text">A equipe jurídica da 7X foi impecável na negociação da minha cobertura. Tudo foi resolvido de forma rápida, transparente e absolutamente profissional.</p>
-                <div class="testimonial-rating">
-                    <span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span>
-                </div>
-                <div class="testimonial-author">
-                    <div class="testimonial-avatar">P</div>
-                    <div class="testimonial-author-info">
-                        <div class="testimonial-name">Paulo Vieira</div>
-                        <div class="testimonial-role">Investidor · Pinheiros, SP</div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="testimonial-card reveal">
-                <div class="testimonial-quote-icon">
-                    <svg width="36" height="36" viewBox="0 0 24 24" fill="currentColor"><path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z"/></svg>
-                </div>
-                <p class="testimonial-text">Vendemos nossa casa em Alphaville em tempo recorde. A 7X trouxe compradores qualificados e o processo foi conduzido com total sigilo, seriedade e eficiência.</p>
-                <div class="testimonial-rating">
-                    <span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span>
-                </div>
-                <div class="testimonial-author">
-                    <div class="testimonial-avatar">C</div>
-                    <div class="testimonial-author-info">
-                        <div class="testimonial-name">Carla Duarte</div>
-                        <div class="testimonial-role">Vendedora · Alphaville, SP</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
 
 <!-- ══ CTA Section ══════════════════════════════════════════════════════ -->
 <section class="cta-section" id="cta-three-section">

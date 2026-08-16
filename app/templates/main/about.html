@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}Sobre Nós | {{ site_name }}{% endblock %}
+{% block title %}Sobre Nós | {{ site_name }} — {{ site_slogan }}{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/pages/about.css') }}">
@@ -8,128 +8,368 @@
 
 {% block content %}
 
-<!-- ══ Page Hero ════════════════════════════════════════════════════════ -->
-<section class="about-hero section">
+<!-- ══ About Hero ════════════════════════════════════════════════════════ -->
+<section class="about-hero" id="about-hero">
+    <div class="about-hero-bg">
+        <img src="{{ url_for('static', filename='img/editorial_luxury.jpg') }}"
+             alt="7X Patrimonial — Imóveis de alto padrão"
+             loading="eager">
+        <div class="about-hero-overlay"></div>
+    </div>
+
+    <div class="about-hero-content">
+        <div class="container">
+            <div class="about-hero-inner">
+                <div class="about-eyebrow">
+                    <span class="about-eyebrow-line"></span>
+                    <span>7X PATRIMONIAL</span>
+                    <span class="about-eyebrow-line"></span>
+                </div>
+                <h1 class="about-hero-title">
+                    Mais do que<br>
+                    <em>imóveis.</em><br>
+                    Legados.
+                </h1>
+                <p class="about-hero-sub">
+                    Há mais de uma década transformamos o mercado imobiliário de alto padrão
+                    com discrição, curadoria incomparável e inteligência de mercado.
+                </p>
+                <div class="about-hero-scroll">
+                    <span class="about-scroll-line"></span>
+                    <span>Role para conhecer</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Metrics strip no rodapé do hero -->
+    <div class="about-hero-metrics">
+        <div class="container">
+            <div class="about-metrics-row">
+                <div class="about-metric">
+                    <span class="about-metric-n" data-target="850">850</span>
+                    <span class="about-metric-suffix">+</span>
+                    <span class="about-metric-label">Imóveis Negociados</span>
+                </div>
+                <div class="about-metric-sep"></div>
+                <div class="about-metric">
+                    <span class="about-metric-n" data-target="14">14</span>
+                    <span class="about-metric-suffix">anos</span>
+                    <span class="about-metric-label">de Mercado Imobiliário</span>
+                </div>
+                <div class="about-metric-sep"></div>
+                <div class="about-metric">
+                    <span class="about-metric-n" data-target="98">98</span>
+                    <span class="about-metric-suffix">%</span>
+                    <span class="about-metric-label">Clientes Satisfeitos</span>
+                </div>
+                <div class="about-metric-sep"></div>
+                <div class="about-metric">
+                    <span class="about-metric-n" data-target="320">320</span>
+                    <span class="about-metric-suffix">M+</span>
+                    <span class="about-metric-label">em Patrimônio Gerido</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<!-- ══ Manifesto ══════════════════════════════════════════════════════════ -->
+<section class="section about-manifesto-section">
     <div class="container">
-        <div class="about-hero-inner reveal">
-            <span class="badge badge-gold">NOSSA HISTÓRIA</span>
-            <h1>Excelência &amp; Inteligência no Mercado Imobiliário</h1>
-            <p class="about-hero-text">
-                Fundada com o propósito de transformar a experiência de compra, venda e locação de imóveis de alto padrão, a <strong>7X Imóveis</strong> une tecnologia, inteligência de mercado e atendimento verdadeiramente humano.
+        <div class="about-manifesto reveal">
+            <div class="about-manifesto-label">
+                <span class="eyebrow-line"></span>
+                <span>NOSSA ESSÊNCIA</span>
+                <span class="eyebrow-line"></span>
+            </div>
+            <blockquote class="about-manifesto-quote">
+                "Não vendemos imóveis.<br>
+                <em>Conectamos pessoas ao lugar onde suas histórias mais importantes acontecerão.</em>"
+            </blockquote>
+            <div class="about-manifesto-divider"></div>
+            <p class="about-manifesto-body">
+                Fundada com o propósito de transformar a experiência de compra, venda e locação
+                de imóveis de alto padrão, a <strong>7X Patrimonial</strong> une tecnologia
+                de ponta, inteligência de mercado e um atendimento verdadeiramente humano.
+                Cada transação é conduzida com sigilo absoluto, expertise jurídica e uma
+                curadoria que respeita o tempo e os critérios dos nossos clientes.
             </p>
-            <div class="accent-line"></div>
         </div>
     </div>
 </section>
 
-<!-- ══ Missão & Valores ════════════════════════════════════════════════ -->
-<section class="section section-surface">
+
+<!-- ══ Missão / Visão / Valores ══════════════════════════════════════════ -->
+<section class="section about-mvv-section">
     <div class="container">
-        <div class="about-grid">
-            <div class="about-text reveal">
-                <span class="badge badge-emerald">NOSSO PROPÓSITO</span>
-                <h2>Missão &amp; Visão</h2>
-                <p>
-                    Nossa missão é proporcionar tranquilidade e máxima rentabilidade aos nossos clientes através de um atendimento transparente, sigiloso e eficiente.
+        <div class="about-mvv-header reveal">
+            <div class="section-eyebrow">
+                <span class="eyebrow-line"></span>
+                <span>NOSSO PROPÓSITO</span>
+            </div>
+            <h2 class="about-mvv-title">O que nos move</h2>
+        </div>
+
+        <div class="about-mvv-grid">
+
+            <div class="mvv-card reveal">
+                <div class="mvv-card-icon">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <circle cx="12" cy="12" r="10"/>
+                        <circle cx="12" cy="12" r="3"/>
+                        <path d="M12 2v3M12 19v3M2 12h3M19 12h3"/>
+                    </svg>
+                </div>
+                <span class="mvv-card-eyebrow">Missão</span>
+                <h3 class="mvv-card-title">Proporcionar tranquilidade</h3>
+                <p class="mvv-card-desc">
+                    Garantir máxima rentabilidade e segurança aos nossos clientes por meio de
+                    atendimento transparente, sigiloso e eficiente em cada etapa da negociação.
                 </p>
-                <p>
-                    Buscamos ser referência nacional no mercado imobiliário premium, conectando compradores exigentes às propriedades mais exclusivas do país.
+            </div>
+
+            <div class="mvv-card reveal">
+                <div class="mvv-card-icon">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                        <circle cx="12" cy="12" r="3"/>
+                    </svg>
+                </div>
+                <span class="mvv-card-eyebrow">Visão</span>
+                <h3 class="mvv-card-title">Referência nacional</h3>
+                <p class="mvv-card-desc">
+                    Ser a principal referência no mercado imobiliário premium do Brasil,
+                    conectando compradores exigentes às propriedades mais exclusivas do país.
                 </p>
             </div>
 
-            <div class="values-card glass-card reveal">
-                <h3>Nossos Valores</h3>
-                <ul class="values-list">
-                    <li>
-                        <span class="values-icon">✨</span>
-                        <div>
-                            <strong>Ética &amp; Transparência</strong>
-                            <span>Informações claras em cada etapa.</span>
-                        </div>
-                    </li>
-                    <li>
-                        <span class="values-icon">🏅</span>
-                        <div>
-                            <strong>Excelência no Atendimento</strong>
-                            <span>Consultores especializados por região.</span>
-                        </div>
-                    </li>
-                    <li>
-                        <span class="values-icon">🔐</span>
-                        <div>
-                            <strong>Segurança Jurídica</strong>
-                            <span>Garantia total em todas as transações.</span>
-                        </div>
-                    </li>
-                    <li>
-                        <span class="values-icon">💡</span>
-                        <div>
-                            <strong>Inovação Tecnológica</strong>
-                            <span>Plataforma moderna e responsiva.</span>
-                        </div>
-                    </li>
-                </ul>
+            <div class="mvv-card reveal">
+                <div class="mvv-card-icon">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2z"/>
+                    </svg>
+                </div>
+                <span class="mvv-card-eyebrow">Valores</span>
+                <h3 class="mvv-card-title">Princípios inegociáveis</h3>
+                <p class="mvv-card-desc">
+                    Ética, excelência, sigilo e inovação são os pilares que sustentam cada
+                    decisão que tomamos — do primeiro contato à entrega das chaves.
+                </p>
             </div>
+
         </div>
     </div>
 </section>
 
-<!-- ══ Timeline ═════════════════════════════════════════════════════════ -->
-<section class="section">
+
+<!-- ══ Pilares / Diferenciais ═══════════════════════════════════════════ -->
+<section class="about-pillars-section">
     <div class="container">
-        <div class="section-header reveal">
-            <span class="badge badge-gold">NOSSA TRAJETÓRIA</span>
-            <h2>Uma Jornada de Crescimento</h2>
-            <div class="accent-line"></div>
+        <div class="about-pillars-header reveal">
+            <div class="section-eyebrow">
+                <span class="eyebrow-line"></span>
+                <span>POR QUE A 7X</span>
+            </div>
+            <h2>O que nos diferencia</h2>
         </div>
 
-        <div class="timeline">
-            <div class="timeline-item reveal">
-                <div class="timeline-marker"></div>
-                <div class="timeline-content glass-card">
-                    <span class="timeline-year">2018</span>
-                    <h3>Fundação</h3>
-                    <p>Início das operações com foco exclusivo no mercado de imóveis de alto padrão em São Paulo.</p>
+        <div class="about-pillars-grid">
+
+            <div class="pillar-item reveal">
+                <div class="pillar-number">01</div>
+                <div class="pillar-body">
+                    <h3 class="pillar-title">Curadoria de Elite</h3>
+                    <p class="pillar-desc">
+                        Nosso portfólio é construído imóvel a imóvel. Avaliamos arquitetura,
+                        localização, histórico e potencial de valorização antes de apresentar
+                        qualquer oportunidade ao cliente.
+                    </p>
                 </div>
             </div>
-            <div class="timeline-item reveal">
-                <div class="timeline-marker"></div>
-                <div class="timeline-content glass-card">
-                    <span class="timeline-year">2020</span>
-                    <h3>Expansão Digital</h3>
-                    <p>Lançamento da plataforma digital com tour virtual 360° e atendimento omnichannel.</p>
+
+            <div class="pillar-item reveal">
+                <div class="pillar-number">02</div>
+                <div class="pillar-body">
+                    <h3 class="pillar-title">Acesso Off-Market</h3>
+                    <p class="pillar-desc">
+                        Grande parte das nossas transações acontece antes de qualquer anúncio
+                        público. Uma rede exclusiva de proprietários e incorporadoras nos
+                        concede acesso privilegiado às melhores oportunidades.
+                    </p>
                 </div>
             </div>
-            <div class="timeline-item reveal">
-                <div class="timeline-marker"></div>
-                <div class="timeline-content glass-card">
-                    <span class="timeline-year">2022</span>
-                    <h3>R$ 500M em Vendas</h3>
-                    <p>Marco histórico de meio bilhão em transações, consolidando a marca no segmento premium.</p>
+
+            <div class="pillar-item reveal">
+                <div class="pillar-number">03</div>
+                <div class="pillar-body">
+                    <h3 class="pillar-title">Segurança Jurídica Total</h3>
+                    <p class="pillar-desc">
+                        Nossa equipe jurídica especializada conduz cada etapa da negociação
+                        com precisão cirúrgica, protegendo o seu patrimônio em cada cláusula
+                        e garantindo total conformidade legal.
+                    </p>
                 </div>
             </div>
-            <div class="timeline-item reveal">
-                <div class="timeline-marker"></div>
-                <div class="timeline-content glass-card">
-                    <span class="timeline-year">2024</span>
-                    <h3>Referência Nacional</h3>
-                    <p>Expansão para novas regiões com rede de corretores especializados em todo o estado.</p>
+
+            <div class="pillar-item reveal">
+                <div class="pillar-number">04</div>
+                <div class="pillar-body">
+                    <h3 class="pillar-title">Discrição Absoluta</h3>
+                    <p class="pillar-desc">
+                        Sigilo é parte do nosso DNA. Cada negociação é conduzida com
+                        confidencialidade total, respeitando a privacidade de compradores
+                        e vendedores em todas as fases do processo.
+                    </p>
                 </div>
             </div>
+
         </div>
     </div>
 </section>
 
-<!-- ══ CTA ══════════════════════════════════════════════════════════════ -->
-<section class="cta-section">
+
+<!-- ══ Timeline ═══════════════════════════════════════════════════════════ -->
+<section class="section about-timeline-section">
     <div class="container">
-        <div class="cta-inner reveal">
-            <span class="badge badge-gold">JUNTE-SE A NÓS</span>
-            <h2>Quer Trabalhar com os Melhores?</h2>
-            <p>Conheça nossa cultura de excelência e faça parte de uma equipe que transforma vidas através do mercado imobiliário.</p>
-            <a href="{{ url_for('main.contact') }}" class="btn btn-primary btn-lg">📩 Entre em Contato</a>
+        <div class="about-timeline-header reveal">
+            <div class="section-eyebrow">
+                <span class="eyebrow-line"></span>
+                <span>NOSSA TRAJETÓRIA</span>
+            </div>
+            <h2>Uma jornada de <em style="font-style:italic; font-weight:400;">crescimento</em></h2>
+        </div>
+
+        <div class="about-timeline">
+            <div class="about-timeline-spine"></div>
+
+            <div class="atl-item reveal">
+                <div class="atl-dot"></div>
+                <div class="atl-card">
+                    <span class="atl-year">2012</span>
+                    <h3 class="atl-title">Fundação</h3>
+                    <p class="atl-desc">Início das operações com foco exclusivo no mercado de imóveis de alto padrão em São Paulo, com uma equipe seleta de três consultores.</p>
+                </div>
+            </div>
+
+            <div class="atl-item reveal">
+                <div class="atl-dot"></div>
+                <div class="atl-card">
+                    <span class="atl-year">2016</span>
+                    <h3 class="atl-title">Expansão Premium</h3>
+                    <p class="atl-desc">Consolidação no segmento de coberturas e mansões. Abertura do escritório nos Jardins e entrada no mercado de lançamentos exclusivos.</p>
+                </div>
+            </div>
+
+            <div class="atl-item reveal">
+                <div class="atl-dot"></div>
+                <div class="atl-card">
+                    <span class="atl-year">2020</span>
+                    <h3 class="atl-title">Plataforma Digital</h3>
+                    <p class="atl-desc">Lançamento da plataforma digital proprietária com curadoria por IA, tour virtual e atendimento omnichannel. Liderança no digital durante a pandemia.</p>
+                </div>
+            </div>
+
+            <div class="atl-item reveal">
+                <div class="atl-dot"></div>
+                <div class="atl-card">
+                    <span class="atl-year">2022</span>
+                    <h3 class="atl-title">R$ 500M em Vendas</h3>
+                    <p class="atl-desc">Marco histórico de meio bilhão em transações, consolidando definitivamente a marca como referência no segmento premium nacional.</p>
+                </div>
+            </div>
+
+            <div class="atl-item reveal">
+                <div class="atl-dot atl-dot--active"></div>
+                <div class="atl-card atl-card--active">
+                    <span class="atl-year">Hoje</span>
+                    <h3 class="atl-title">Referência Nacional</h3>
+                    <p class="atl-desc">Mais de 850 imóveis negociados, presença nos principais endereços nobres de São Paulo e uma rede exclusiva de parceiros e incorporadoras de alto padrão.</p>
+                </div>
+            </div>
+
         </div>
     </div>
 </section>
 
+
+<!-- ══ CTA Final ══════════════════════════════════════════════════════════ -->
+<section class="about-cta-section">
+    <div class="about-cta-bg-pattern"></div>
+    <div class="container">
+        <div class="about-cta-inner reveal">
+            <div class="about-cta-eyebrow">
+                <div class="cta-line"></div>
+                <span class="badge badge-gold">VAMOS CONVERSAR?</span>
+                <div class="cta-line"></div>
+            </div>
+            <h2 class="about-cta-title">
+                Pronto para encontrar<br>
+                <em>seu próximo legado?</em>
+            </h2>
+            <p class="about-cta-sub">
+                Agende uma conversa exclusiva com um dos nossos consultores e descubra
+                oportunidades selecionadas para o seu perfil.
+            </p>
+            <div class="about-cta-btns">
+                <a href="{{ url_for('main.contact') }}" class="btn btn-primary btn-lg">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                        <polyline points="22,6 12,13 2,6"/>
+                    </svg>
+                    Fale com um Consultor
+                </a>
+                <a href="{{ url_for('properties.list_properties') }}" class="btn btn-outline btn-lg">
+                    Ver Catálogo Completo
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                        <polyline points="9 18 15 12 9 6"/>
+                    </svg>
+                </a>
+            </div>
+            <div class="cta-trust-row">
+                <div class="cta-trust-item">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+                    Sem compromisso
+                </div>
+                <div class="cta-trust-item">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+                    100% confidencial
+                </div>
+                <div class="cta-trust-item">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+                    Resposta em 24h
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+/* Counter animation para as métricas do hero */
+(function () {
+    const easeOut = t => 1 - Math.pow(1 - t, 3);
+    const obs = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+            if (!entry.isIntersecting) return;
+            const el = entry.target;
+            const target = +el.dataset.target;
+            const duration = 1800;
+            const start = performance.now();
+            const tick = now => {
+                const p = Math.min((now - start) / duration, 1);
+                el.textContent = Math.round(easeOut(p) * target);
+                if (p < 1) requestAnimationFrame(tick);
+                else el.textContent = target;
+            };
+            requestAnimationFrame(tick);
+            obs.unobserve(el);
+        });
+    }, { threshold: 0.5 });
+    document.querySelectorAll('.about-metric-n[data-target]').forEach(el => obs.observe(el));
+})();
+</script>
 {% endblock %}
