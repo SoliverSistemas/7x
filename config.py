@@ -23,6 +23,10 @@ class Config:
     TECIMOB_API_TOKEN = os.environ.get('TECIMOB_API_TOKEN') or ''
     USE_TECIMOB_API = os.environ.get('USE_TECIMOB_API', 'false').lower() in ('true', '1', 't')
 
+    # Admin Panel credentials (set in .env)
+    ADMIN_USERNAME = os.environ.get('ADMIN_USERNAME') or 'admin'
+    ADMIN_PASSWORD = os.environ.get('ADMIN_PASSWORD') or 'changeme'
+
 class DevelopmentConfig(Config):
     DEBUG = True
     ENV = 'development'

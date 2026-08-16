@@ -1,0 +1,162 @@
+{% extends 'admin/base_admin.html' %}
+
+{% block title %}Dashboard{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+
+{% block content %}
+
+<!-- ── KPI Cards ────────────────────────────────────────────────────────── -->
+<div class="kpi-grid">
+    <div class="kpi-card">
+        <div class="kpi-icon kpi-icon--gold">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>
+            </svg>
+        </div>
+        <div class="kpi-info">
+            <span class="kpi-label">Total de Imóveis</span>
+            <span class="kpi-value">{{ total }}</span>
+        </div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-icon kpi-icon--green">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                <line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+            </svg>
+        </div>
+        <div class="kpi-info">
+            <span class="kpi-label">Para Venda</span>
+            <span class="kpi-value">{{ for_sale }}</span>
+        </div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-icon kpi-icon--blue">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>
+            </svg>
+        </div>
+        <div class="kpi-info">
+            <span class="kpi-label">Para Aluguel</span>
+            <span class="kpi-value">{{ for_rent }}</span>
+        </div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-icon kpi-icon--purple">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+            </svg>
+        </div>
+        <div class="kpi-info">
+            <span class="kpi-label">Em Destaque</span>
+            <span class="kpi-value">{{ featured }}</span>
+        </div>
+    </div>
+</div>
+
+<!-- ── Charts row ───────────────────────────────────────────────────────── -->
+<div class="dash-grid">
+
+    <!-- By type -->
+    <div class="dash-card">
+        <div class="dash-card-header">
+            <h3>Por Tipo</h3>
+        </div>
+        <div class="dash-list">
+            {% for type_name, count in types.items()|sort(attribute='1', reverse=True) %}
+            <div class="dash-list-row">
+                <span class="dash-list-label">{{ type_name }}</span>
+                <div class="dash-bar-wrap">
+                    <div class="dash-bar" style="width: {{ (count / total * 100)|round|int }}%"></div>
+                </div>
+                <span class="dash-list-count">{{ count }}</span>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- By city -->
+    <div class="dash-card">
+        <div class="dash-card-header">
+            <h3>Por Cidade</h3>
+        </div>
+        <div class="dash-list">
+            {% for city_name, count in cities.items()|sort(attribute='1', reverse=True) %}
+            <div class="dash-list-row">
+                <span class="dash-list-label">{{ city_name }}</span>
+                <div class="dash-bar-wrap">
+                    <div class="dash-bar dash-bar--blue" style="width: {{ (count / total * 100)|round|int }}%"></div>
+                </div>
+                <span class="dash-list-count">{{ count }}</span>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Average price -->
+    <div class="dash-card dash-card--stat">
+        <div class="dash-card-header">
+            <h3>Ticket Médio</h3>
+        </div>
+        <div class="dash-big-stat">
+            <span class="dash-big-val">{{ avg_price|currency }}</span>
+            <span class="dash-big-sub">média geral do portfólio</span>
+        </div>
+        <div class="dash-stat-breakdown">
+            <div class="dash-stat-item">
+                <span>Venda</span>
+                <strong>{{ for_sale }} imóveis</strong>
+            </div>
+            <div class="dash-stat-item">
+                <span>Aluguel</span>
+                <strong>{{ for_rent }} imóveis</strong>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- ── Recent properties ─────────────────────────────────────────────────── -->
+<div class="dash-card" style="margin-top:1.5rem;">
+    <div class="dash-card-header">
+        <h3>Imóveis Recentes</h3>
+        <a href="{{ url_for('admin.properties') }}" class="dash-link">Ver todos →</a>
+    </div>
+    <div class="admin-table-wrap">
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Imóvel</th>
+                    <th>Tipo</th>
+                    <th>Finalidade</th>
+                    <th>Cidade</th>
+                    <th>Preço</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for p in recent %}
+                <tr>
+                    <td class="td-muted">#{{ p.id }}</td>
+                    <td class="td-title">{{ p.title|truncate(40) }}</td>
+                    <td><span class="badge-sm">{{ p.type }}</span></td>
+                    <td>
+                        <span class="badge-sm badge-sm--{{ 'gold' if p.purpose == 'Venda' else 'blue' }}">
+                            {{ p.purpose }}
+                        </span>
+                    </td>
+                    <td class="td-muted">{{ p.city }}</td>
+                    <td class="td-price">{{ p.price|currency }}</td>
+                    <td>
+                        <a href="{{ url_for('admin.property_detail', property_id=p.id) }}" class="admin-row-action">
+                            Ver <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}

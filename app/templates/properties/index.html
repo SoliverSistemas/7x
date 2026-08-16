@@ -7,112 +7,389 @@
 {% endblock %}
 
 {% block content %}
-<section class="section catalog-section">
-    <div class="container">
-        <div class="catalog-header reveal">
-            <div>
-                <h1>Catálogo de Imóveis</h1>
-                <p class="text-secondary" id="results-count">{{ properties|length }} imóveis encontrados</p>
-            </div>
-        </div>
 
+<!-- ══ Page Hero compacto ════════════════════════════════════════════════ -->
+<section class="prop-hero">
+    <div class="prop-hero-bg"></div>
+    <div class="container">
+        <div class="prop-hero-inner">
+            <div class="section-eyebrow">
+                <span class="eyebrow-line"></span>
+                <span>CURADORIA EXCLUSIVA</span>
+            </div>
+            <h1 class="prop-hero-title">
+                Catálogo <em>7X</em>
+            </h1>
+            <p class="prop-hero-sub">
+                <span class="prop-count">{{ properties|length }}</span>
+                imóveis selecionados para você
+            </p>
+        </div>
+    </div>
+</section>
+
+<!-- ══ Catalog Layout ════════════════════════════════════════════════════ -->
+<section class="prop-catalog-section">
+    <div class="container">
         <div class="catalog-layout">
-            <!-- Filter Sidebar -->
-            <aside class="filter-sidebar reveal">
-                <div class="filter-sidebar-header">
-                    <h3>Filtros de Busca</h3>
-                    <a href="{{ url_for('properties.list_properties') }}" class="btn-ghost">Limpar</a>
+
+            <!-- ══ Sidebar ═══════════════════════════════════════════════ -->
+            <aside class="filter-sidebar" id="filterSidebar">
+
+                <!-- Sidebar header -->
+                <div class="sidebar-header">
+                    <div class="sidebar-title-row">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="4" y1="6" x2="20" y2="6"/>
+                            <line x1="8" y1="12" x2="20" y2="12"/>
+                            <line x1="12" y1="18" x2="20" y2="18"/>
+                        </svg>
+                        <h3>Filtros</h3>
+                    </div>
+                    {% if current_filters.query or current_filters.type or current_filters.purpose or current_filters.city or current_filters.bedrooms or current_filters.min_price or current_filters.max_price %}
+                    <a href="{{ url_for('properties.list_properties') }}" class="sidebar-clear-btn">
+                        Limpar tudo
+                    </a>
+                    {% endif %}
                 </div>
 
+                <!-- Active tags -->
+                {% set has_filters = current_filters.query or current_filters.type or current_filters.purpose or current_filters.city or current_filters.bedrooms or current_filters.min_price or current_filters.max_price %}
+                {% if has_filters %}
+                <div class="sidebar-active-tags">
+                    {% if current_filters.purpose %}
+                    <a href="{{ url_for('properties.list_properties', q=current_filters.query, type=current_filters.type, city=current_filters.city, bedrooms=current_filters.bedrooms, min_price=current_filters.min_price, max_price=current_filters.max_price, sort=current_filters.sort) }}" class="active-tag">
+                        {{ current_filters.purpose }} <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                    </a>
+                    {% endif %}
+                    {% if current_filters.type %}
+                    <a href="{{ url_for('properties.list_properties', q=current_filters.query, purpose=current_filters.purpose, city=current_filters.city, bedrooms=current_filters.bedrooms, min_price=current_filters.min_price, max_price=current_filters.max_price, sort=current_filters.sort) }}" class="active-tag">
+                        {{ current_filters.type }} <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                    </a>
+                    {% endif %}
+                    {% if current_filters.city %}
+                    <a href="{{ url_for('properties.list_properties', q=current_filters.query, purpose=current_filters.purpose, type=current_filters.type, bedrooms=current_filters.bedrooms, min_price=current_filters.min_price, max_price=current_filters.max_price, sort=current_filters.sort) }}" class="active-tag">
+                        {{ current_filters.city }} <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                    </a>
+                    {% endif %}
+                    {% if current_filters.bedrooms %}
+                    <a href="{{ url_for('properties.list_properties', q=current_filters.query, purpose=current_filters.purpose, type=current_filters.type, city=current_filters.city, neighborhood=current_filters.neighborhood, suites=current_filters.suites, bathrooms=current_filters.bathrooms, garage=current_filters.garage, min_price=current_filters.min_price, max_price=current_filters.max_price, min_area=current_filters.min_area, max_area=current_filters.max_area, financeable=current_filters.financeable, exchange=current_filters.exchange, furnished=current_filters.furnished, sort=current_filters.sort) }}" class="active-tag">
+                        {{ current_filters.bedrooms }}+ dorms <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                    </a>
+                    {% endif %}
+                    {% if current_filters.query %}
+                    <a href="{{ url_for('properties.list_properties', purpose=current_filters.purpose, type=current_filters.type, city=current_filters.city, neighborhood=current_filters.neighborhood, bedrooms=current_filters.bedrooms, suites=current_filters.suites, bathrooms=current_filters.bathrooms, garage=current_filters.garage, min_price=current_filters.min_price, max_price=current_filters.max_price, min_area=current_filters.min_area, max_area=current_filters.max_area, financeable=current_filters.financeable, exchange=current_filters.exchange, furnished=current_filters.furnished, sort=current_filters.sort) }}" class="active-tag">
+                        "{{ current_filters.query }}" <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                    </a>
+                    {% endif %}
+                </div>
+                {% endif %}
+
+                <!-- Filter form -->
                 <form id="catalog-filter-form" action="{{ url_for('properties.list_properties') }}" method="GET">
-                    <div class="form-group">
-                        <label class="form-label">Buscar por palavra-chave</label>
-                        <input type="text" name="q" class="form-control" placeholder="Ex: Vista, Suíte, Piscina..." value="{{ current_filters.query }}">
+                    <input type="hidden" name="category" id="filter-category" value="{{ current_filters.category }}">
+
+                    <!-- Search -->
+                    <div class="sidebar-group">
+                        <label class="sidebar-label">Palavra-chave</label>
+                        <div class="sidebar-search-wrap">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                            <input type="text" name="q" id="filter-q"
+                                   class="sidebar-input sidebar-search-input"
+                                   placeholder="Vista, piscina, bairro..."
+                                   value="{{ current_filters.query }}">
+                        </div>
                     </div>
 
-                    <div class="form-group">
-                        <label class="form-label">Finalidade</label>
-                        <select name="purpose" class="form-select">
-                            <option value="">Todas</option>
-                            <option value="Venda" {% if current_filters.purpose == 'Venda' %}selected{% endif %}>Venda</option>
-                            <option value="Aluguel" {% if current_filters.purpose == 'Aluguel' %}selected{% endif %}>Aluguel</option>
-                        </select>
+                    <!-- Purpose -->
+                    <div class="sidebar-group">
+                        <label class="sidebar-label">Finalidade</label>
+                        <div class="sidebar-chips">
+                            <button type="button" class="sidebar-chip {% if not current_filters.purpose %}sidebar-chip--active{% endif %}"
+                                    data-filter="purpose" data-value="">Todos</button>
+                            <button type="button" class="sidebar-chip {% if current_filters.purpose == 'Venda' %}sidebar-chip--active{% endif %}"
+                                    data-filter="purpose" data-value="Venda">Comprar</button>
+                            <button type="button" class="sidebar-chip {% if current_filters.purpose == 'Aluguel' %}sidebar-chip--active{% endif %}"
+                                    data-filter="purpose" data-value="Aluguel">Alugar</button>
+                            <input type="hidden" name="purpose" id="filter-purpose" value="{{ current_filters.purpose }}">
+                        </div>
                     </div>
 
-                    <div class="form-group">
-                        <label class="form-label">Tipo de Imóvel</label>
-                        <select name="type" class="form-select">
-                            <option value="">Todos</option>
-                            {% for t in types %}
+                    <!-- Type -->
+                    <div class="sidebar-group">
+                        <label class="sidebar-label">Tipo de Imóvel</label>
+                        <div class="sidebar-select-wrap">
+                            <select name="type" id="filter-type" class="sidebar-select">
+                                <option value="">Todos os tipos</option>
+                                {% for t in types %}
                                 <option value="{{ t }}" {% if current_filters.type == t %}selected{% endif %}>{{ t }}</option>
-                            {% endfor %}
-                        </select>
+                                {% endfor %}
+                            </select>
+                            <svg class="sidebar-select-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+                        </div>
                     </div>
 
-                    <div class="form-group">
-                        <label class="form-label">Cidade</label>
-                        <select name="city" class="form-select">
-                            <option value="">Todas</option>
-                            {% for c in cities %}
+                    <!-- City -->
+                    <div class="sidebar-group">
+                        <label class="sidebar-label">Cidade</label>
+                        <div class="sidebar-select-wrap">
+                            <select name="city" id="filter-city" class="sidebar-select">
+                                <option value="">Todas as cidades</option>
+                                {% for c in cities %}
                                 <option value="{{ c }}" {% if current_filters.city == c %}selected{% endif %}>{{ c }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-
-                    <div class="price-row">
-                        <div class="form-group">
-                            <label class="form-label">Preço Mín (R$)</label>
-                            <input type="number" name="min_price" class="form-control" placeholder="0" value="{{ current_filters.min_price }}">
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Preço Máx (R$)</label>
-                            <input type="number" name="max_price" class="form-control" placeholder="Sem máx" value="{{ current_filters.max_price }}">
+                                {% endfor %}
+                            </select>
+                            <svg class="sidebar-select-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
                         </div>
                     </div>
 
-                    <div class="form-group">
-                        <label class="form-label">Mínimo de Dormitórios</label>
-                        <select name="bedrooms" class="form-select">
-                            <option value="">Qualquer</option>
-                            <option value="1" {% if current_filters.bedrooms == '1' %}selected{% endif %}>1+ Quartos</option>
-                            <option value="2" {% if current_filters.bedrooms == '2' %}selected{% endif %}>2+ Quartos</option>
-                            <option value="3" {% if current_filters.bedrooms == '3' %}selected{% endif %}>3+ Quartos</option>
-                            <option value="4" {% if current_filters.bedrooms == '4' %}selected{% endif %}>4+ Quartos</option>
-                        </select>
+                    <!-- Neighborhood -->
+                    <div class="sidebar-group">
+                        <label class="sidebar-label">Bairro</label>
+                        <div class="sidebar-select-wrap">
+                            <select name="neighborhood" id="filter-neighborhood" class="sidebar-select">
+                                <option value="">Todos os bairros</option>
+                                {% for n in neighborhoods %}
+                                <option value="{{ n }}" {% if current_filters.neighborhood == n %}selected{% endif %}>{{ n }}</option>
+                                {% endfor %}
+                            </select>
+                            <svg class="sidebar-select-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+                        </div>
                     </div>
 
-                    <div class="form-group">
-                        <label class="form-label">Ordenar Por</label>
-                        <select name="sort" class="form-select">
-                            <option value="recent" {% if current_filters.sort == 'recent' %}selected{% endif %}>Mais Recentes</option>
-                            <option value="price-asc" {% if current_filters.sort == 'price-asc' %}selected{% endif %}>Menor Preço</option>
-                            <option value="price-desc" {% if current_filters.sort == 'price-desc' %}selected{% endif %}>Maior Preço</option>
-                            <option value="area-desc" {% if current_filters.sort == 'area-desc' %}selected{% endif %}>Maior Área</option>
-                        </select>
+                    <div class="sidebar-section-divider"></div>
+
+                    <!-- Bedrooms chips -->
+                    <div class="sidebar-group">
+                        <label class="sidebar-label">Dormitórios (mín.)</label>
+                        <div class="sidebar-chips sidebar-chips--bedrooms">
+                            <button type="button" class="sidebar-chip sidebar-chip--sm {% if not current_filters.bedrooms %}sidebar-chip--active{% endif %}"
+                                    data-filter="bedrooms" data-value="">Qualquer</button>
+                            <button type="button" class="sidebar-chip sidebar-chip--sm {% if current_filters.bedrooms == '1' %}sidebar-chip--active{% endif %}"
+                                    data-filter="bedrooms" data-value="1">1+</button>
+                            <button type="button" class="sidebar-chip sidebar-chip--sm {% if current_filters.bedrooms == '2' %}sidebar-chip--active{% endif %}"
+                                    data-filter="bedrooms" data-value="2">2+</button>
+                            <button type="button" class="sidebar-chip sidebar-chip--sm {% if current_filters.bedrooms == '3' %}sidebar-chip--active{% endif %}"
+                                    data-filter="bedrooms" data-value="3">3+</button>
+                            <button type="button" class="sidebar-chip sidebar-chip--sm {% if current_filters.bedrooms == '4' %}sidebar-chip--active{% endif %}"
+                                    data-filter="bedrooms" data-value="4">4+</button>
+                            <input type="hidden" name="bedrooms" id="filter-bedrooms" value="{{ current_filters.bedrooms }}">
+                        </div>
                     </div>
 
-                    <button type="submit" class="btn btn-primary btn-full mt-filter">
-                        🔍 Filtrar Imóveis
+                    <!-- Suites chips -->
+                    <div class="sidebar-group">
+                        <label class="sidebar-label">Suítes (mín.)</label>
+                        <div class="sidebar-chips sidebar-chips--bedrooms">
+                            <button type="button" class="sidebar-chip sidebar-chip--sm {% if not current_filters.suites %}sidebar-chip--active{% endif %}"
+                                    data-filter="suites" data-value="">Qualquer</button>
+                            <button type="button" class="sidebar-chip sidebar-chip--sm {% if current_filters.suites == '1' %}sidebar-chip--active{% endif %}"
+                                    data-filter="suites" data-value="1">1+</button>
+                            <button type="button" class="sidebar-chip sidebar-chip--sm {% if current_filters.suites == '2' %}sidebar-chip--active{% endif %}"
+                                    data-filter="suites" data-value="2">2+</button>
+                            <button type="button" class="sidebar-chip sidebar-chip--sm {% if current_filters.suites == '3' %}sidebar-chip--active{% endif %}"
+                                    data-filter="suites" data-value="3">3+</button>
+                            <input type="hidden" name="suites" id="filter-suites" value="{{ current_filters.suites }}">
+                        </div>
+                    </div>
+
+                    <!-- Bathrooms chips -->
+                    <div class="sidebar-group">
+                        <label class="sidebar-label">Banheiros (mín.)</label>
+                        <div class="sidebar-chips sidebar-chips--bedrooms">
+                            <button type="button" class="sidebar-chip sidebar-chip--sm {% if not current_filters.bathrooms %}sidebar-chip--active{% endif %}"
+                                    data-filter="bathrooms" data-value="">Qualquer</button>
+                            <button type="button" class="sidebar-chip sidebar-chip--sm {% if current_filters.bathrooms == '2' %}sidebar-chip--active{% endif %}"
+                                    data-filter="bathrooms" data-value="2">2+</button>
+                            <button type="button" class="sidebar-chip sidebar-chip--sm {% if current_filters.bathrooms == '3' %}sidebar-chip--active{% endif %}"
+                                    data-filter="bathrooms" data-value="3">3+</button>
+                            <button type="button" class="sidebar-chip sidebar-chip--sm {% if current_filters.bathrooms == '4' %}sidebar-chip--active{% endif %}"
+                                    data-filter="bathrooms" data-value="4">4+</button>
+                            <input type="hidden" name="bathrooms" id="filter-bathrooms" value="{{ current_filters.bathrooms }}">
+                        </div>
+                    </div>
+
+                    <!-- Garage chips -->
+                    <div class="sidebar-group">
+                        <label class="sidebar-label">Vagas de Garagem (mín.)</label>
+                        <div class="sidebar-chips sidebar-chips--bedrooms">
+                            <button type="button" class="sidebar-chip sidebar-chip--sm {% if not current_filters.garage %}sidebar-chip--active{% endif %}"
+                                    data-filter="garage" data-value="">Qualquer</button>
+                            <button type="button" class="sidebar-chip sidebar-chip--sm {% if current_filters.garage == '1' %}sidebar-chip--active{% endif %}"
+                                    data-filter="garage" data-value="1">1+</button>
+                            <button type="button" class="sidebar-chip sidebar-chip--sm {% if current_filters.garage == '2' %}sidebar-chip--active{% endif %}"
+                                    data-filter="garage" data-value="2">2+</button>
+                            <button type="button" class="sidebar-chip sidebar-chip--sm {% if current_filters.garage == '3' %}sidebar-chip--active{% endif %}"
+                                    data-filter="garage" data-value="3">3+</button>
+                            <input type="hidden" name="garage" id="filter-garage" value="{{ current_filters.garage }}">
+                        </div>
+                    </div>
+
+                    <div class="sidebar-section-divider"></div>
+
+                    <!-- Price range -->
+                    <div class="sidebar-group">
+                        <label class="sidebar-label">Faixa de Preço (R$)</label>
+                        <div class="sidebar-price-row">
+                            <div class="sidebar-price-input-wrap">
+                                <span>Mín</span>
+                                <input type="number" name="min_price" id="filter-min-price"
+                                       class="sidebar-price-input"
+                                       placeholder="0" value="{{ current_filters.min_price }}" min="0">
+                            </div>
+                            <div class="sidebar-price-sep">—</div>
+                            <div class="sidebar-price-input-wrap">
+                                <span>Máx</span>
+                                <input type="number" name="max_price" id="filter-max-price"
+                                       class="sidebar-price-input"
+                                       placeholder="Sem limite" value="{{ current_filters.max_price }}" min="0">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Area range -->
+                    <div class="sidebar-group">
+                        <label class="sidebar-label">Área Útil (m²)</label>
+                        <div class="sidebar-price-row">
+                            <div class="sidebar-price-input-wrap">
+                                <span>Mín</span>
+                                <input type="number" name="min_area" id="filter-min-area"
+                                       class="sidebar-price-input"
+                                       placeholder="0" value="{{ current_filters.min_area }}" min="0">
+                            </div>
+                            <div class="sidebar-price-sep">—</div>
+                            <div class="sidebar-price-input-wrap">
+                                <span>Máx</span>
+                                <input type="number" name="max_area" id="filter-max-area"
+                                       class="sidebar-price-input"
+                                       placeholder="Sem limite" value="{{ current_filters.max_area }}" min="0">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="sidebar-section-divider"></div>
+
+                    <!-- Special features toggles -->
+                    <div class="sidebar-group">
+                        <label class="sidebar-label">Características</label>
+                        <div class="sidebar-toggles">
+                            <label class="sidebar-toggle">
+                                <input type="checkbox" name="financeable" value="1" id="filter-financeable"
+                                       {% if current_filters.financeable == '1' %}checked{% endif %}>
+                                <span class="sidebar-toggle-track"></span>
+                                <span class="sidebar-toggle-label">Financiável</span>
+                            </label>
+                            <label class="sidebar-toggle">
+                                <input type="checkbox" name="exchange" value="1" id="filter-exchange"
+                                       {% if current_filters.exchange == '1' %}checked{% endif %}>
+                                <span class="sidebar-toggle-track"></span>
+                                <span class="sidebar-toggle-label">Aceita Troca</span>
+                            </label>
+                            <label class="sidebar-toggle">
+                                <input type="checkbox" name="furnished" value="1" id="filter-furnished"
+                                       {% if current_filters.furnished == '1' %}checked{% endif %}>
+                                <span class="sidebar-toggle-track"></span>
+                                <span class="sidebar-toggle-label">Mobiliado</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Sort -->
+                    <div class="sidebar-group">
+                        <label class="sidebar-label">Ordenar por</label>
+                        <div class="sidebar-select-wrap">
+                            <select name="sort" id="filter-sort" class="sidebar-select">
+                                <option value="recent" {% if current_filters.sort == 'recent' %}selected{% endif %}>Mais recentes</option>
+                                <option value="price-asc" {% if current_filters.sort == 'price-asc' %}selected{% endif %}>Menor preço</option>
+                                <option value="price-desc" {% if current_filters.sort == 'price-desc' %}selected{% endif %}>Maior preço</option>
+                                <option value="area-desc" {% if current_filters.sort == 'area-desc' %}selected{% endif %}>Maior área</option>
+                            </select>
+                            <svg class="sidebar-select-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+                        </div>
+                    </div>
+
+                    <!-- Submit -->
+                    <button type="submit" class="sidebar-submit-btn">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                        Buscar Imóveis
                     </button>
+
                 </form>
             </aside>
 
-            <!-- Properties Grid Container -->
-            <div class="properties-grid" id="properties-container">
-                {% if properties %}
-                    {% for p in properties %}
+            <!-- ══ Grid Area ═════════════════════════════════════════════ -->
+            <div class="catalog-main">
+
+                <!-- Toolbar -->
+                <div class="catalog-toolbar">
+                    <p class="results-info">
+                        <strong>{{ properties|length }}</strong>
+                        imóvel{{ 's' if properties|length != 1 else '' }} encontrado{{ 's' if properties|length != 1 else '' }}
+                    </p>
+                    <div class="toolbar-right">
+                        <!-- View toggle -->
+                        <div class="view-toggle" role="group" aria-label="Visualização">
+                            <button type="button" class="view-btn view-btn--active" id="viewGrid" title="Grade" aria-pressed="true">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+                                    <rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/>
+                                </svg>
+                            </button>
+                            <button type="button" class="view-btn" id="viewList" title="Lista" aria-pressed="false">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/>
+                                    <line x1="8" y1="18" x2="21" y2="18"/>
+                                    <line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/>
+                                    <line x1="3" y1="18" x2="3.01" y2="18"/>
+                                </svg>
+                            </button>
+                        </div>
+                        <!-- Mobile filter toggle -->
+                        <button class="mobile-filter-btn" id="mobileFilterBtn" type="button">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="4" y1="6" x2="20" y2="6"/>
+                                <line x1="8" y1="12" x2="20" y2="12"/>
+                                <line x1="12" y1="18" x2="20" y2="18"/>
+                            </svg>
+                            Filtros
+                            {% if has_filters %}<span class="mobile-filter-dot"></span>{% endif %}
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Category Navigation -->
+                <div class="category-nav">
+                    {% set current_cat = current_filters.category %}
+                    <button type="button" class="category-btn {{ 'active' if not current_cat or current_cat == 'Todas' else '' }}" onclick="updateFilter('category', '')">Todas</button>
+                    <button type="button" class="category-btn {{ 'active' if current_cat == 'Exclusivo' else '' }}" onclick="updateFilter('category', 'Exclusivo')">Exclusivos</button>
+                    <button type="button" class="category-btn {{ 'active' if current_cat == 'Alto Padrão' else '' }}" onclick="updateFilter('category', 'Alto Padrão')">Alto Padrão</button>
+                    <button type="button" class="category-btn {{ 'active' if current_cat == 'Destaque' else '' }}" onclick="updateFilter('category', 'Destaque')">Destaques</button>
+                    <button type="button" class="category-btn {{ 'active' if current_cat == 'Geral' else '' }}" onclick="updateFilter('category', 'Geral')">Geral</button>
+                </div>
+
+                <!-- Properties grid -->
+                <div class="properties-grid" id="properties-container">
+                    {% if properties %}
+                        {% for p in properties %}
                         <div class="property-card" data-href="{{ url_for('properties.detail', property_id=p.id) }}">
                             <div class="card-img-wrapper">
+                                {% if p.calculated_category and p.calculated_category != 'Geral' %}
+                                <div class="card-ribbon card-ribbon--{{ p.calculated_category|lower|replace(' ', '-')|replace('ã', 'a') }}">{{ p.calculated_category }}</div>
+                                {% endif %}
                                 <div class="card-badges">
                                     <span class="badge badge-gold">{{ p.purpose }}</span>
                                     {% if p.badge %}
                                         <span class="badge badge-blue">{{ p.badge }}</span>
                                     {% endif %}
                                 </div>
-                                <button class="card-favorite-btn" data-id="{{ p.id }}" title="Salvar Favorito" aria-label="Salvar nos favoritos">
-                                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                                <button class="card-favorite-btn" data-id="{{ p.id }}"
+                                        title="Salvar Favorito" aria-label="Salvar nos favoritos">
+                                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                                    </svg>
                                 </button>
-                                <img src="{{ url_for('static', filename='img/' + p.image) }}" alt="{{ p.title }}" loading="lazy">
+                                <img src="{{ url_for('static', filename='img/' + p.image) }}"
+                                     alt="{{ p.title }}" loading="lazy">
                                 <div class="card-price-overlay">
                                     <span class="card-price-label">{{ p.purpose == 'Aluguel' and 'Aluguel / mês' or 'Valor' }}</span>
                                     <span class="card-price-val">{{ p.price|currency }}</span>
@@ -120,7 +397,10 @@
                             </div>
                             <div class="card-body">
                                 <div class="card-location">
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                                        <circle cx="12" cy="10" r="3"/>
+                                    </svg>
                                     {{ p.neighborhood }}, {{ p.city }}
                                 </div>
                                 <h3 class="card-title">
@@ -159,9 +439,9 @@
                                 </div>
                                 <div class="card-footer">
                                     {% if p.condo_fee %}
-                                    <div style="font-size:0.72rem; color:var(--text-muted); line-height:1.3;">
-                                        <span style="display:block; text-transform:uppercase; letter-spacing:0.05em;">Condomínio</span>
-                                        <span style="font-weight:600; color:var(--text-secondary);">{{ p.condo_fee|currency }}</span>
+                                    <div class="card-condo">
+                                        <span class="card-condo-label">Condomínio</span>
+                                        <span class="card-condo-val">{{ p.condo_fee|currency }}</span>
                                     </div>
                                     {% else %}
                                     <div></div>
@@ -173,20 +453,116 @@
                                 </div>
                             </div>
                         </div>
-                    {% endfor %}
-                {% else %}
-                    <div class="empty-state">
-                        <h3>Nenhum imóvel encontrado</h3>
-                        <p>Tente ajustar os filtros ou pesquisar por outro termo.</p>
-                    </div>
-                {% endif %}
-            </div>
-        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="empty-state">
+                            <div class="empty-state-icon">
+                                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2">
+                                    <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+                                </svg>
+                            </div>
+                            <h3>Nenhum imóvel encontrado</h3>
+                            <p>Tente ajustar os filtros ou pesquisar por outro termo.</p>
+                            <a href="{{ url_for('properties.list_properties') }}" class="btn btn-outline" style="margin-top:1.5rem;">
+                                Limpar filtros
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+
+            </div><!-- /.catalog-main -->
+        </div><!-- /.catalog-layout -->
     </div>
 </section>
+
+<!-- Mobile sidebar overlay -->
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
 
 {% endblock %}
 
 {% block extra_js %}
 <script src="{{ url_for('static', filename='js/properties.js') }}"></script>
+<script>
+(function () {
+    const form = document.getElementById('catalog-filter-form');
+
+    /* ── Generic chip group handler ── */
+    function setupChips(filterName, hiddenId) {
+        document.querySelectorAll(`[data-filter="${filterName}"]`).forEach(btn => {
+            btn.addEventListener('click', function () {
+                document.querySelectorAll(`[data-filter="${filterName}"]`).forEach(b => b.classList.remove('sidebar-chip--active'));
+                this.classList.add('sidebar-chip--active');
+                document.getElementById(hiddenId).value = this.dataset.value;
+            });
+        });
+    }
+
+    setupChips('purpose',   'filter-purpose');
+    setupChips('bedrooms',  'filter-bedrooms');
+    setupChips('suites',    'filter-suites');
+    setupChips('bathrooms', 'filter-bathrooms');
+    setupChips('garage',    'filter-garage');
+
+    /* ── Update Filter helper (Categories) ── */
+    window.updateFilter = function(field, value) {
+        const input = document.getElementById('filter-' + field);
+        if (input) {
+            input.value = value;
+            document.getElementById('catalog-filter-form').submit();
+        }
+    };
+
+    /* ── Live search debounce ── */
+    const searchInput = document.getElementById('filter-q');
+    if (searchInput) {
+        let debounce;
+        searchInput.addEventListener('input', () => {
+            clearTimeout(debounce);
+            debounce = setTimeout(() => form.submit(), 650);
+        });
+    }
+
+    /* ── Auto-submit on select change ── */
+    ['filter-type', 'filter-city', 'filter-neighborhood', 'filter-sort'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.addEventListener('change', () => form.submit());
+    });
+
+    /* ── Auto-submit on toggle change ── */
+    ['filter-financeable', 'filter-exchange', 'filter-furnished'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.addEventListener('change', () => form.submit());
+    });
+
+    /* ── View toggle (grid / list) ── */
+    const grid    = document.getElementById('properties-container');
+    const btnGrid = document.getElementById('viewGrid');
+    const btnList = document.getElementById('viewList');
+
+    function setView(view) {
+        const isList = view === 'list';
+        grid.classList.toggle('properties-list', isList);
+        btnGrid.classList.toggle('view-btn--active', !isList);
+        btnList.classList.toggle('view-btn--active', isList);
+        btnGrid.setAttribute('aria-pressed', String(!isList));
+        btnList.setAttribute('aria-pressed', String(isList));
+        localStorage.setItem('propView', view);
+    }
+
+    if (localStorage.getItem('propView') === 'list') setView('list');
+    btnGrid.addEventListener('click', () => setView('grid'));
+    btnList.addEventListener('click', () => setView('list'));
+
+    /* ── Mobile sidebar toggle ── */
+    const sidebar   = document.getElementById('filterSidebar');
+    const overlay   = document.getElementById('sidebarOverlay');
+    const mobileBtn = document.getElementById('mobileFilterBtn');
+
+    function openSidebar()  { sidebar.classList.add('sidebar--open'); overlay.classList.add('overlay--active'); document.body.style.overflow = 'hidden'; }
+    function closeSidebar() { sidebar.classList.remove('sidebar--open'); overlay.classList.remove('overlay--active'); document.body.style.overflow = ''; }
+
+    mobileBtn.addEventListener('click', openSidebar);
+    overlay.addEventListener('click', closeSidebar);
+})();
+</script>
 {% endblock %}

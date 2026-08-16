@@ -42,13 +42,22 @@ LANCAMENTOS = [
 
 @main_bp.route('/')
 def index():
-    featured_properties = PropertyRepository.get_featured()
+    featured_properties = PropertyRepository.filter(category="Destaque")
+    exclusive_properties = PropertyRepository.filter(category="Exclusivo")
+    high_end_properties = PropertyRepository.filter(category="Alto Padrão")
+    
+    # If no featured, fallback to get_featured() logic which is all_props[:3]
+    if not featured_properties:
+        featured_properties = PropertyRepository.get_featured()
+        
     all_properties = PropertyRepository.get_all()
     cities = PropertyRepository.get_cities()
     types = PropertyRepository.get_types()
     return render_template(
         'main/index.html',
         featured_properties=featured_properties,
+        exclusive_properties=exclusive_properties,
+        high_end_properties=high_end_properties,
         total_properties=len(all_properties),
         cities=cities,
         types=types,

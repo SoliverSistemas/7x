@@ -417,12 +417,61 @@ class PropertyRepository:
     ]
 
     @classmethod
+    def calculate_category(cls, prop):
+        if prop.get('is_exclusive', False):
+            return "Exclusivo"
+        
+        try:
+            price = float(prop.get('price', 0))
+        except (ValueError, TypeError):
+            price = 0
+            
+        try:
+            area = float(prop.get('area', 0))
+        except (ValueError, TypeError):
+            area = 0
+            
+        try:
+            suites = int(prop.get('suites', 0))
+        except (ValueError, TypeError):
+            suites = 0
+            
+        if price >= 3000000 or (area >= 200 and suites >= 3):
+            return "Alto Padrão"
+            
+        if prop.get('featured', False):
+            return "Destaque"
+            
+        return "Geral"
+
+    @classmethod
     def get_all(cls):
         # Check if Tecimobi API returns items
         result = TecimobService.fetch_properties()
         if result:
-            return result.get('properties', [])
-        return cls._properties
+            props = result.get('properties', [])
+        else:
+            props = cls._properties
+            
+        for p in props:
+            p['calculated_category'] = cls.calculate_category(p)
+            
+        return props
+
+    @classmethod
+    def toggle_exclusive(cls, property_id):
+        # Only works for local mock data for this demo
+        try:
+            pid = int(property_id)
+            match = next((p for p in cls._properties if p['id'] == pid), None)
+            if match:
+                current = match.get('is_exclusive', False)
+                match['is_exclusive'] = not current
+                match['calculated_category'] = cls.calculate_category(match)
+                return match['is_exclusive']
+        except (ValueError, TypeError):
+            pass
+        return None
 
     @classmethod
     def get_featured(cls):
@@ -434,6 +483,7 @@ class PropertyRepository:
         # Try Tecimobi API first if active
         tecimobi_prop = TecimobService.fetch_property_by_id(str(property_id))
         if tecimobi_prop:
+            tecimobi_prop['calculated_category'] = cls.calculate_category(tecimobi_prop)
             return tecimobi_prop
 
         # Search by int ID
@@ -441,16 +491,20 @@ class PropertyRepository:
             pid = int(property_id)
             match = next((p for p in cls._properties if p['id'] == pid), None)
             if match:
+                match['calculated_category'] = cls.calculate_category(match)
                 return match
         except (ValueError, TypeError):
             pass
 
         # Search by string UUID or reference or slug
         s_id = str(property_id).strip().lower()
-        return next((p for p in cls._properties if
-                     str(p.get('id', '')).lower() == s_id or
-                     str(p.get('reference', '')).lower() == s_id or
-                     str(p.get('slug', '')).lower() == s_id), None)
+        match = next((p for p in cls._properties if
+                      str(p.get('id', '')).lower() == s_id or
+                      str(p.get('reference', '')).lower() == s_id or
+                      str(p.get('slug', '')).lower() == s_id), None)
+        if match:
+            match['calculated_category'] = cls.calculate_category(match)
+        return match
 
     @classmethod
     def get_by_slug(cls, slug):
@@ -458,8 +512,17 @@ class PropertyRepository:
         return next((p for p in all_props if p.get('slug') == slug), None)
 
     @classmethod
-    def filter(cls, search_query="", prop_type="", purpose="", min_price=None, max_price=None, bedrooms=None, city="", neighborhood="", sort_by="recent"):
+    def filter(cls, search_query="", prop_type="", purpose="", min_price=None, max_price=None,
+               bedrooms=None, suites=None, bathrooms=None, garage=None,
+               min_area=None, max_area=None,
+               city="", neighborhood="",
+               financeable=None, exchange=None, furnished=None,
+               sort_by="recent", category=None):
         results = cls.get_all().copy()
+
+        # Category
+        if category and category.lower() != "todas":
+            results = [p for p in results if p.get('calculated_category', '').lower() == category.lower()]
 
         # Text search
         if search_query:
@@ -494,35 +557,81 @@ class PropertyRepository:
         # Min Price
         if min_price is not None and min_price != "":
             try:
-                min_p = float(min_price)
-                results = [p for p in results if p.get('price', 0) >= min_p]
-            except ValueError:
+                results = [p for p in results if p.get('price', 0) >= float(min_price)]
+            except (ValueError, TypeError):
                 pass
 
         # Max Price
         if max_price is not None and max_price != "":
             try:
-                max_p = float(max_price)
-                results = [p for p in results if p.get('price', 0) <= max_p]
-            except ValueError:
+                results = [p for p in results if p.get('price', 0) <= float(max_price)]
+            except (ValueError, TypeError):
                 pass
 
         # Bedrooms
         if bedrooms is not None and bedrooms != "":
             try:
-                beds = int(bedrooms)
-                results = [p for p in results if p.get('bedrooms', 0) >= beds]
-            except ValueError:
+                results = [p for p in results if p.get('bedrooms', 0) >= int(bedrooms)]
+            except (ValueError, TypeError):
                 pass
 
-        # Sorting
-        if sort_by == "price_asc":
+        # Suites
+        if suites is not None and suites != "":
+            try:
+                results = [p for p in results if p.get('suites', 0) >= int(suites)]
+            except (ValueError, TypeError):
+                pass
+
+        # Bathrooms
+        if bathrooms is not None and bathrooms != "":
+            try:
+                results = [p for p in results if p.get('bathrooms', 0) >= int(bathrooms)]
+            except (ValueError, TypeError):
+                pass
+
+        # Garage / vagas
+        if garage is not None and garage != "":
+            try:
+                results = [p for p in results if p.get('garage', 0) >= int(garage)]
+            except (ValueError, TypeError):
+                pass
+
+        # Min Area
+        if min_area is not None and min_area != "":
+            try:
+                results = [p for p in results if p.get('area', 0) >= float(min_area)]
+            except (ValueError, TypeError):
+                pass
+
+        # Max Area
+        if max_area is not None and max_area != "":
+            try:
+                results = [p for p in results if p.get('area', 0) <= float(max_area)]
+            except (ValueError, TypeError):
+                pass
+
+        # Financeable
+        if financeable == '1':
+            results = [p for p in results if p.get('is_financeable', False)]
+
+        # Accepts Exchange
+        if exchange == '1':
+            results = [p for p in results if p.get('accepts_exchange', False)]
+
+        # Furnished
+        if furnished == '1':
+            results = [p for p in results if
+                       p.get('furnished') and p.get('furnished') != 'Não mobiliado']
+
+        # Sorting — accept both hyphen and underscore variants
+        sort_key = sort_by.replace('-', '_')
+        if sort_key == "price_asc":
             results.sort(key=lambda x: x.get('price', 0))
-        elif sort_by == "price_desc":
+        elif sort_key == "price_desc":
             results.sort(key=lambda x: x.get('price', 0), reverse=True)
-        elif sort_by == "area_desc":
+        elif sort_key == "area_desc":
             results.sort(key=lambda x: x.get('area', 0), reverse=True)
-        else: # 'recent'
+        else:  # 'recent'
             results.sort(key=lambda x: str(x.get('id', 0)), reverse=True)
 
         return results

@@ -125,24 +125,35 @@
 </section>
 
 
-<!-- ══ Featured Properties ══════════════════════════════════════════════ -->
-<section class="section">
+<!-- ══ Categorized Properties ══════════════════════════════════════════════ -->
+{% set home_sections = [
+    {'eyebrow': 'SELEÇÃO EXCLUSIVA', 'title': 'Imóveis ', 'em': 'Exclusivos', 'items': exclusive_properties},
+    {'eyebrow': 'O MELHOR DO MERCADO', 'title': 'Imóveis de ', 'em': 'Alto Padrão', 'items': high_end_properties},
+    {'eyebrow': 'OPORTUNIDADES', 'title': 'Imóveis em ', 'em': 'Destaque', 'items': featured_properties}
+] %}
+
+{% for sec in home_sections %}
+{% if sec['items'] %}
+<section class="section" {% if loop.index > 1 %}style="padding-top: 2rem;"{% endif %}>
     <div class="container">
         <div class="section-header-flex reveal">
             <div>
                 <div class="section-eyebrow">
                     <span class="eyebrow-line"></span>
-                    <span>SELEÇÃO EXCLUSIVA</span>
+                    <span>{{ sec.eyebrow }}</span>
                 </div>
-                <h2>Imóveis em <em style="font-style: italic; font-weight: 400;">Destaque</em></h2>
+                <h2>{{ sec.title }}<em style="font-style: italic; font-weight: 400;">{{ sec.em }}</em></h2>
             </div>
-            <a href="{{ url_for('properties.list_properties') }}" class="btn btn-outline">Ver Todo o Catálogo &rarr;</a>
+            <a href="{{ url_for('properties.list_properties', category=sec.em) }}" class="btn btn-outline">Ver Catálogo Completo &rarr;</a>
         </div>
 
         <div class="properties-grid">
-            {% for p in featured_properties %}
+            {% for p in sec['items'] %}
                 <div class="property-card" data-href="{{ url_for('properties.detail', property_id=p.id) }}">
                     <div class="card-img-wrapper">
+                        {% if p.calculated_category and p.calculated_category != 'Geral' %}
+                        <div class="card-ribbon card-ribbon--{{ p.calculated_category|lower|replace(' ', '-')|replace('ã', 'a') }}">{{ p.calculated_category }}</div>
+                        {% endif %}
                         <div class="card-badges">
                             <span class="badge badge-gold">{{ p.purpose }}</span>
                             {% if p.badge %}
@@ -225,6 +236,8 @@
         </div>
     </div>
 </section>
+{% endif %}
+{% endfor %}
 
 
 <!-- ══ Lançamentos ═══════════════════════════════════════════════════════ -->

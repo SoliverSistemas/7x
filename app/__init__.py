@@ -44,10 +44,12 @@ def create_app(config_name='dev'):
     from app.routes.main import main_bp
     from app.routes.properties import properties_bp
     from app.routes.api import api_bp
+    from app.routes.admin import admin_bp
 
     app.register_blueprint(main_bp)
     app.register_blueprint(properties_bp, url_prefix='/imoveis')
     app.register_blueprint(api_bp, url_prefix='/api')
+    app.register_blueprint(admin_bp, url_prefix='/admin')
 
     # Register Error Handlers
     @app.errorhandler(404)

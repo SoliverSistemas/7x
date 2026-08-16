@@ -164,6 +164,40 @@
     transform: scale(1.07);
 }
 
+/* Card Ribbon (Faixa de Categoria) */
+.card-ribbon {
+    position: absolute;
+    top: 18px;
+    right: -32px;
+    background: var(--primary);
+    color: #0d1012;
+    padding: 0.35rem 3.5rem;
+    font-size: 0.65rem;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    transform: rotate(45deg);
+    z-index: 10;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    pointer-events: none;
+}
+
+.card-ribbon--exclusivo {
+    background: #0d1012;
+    color: var(--primary);
+    border: 1px solid rgba(201, 172, 119, 0.4);
+}
+
+.card-ribbon--alto-padrao {
+    background: linear-gradient(135deg, #e6e6e6, #ffffff);
+    color: #111;
+}
+
+.card-ribbon--destaque {
+    background: linear-gradient(135deg, var(--primary), var(--primary-hover));
+    color: #0d1012;
+}
+
 /* Rich gradient overlay */
 .card-img-wrapper::after {
     content: '';

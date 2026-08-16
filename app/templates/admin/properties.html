@@ -1,0 +1,143 @@
+{% extends 'admin/base_admin.html' %}
+
+{% block title %}Imóveis{% endblock %}
+{% block page_title %}Gestão de Imóveis{% endblock %}
+
+{% block content %}
+
+<!-- Toolbar -->
+<div class="admin-toolbar">
+    <form method="GET" action="{{ url_for('admin.properties') }}" class="admin-search-form">
+        <div class="admin-search-wrap">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+            </svg>
+            <input type="text" name="q" placeholder="Buscar imóvel, bairro, referência..."
+                   value="{{ current_filters.query }}" class="admin-search-input" autofocus>
+        </div>
+        <div class="admin-select-wrap">
+            <select name="purpose" class="admin-select" onchange="this.form.submit()">
+                <option value="">Todos</option>
+                <option value="Venda" {% if current_filters.purpose == 'Venda' %}selected{% endif %}>Venda</option>
+                <option value="Aluguel" {% if current_filters.purpose == 'Aluguel' %}selected{% endif %}>Aluguel</option>
+            </select>
+        </div>
+        <div class="admin-select-wrap">
+            <select name="sort" class="admin-select" onchange="this.form.submit()">
+                <option value="recent" {% if current_filters.sort == 'recent' %}selected{% endif %}>Mais recentes</option>
+                <option value="price-desc" {% if current_filters.sort == 'price-desc' %}selected{% endif %}>Maior preço</option>
+                <option value="price-asc" {% if current_filters.sort == 'price-asc' %}selected{% endif %}>Menor preço</option>
+                <option value="area-desc" {% if current_filters.sort == 'area-desc' %}selected{% endif %}>Maior área</option>
+            </select>
+        </div>
+        <button type="submit" class="admin-btn-primary">Buscar</button>
+        {% if current_filters.query or current_filters.purpose %}
+        <a href="{{ url_for('admin.properties') }}" class="admin-btn-ghost">Limpar</a>
+        {% endif %}
+    </form>
+    <div class="admin-toolbar-right">
+        <span class="admin-result-count">{{ properties|length }} imóvel{{ 's' if properties|length != 1 else '' }}</span>
+    </div>
+</div>
+
+<!-- Table -->
+<div class="dash-card" style="padding:0; overflow:hidden;">
+    <div class="admin-table-wrap">
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>ID / Ref</th>
+                    <th>Imóvel</th>
+                    <th>Tipo</th>
+                    <th>Finalidade</th>
+                    <th>Localização</th>
+                    <th>Área</th>
+                    <th>Dorms</th>
+                    <th>Preço</th>
+                    <th>Categoria</th>
+                    <th>Status</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if properties %}
+                {% for p in properties %}
+                <tr class="admin-table-row" data-href="{{ url_for('admin.property_detail', property_id=p.id) }}">
+                    <td>
+                        <span class="td-id">#{{ p.id }}</span>
+                        <span class="td-ref">{{ p.reference or '—' }}</span>
+                    </td>
+                    <td class="td-title">
+                        <div class="td-with-img">
+                            <img src="{{ url_for('static', filename='img/' + p.image) }}"
+                                 alt="{{ p.title }}" class="td-thumb" loading="lazy">
+                            <span>{{ p.title|truncate(38) }}</span>
+                        </div>
+                    </td>
+                    <td><span class="badge-sm">{{ p.type }}</span></td>
+                    <td>
+                        <span class="badge-sm badge-sm--{{ 'gold' if p.purpose == 'Venda' else 'blue' }}">
+                            {{ p.purpose }}
+                        </span>
+                    </td>
+                    <td class="td-muted">{{ p.neighborhood }}, {{ p.city }}</td>
+                    <td class="td-muted">{{ p.area|area_format if p.area else '—' }}</td>
+                    <td class="td-muted">{{ p.bedrooms or '—' }}</td>
+                    <td class="td-price">{{ p.price|currency }}</td>
+                    <td>
+                        <span class="badge-sm badge-sm--{{ 'gold' if p.calculated_category == 'Exclusivo' else 'blue' if p.calculated_category == 'Alto Padrão' else 'purple' if p.calculated_category == 'Destaque' else 'default' }}">
+                            {{ p.calculated_category }}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="status-dot status-dot--{{ 'green' if p.status == 'Disponível' else 'yellow' }}">
+                            {{ p.status or 'Disponível' }}
+                        </span>
+                    </td>
+                    <td style="display: flex; gap: 0.75rem; align-items: center;">
+                        <a href="{{ url_for('admin.property_detail', property_id=p.id) }}" class="admin-row-action">
+                            Ver <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+                        </a>
+                        <form method="POST" action="{{ url_for('admin.toggle_exclusive', property_id=p.id) }}" style="margin:0;">
+                            <button type="submit" class="admin-row-action" title="Alternar Exclusividade" style="background:none; border:none; cursor:pointer; padding:0; display:flex;">
+                                {% if p.is_exclusive %}
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="var(--adm-gold)" stroke="var(--adm-gold)" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                                {% else %}
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                                {% endif %}
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+                {% else %}
+                <tr>
+                    <td colspan="10" class="td-empty">
+                        <div class="admin-empty">
+                            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2">
+                                <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+                            </svg>
+                            <p>Nenhum imóvel encontrado para os filtros aplicados.</p>
+                            <a href="{{ url_for('admin.properties') }}" class="admin-btn-ghost">Limpar filtros</a>
+                        </div>
+                    </td>
+                </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Row click → detail page
+document.querySelectorAll('.admin-table-row[data-href]').forEach(row => {
+    row.style.cursor = 'pointer';
+    row.addEventListener('click', e => {
+        if (!e.target.closest('a') && !e.target.closest('button')) window.location.href = row.dataset.href;
+    });
+});
+</script>
+{% endblock %}
