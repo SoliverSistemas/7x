@@ -36,7 +36,7 @@
         {% endif %}
     </form>
     <div class="admin-toolbar-right">
-        <span class="admin-result-count">{{ properties|length }} imóvel{{ 's' if properties|length != 1 else '' }}</span>
+        <span class="admin-result-count">{{ pagination.total }} imóvel{{ 's' if pagination.total != 1 else '' }} · página {{ pagination.current_page }}/{{ pagination.last_page }}</span>
     </div>
 </div>
 
@@ -69,7 +69,14 @@
                     </td>
                     <td class="td-title">
                         <div class="td-with-img">
-                            <img src="{{ url_for('static', filename='img/' + p.image) }}"
+                            {% if p.image and p.image.startswith('http') %}
+                                {% set thumb_src = p.image %}
+                            {% elif p.image %}
+                                {% set thumb_src = url_for('static', filename='img/' + p.image) %}
+                            {% else %}
+                                {% set thumb_src = url_for('static', filename='img/placeholder.jpg') %}
+                            {% endif %}
+                            <img src="{{ thumb_src }}"
                                  alt="{{ p.title }}" class="td-thumb" loading="lazy">
                             <span>{{ p.title|truncate(38) }}</span>
                         </div>
@@ -127,6 +134,36 @@
         </table>
     </div>
 </div>
+
+<!-- Paginação -->
+{% if pagination.last_page > 1 %}
+<div class="adm-pagination">
+    <span class="adm-pagination-info">{{ pagination.total }} imóveis · página {{ pagination.current_page }} de {{ pagination.last_page }}</span>
+    <div class="adm-pagination-links">
+        {% if pagination.has_prev %}
+        <a href="{{ url_for('admin.properties', page=pagination.current_page - 1, q=current_filters.query, purpose=current_filters.purpose, sort=current_filters.sort) }}" class="adm-page-btn">
+            ← Anterior
+        </a>
+        {% endif %}
+
+        {% for p in range(1, pagination.last_page + 1) %}
+            {% if p == pagination.current_page %}
+            <span class="adm-page-btn adm-page-btn--active">{{ p }}</span>
+            {% elif p == 1 or p == pagination.last_page or (p >= pagination.current_page - 2 and p <= pagination.current_page + 2) %}
+            <a href="{{ url_for('admin.properties', page=p, q=current_filters.query, purpose=current_filters.purpose, sort=current_filters.sort) }}" class="adm-page-btn">{{ p }}</a>
+            {% elif p == pagination.current_page - 3 or p == pagination.current_page + 3 %}
+            <span class="adm-page-btn adm-page-btn--ellipsis">…</span>
+            {% endif %}
+        {% endfor %}
+
+        {% if pagination.has_next %}
+        <a href="{{ url_for('admin.properties', page=pagination.current_page + 1, q=current_filters.query, purpose=current_filters.purpose, sort=current_filters.sort) }}" class="adm-page-btn">
+            Próxima →
+        </a>
+        {% endif %}
+    </div>
+</div>
+{% endif %}
 
 {% endblock %}
 

@@ -5,6 +5,7 @@ properties_bp = Blueprint('properties', __name__)
 
 @properties_bp.route('/')
 def list_properties():
+    page        = request.args.get('page', 1, type=int)
     query       = request.args.get('q', '')
     prop_type   = request.args.get('type', '')
     purpose     = request.args.get('purpose', '')
@@ -24,7 +25,9 @@ def list_properties():
     sort_by     = request.args.get('sort', 'recent')
     category    = request.args.get('category', '')
 
-    filtered_properties = PropertyRepository.filter(
+    filter_results = PropertyRepository.filter(
+        page=page,
+        per_page=12,
         search_query=query,
         prop_type=prop_type,
         purpose=purpose,
@@ -51,7 +54,8 @@ def list_properties():
 
     return render_template(
         'properties/index.html',
-        properties=filtered_properties,
+        properties=filter_results['properties'],
+        pagination=filter_results,
         cities=cities,
         types=types,
         neighborhoods=neighborhoods,

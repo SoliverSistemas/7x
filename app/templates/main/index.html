@@ -165,7 +165,8 @@
                             <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
                         </button>
 
-                        <img src="{{ url_for('static', filename='img/' + p.image) }}" alt="{{ p.title }}" loading="lazy">
+                        {% set img_src = p.exclusive_cover_url if p.exclusive_cover_url else (p.image if p.image and p.image.startswith('http') else url_for('static', filename='img/' + p.image) if p.image else url_for('static', filename='img/placeholder.jpg')) %}
+                        <img src="{{ img_src }}" alt="{{ p.title }}" loading="lazy">
 
                         <div class="card-price-overlay">
                             <span class="card-price-label">{{ p.purpose == 'Aluguel' and 'Aluguel / mês' or 'Valor' }}</span>
@@ -306,7 +307,30 @@
     <!-- Slides Container -->
     <div class="cine-track" id="cine-track">
 
-        <!-- Slide 1 -->
+        {% if exclusive_properties %}
+            {% for p in exclusive_properties %}
+            {% set cover = p.exclusive_cover_url if p.exclusive_cover_url else (p.image if p.image else 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=2400&q=90') %}
+            <div class="cine-slide {% if loop.first %}active{% endif %}" data-index="{{ loop.index }}">
+                <div class="cine-slide-bg" style="background-image: url('{{ cover }}');"></div>
+                <div class="cinematic-overlay"></div>
+                <div class="cine-slide-content">
+                    <div class="cine-badge">{{ p.purpose }} · Exclusivo 7X</div>
+                    <h3 class="cine-prop-title">{{ p.title }}</h3>
+                    <div class="cine-prop-meta">
+                        {% if p.area %}<span>{{ p.area|area_format }}</span><span class="cine-meta-sep">·</span>{% endif %}
+                        {% if p.bedrooms %}<span>{{ p.bedrooms }} Dorms</span><span class="cine-meta-sep">·</span>{% endif %}
+                        <span>{{ p.neighborhood }}, {{ p.city }}</span>
+                    </div>
+                    <p class="cine-prop-desc">{{ p.description[:180] + '…' if p.description and p.description|length > 180 else p.description or 'Imóvel exclusivo selecionado pela curadoria 7X.' }}</p>
+                    <a href="{{ url_for('properties.detail', property_id=p.id) }}" class="btn btn-primary cine-btn">
+                        Visualizar Imóvel
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+        <!-- Placeholders enquanto a coleção está vazia (visíveis só para admins) -->
         <div class="cine-slide active" data-index="1">
             <div class="cine-slide-bg" style="background-image: url('https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=2400&q=90');"></div>
             <div class="cinematic-overlay"></div>
@@ -318,53 +342,36 @@
                     <span>4 Suítes</span><span class="cine-meta-sep">·</span>
                     <span>Piscina Infinita</span>
                 </div>
-                <p class="cine-prop-desc">Vista eterna para o parque. Arquitetura autoral com pé-direito duplo e skyline definitivo de São Paulo.</p>
-                <a href="#" class="btn btn-primary cine-btn">
-                    Visualizar Imóvel
+                <p class="cine-prop-desc">Configure os imóveis da Coleção Exclusiva no painel admin → Coleção Exclusiva.</p>
+                <a href="{{ url_for('admin.exclusive_collection') }}" class="btn btn-primary cine-btn">
+                    Configurar no Admin
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
                 </a>
             </div>
         </div>
-
-        <!-- Slide 2 -->
         <div class="cine-slide" data-index="2">
             <div class="cine-slide-bg" style="background-image: url('https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=2400&q=90');"></div>
             <div class="cinematic-overlay"></div>
             <div class="cine-slide-content">
                 <div class="cine-badge">Exclusividade 7X</div>
-                <h3 class="cine-prop-title">Villa Fasano<br>Fazenda Boa Vista</h3>
-                <div class="cine-prop-meta">
-                    <span>1.200 m²</span><span class="cine-meta-sep">·</span>
-                    <span>6 Suítes</span><span class="cine-meta-sep">·</span>
-                    <span>Piquete Privativo</span>
-                </div>
-                <p class="cine-prop-desc">O refúgio definitivo de alto luxo no interior. Natureza exuberante com acabamentos de padrão internacional.</p>
-                <a href="#" class="btn btn-primary cine-btn">
-                    Visualizar Imóvel
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
-                </a>
+                <h3 class="cine-prop-title">Slot 2<br>Disponível</h3>
+                <div class="cine-prop-meta"><span>Adicione um imóvel no painel admin</span></div>
+                <p class="cine-prop-desc">Acesse Admin → Coleção Exclusiva para definir os imóveis e suas capas.</p>
+                <a href="{{ url_for('admin.exclusive_collection') }}" class="btn btn-primary cine-btn">Configurar</a>
             </div>
         </div>
-
-        <!-- Slide 3 -->
         <div class="cine-slide" data-index="3">
             <div class="cine-slide-bg" style="background-image: url('https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=2400&q=90');"></div>
             <div class="cinematic-overlay"></div>
             <div class="cine-slide-content">
-                <div class="cine-badge">Novo Lançamento</div>
-                <h3 class="cine-prop-title">Mansão<br>Jardim Europa</h3>
-                <div class="cine-prop-meta">
-                    <span>860 m²</span><span class="cine-meta-sep">·</span>
-                    <span>5 Suítes</span><span class="cine-meta-sep">·</span>
-                    <span>Automação Total</span>
-                </div>
-                <p class="cine-prop-desc">Terreno raro em um dos endereços mais valorizados do país. Design contemporâneo e paisagismo assinado.</p>
-                <a href="#" class="btn btn-primary cine-btn">
-                    Visualizar Imóvel
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
-                </a>
+                <div class="cine-badge">Slot 3</div>
+                <h3 class="cine-prop-title">Slot 3<br>Disponível</h3>
+                <div class="cine-prop-meta"><span>Adicione um imóvel no painel admin</span></div>
+                <p class="cine-prop-desc">Acesse Admin → Coleção Exclusiva para definir os imóveis e suas capas.</p>
+                <a href="{{ url_for('admin.exclusive_collection') }}" class="btn btn-primary cine-btn">Configurar</a>
             </div>
         </div>
+        {% endif %}
 
     </div>
 
@@ -396,10 +403,11 @@
         </button>
 
         <!-- Dots de Progresso (Rodapé) -->
+        {% set n_slides = exclusive_properties|length if exclusive_properties else 3 %}
         <div class="cine-dots" id="cine-dots">
-            <button class="cine-dot active" data-slide="0" aria-label="Slide 1"></button>
-            <button class="cine-dot" data-slide="1" aria-label="Slide 2"></button>
-            <button class="cine-dot" data-slide="2" aria-label="Slide 3"></button>
+            {% for i in range(n_slides) %}
+            <button class="cine-dot {% if loop.first %}active{% endif %}" data-slide="{{ loop.index0 }}" aria-label="Slide {{ loop.index }}"></button>
+            {% endfor %}
         </div>
 
         <!-- CTA do portfólio completo (Rodapé Direito) -->

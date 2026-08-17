@@ -1,5 +1,10 @@
 from flask import Flask, render_template
 from config import config_by_name
+from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
+
+db = SQLAlchemy()
+migrate = Migrate()
 
 def create_app(config_name='dev'):
     """
@@ -12,6 +17,10 @@ def create_app(config_name='dev'):
         app.config.from_object(config_by_name.get(config_name, config_by_name['default']))
     else:
         app.config.from_object(config_name)
+        
+    # Initialize Database
+    db.init_app(app)
+    migrate.init_app(app, db)
     
     # Register Custom Template Filters
     @app.template_filter('currency')
@@ -59,5 +68,9 @@ def create_app(config_name='dev'):
     @app.errorhandler(500)
     def internal_server_error(e):
         return render_template('500.html'), 500
+
+    # Import models so Flask-Migrate can detect them
+    with app.app_context():
+        from app.models.db_models import Property, ExclusiveCollection  # noqa: F401
 
     return app

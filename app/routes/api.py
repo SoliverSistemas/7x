@@ -1,5 +1,6 @@
 from flask import Blueprint, jsonify, request
 from app.models.property_model import PropertyRepository
+from app.services.tecimobi_service import TecimobService
 
 api_bp = Blueprint('api', __name__)
 
@@ -14,7 +15,7 @@ def get_properties():
     bedrooms = request.args.get('bedrooms', None)
     sort_by = request.args.get('sort', 'recent')
 
-    properties = PropertyRepository.filter(
+    result = PropertyRepository.filter(
         search_query=query,
         prop_type=prop_type,
         purpose=purpose,
@@ -27,8 +28,8 @@ def get_properties():
 
     return jsonify({
         'status': 'success',
-        'count': len(properties),
-        'properties': properties
+        'count': result['total'],
+        'properties': result['properties']
     })
 
 @api_bp.route('/schedule-visit', methods=['POST'])
@@ -47,9 +48,24 @@ def schedule_visit():
             'message': 'Por favor, preencha todos os campos obrigatórios (nome, telefone, data).'
         }), 400
 
+    # Tenta enviar o Lead para o Tecimob CRM
+    msg = f"Deseja agendar uma visita para {visit_date} às {visit_time}."
+    lead_sent = TecimobService.send_lead(
+        name=name,
+        phone=phone,
+        email=email,
+        property_id=property_id,
+        message=msg
+    )
+
+    if lead_sent:
+        message_response = f'Visita agendada com sucesso para {visit_date} às {visit_time}! Nosso corretor entrará em contato via WhatsApp.'
+    else:
+        message_response = f'Recebemos sua solicitação para {visit_date} às {visit_time}. No entanto, nossa integração com o sistema está offline no momento. Um corretor retornará em breve.'
+
     return jsonify({
         'status': 'success',
-        'message': f'Visita agendada com sucesso para {visit_date} às {visit_time}! Nosso corretor entrará em contato via WhatsApp.'
+        'message': message_response
     })
 
 @api_bp.route('/calculate-financing', methods=['POST'])

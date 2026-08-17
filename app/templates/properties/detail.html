@@ -552,7 +552,7 @@
                                     {% endif %}
                                 </div>
                                 <button class="card-favorite-btn" data-id="{{ p.id }}" title="Salvar Favorito">♡</button>
-                                <img src="{{ url_for('static', filename='img/' + p.image) if not p.image.startswith('http') else p.image }}" alt="{{ p.title }}" loading="lazy">
+                                <img src="{{ p.image if p.image and p.image.startswith('http') else (url_for('static', filename='img/' + p.image) if p.image else url_for('static', filename='img/placeholder.jpg')) }}" alt="{{ p.title }}" loading="lazy">
                             </div>
                             <div class="card-body">
                                 <div class="card-location">📍 {{ p.neighborhood }}, {{ p.city }}</div>

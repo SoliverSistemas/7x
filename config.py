@@ -5,6 +5,16 @@ load_dotenv()
 
 class Config:
     SECRET_KEY = os.environ.get('SECRET_KEY') or '7x-imoveis-secret-key-2026-super-secure'
+    
+    # Database — Supabase/PostgreSQL ou SQLite local como fallback
+    basedir = os.path.abspath(os.path.dirname(__file__))
+    _db_url = os.environ.get('DATABASE_URL') or ''
+    # Supabase entrega 'postgres://' mas SQLAlchemy exige 'postgresql://'
+    if _db_url.startswith('postgres://'):
+        _db_url = _db_url.replace('postgres://', 'postgresql://', 1)
+    SQLALCHEMY_DATABASE_URI = _db_url or 'sqlite:///' + os.path.join(basedir, 'app.db')
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
+    
     STATIC_FOLDER = 'static'
     TEMPLATES_FOLDER = 'templates'
     SITE_NAME = os.environ.get('SITE_NAME') or '7X Imóveis'

@@ -388,7 +388,8 @@
                                         <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
                                     </svg>
                                 </button>
-                                <img src="{{ url_for('static', filename='img/' + p.image) }}"
+                                {% set img_src = p.image if p.image and p.image.startswith('http') else (url_for('static', filename='img/' + p.image) if p.image else url_for('static', filename='img/placeholder.jpg')) %}
+                                <img src="{{ img_src }}"
                                      alt="{{ p.title }}" loading="lazy">
                                 <div class="card-price-overlay">
                                     <span class="card-price-label">{{ p.purpose == 'Aluguel' and 'Aluguel / mês' or 'Valor' }}</span>
@@ -471,6 +472,36 @@
                 </div>
 
             </div><!-- /.catalog-main -->
+
+            <!-- Pagination -->
+            {% if pagination and pagination.last_page > 1 %}
+            <div class="pagination">
+                
+                {% if pagination.has_prev %}
+                <a href="{{ url_for('properties.list_properties', page=pagination.current_page - 1, **current_filters) }}" class="btn-page btn-page-prev">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+                    Anterior
+                </a>
+                {% endif %}
+                
+                <span class="page-info">Página {{ pagination.current_page }} de {{ pagination.last_page }}</span>
+                
+                {% if pagination.has_next %}
+                <a href="{{ url_for('properties.list_properties', page=pagination.current_page + 1, **current_filters) }}" class="btn-page btn-page-next">
+                    Próxima
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+                </a>
+                {% endif %}
+            </div>
+            <style>
+                .pagination { display: flex; align-items: center; justify-content: center; gap: 1rem; margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--border-light); }
+                .btn-page { display: flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1.25rem; background: var(--bg-card); border: 1px solid var(--border-light); border-radius: 8px; color: var(--text-main); font-weight: 500; transition: all 0.2s ease; text-decoration: none; }
+                .btn-page:hover { background: var(--accent-light); border-color: var(--accent-gold); color: var(--accent-gold); }
+                .btn-page svg { width: 16px; height: 16px; }
+                .page-info { font-size: 0.95rem; color: var(--text-muted); font-weight: 500; }
+            </style>
+            {% endif %}
+
         </div><!-- /.catalog-layout -->
     </div>
 </section>

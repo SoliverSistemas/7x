@@ -84,7 +84,8 @@ class TecimobService:
     @classmethod
     def fetch_properties(cls, page=1, per_page=20, transaction=None, city=None,
                          neighborhood=None, price_gte=None, price_lte=None,
-                         bedroom_qty=None, prop_type=None, status='disponivel'):
+                         bedroom_qty=None, prop_type=None, status='disponivel',
+                         min_area=None, max_area=None, reference=None):
         """
         Busca imóveis via GET /api/properties
         Filtros suportados pela API Tecimob:
@@ -96,6 +97,9 @@ class TecimobService:
           - filter[by_room][bedroom][filter]: 'greater_equals'
           - filter[subtype.type.title]: tipo do imóvel (ex: Residencial)
           - filter[status]: 'disponivel' | 'vendido' | 'alugado' | 'excluido'
+          - filter[by_area][built_area][greater_equals]: min_area
+          - filter[by_area][built_area][lower_equals]: max_area
+          - filter[reference]: reference
         """
         if not cls._is_active():
             return None
@@ -117,6 +121,12 @@ class TecimobService:
             params['filter[by_room][bedroom][filter]'] = 'greater_equals'
         if prop_type:
             params['filter[subtype.type.title]'] = prop_type
+        if min_area:
+            params['filter[by_area][built_area][greater_equals]'] = min_area
+        if max_area:
+            params['filter[by_area][built_area][lower_equals]'] = max_area
+        if reference:
+            params['filter[reference]'] = reference
 
         data = cls._get('/api/properties', params=params)
         if not data:
@@ -275,20 +285,27 @@ class TecimobService:
         garage = int(rooms_map.get('vagas', rooms_map.get('garagem', 0)) or 0)
 
         # ── Imagens ───────────────────────────────────
-        # Na API Tecimob, imagens vêm dentro de `informations` ou na property diretamente
-        # como files/images. Usamos 'url' do imóvel como fallback.
-        informations = item.get('informations') or []
+        # Na listagem: sem imagens (campo 'images' só vem no detalhe)
+        # No detalhe: item['images'] = [{file_url, order, gallery}, ...]
+        images_list = item.get('images') or []
         gallery_urls = []
-        for info in informations:
-            if info.get('name') == 'images' or 'imagem' in (info.get('name') or '').lower():
-                v = info.get('value')
-                if isinstance(v, list):
-                    gallery_urls.extend(v)
-                elif isinstance(v, str) and v.startswith('http'):
-                    gallery_urls.append(v)
+        if images_list:
+            # Ordenar por 'order' e pegar file_url
+            sorted_imgs = sorted(images_list, key=lambda x: x.get('order', 999))
+            gallery_urls = [img['file_url'] for img in sorted_imgs if img.get('file_url')]
+        else:
+            # Fallback: busca em informations (campo legado)
+            informations = item.get('informations') or []
+            for info in informations:
+                if 'imagem' in (info.get('name') or '').lower() or info.get('name') == 'images':
+                    v = info.get('value')
+                    if isinstance(v, list):
+                        gallery_urls.extend(v)
+                    elif isinstance(v, str) and v.startswith('http'):
+                        gallery_urls.append(v)
 
         prop_url = item.get('url') or ''
-        main_image = gallery_urls[0] if gallery_urls else 'img_prop_1.jpg'
+        main_image = gallery_urls[0] if gallery_urls else None
 
         # ── Corretor ──────────────────────────────────
         user = item.get('user') or {}

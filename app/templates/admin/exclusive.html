@@ -1,0 +1,159 @@
+{% extends 'admin/base_admin.html' %}
+
+{% block title %}Coleção Exclusiva{% endblock %}
+{% block page_title %}Coleção Exclusiva{% endblock %}
+
+{% block content %}
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% for category, message in messages %}
+    <div class="flash {{ category }}">{{ message }}</div>
+  {% endfor %}
+{% endwith %}
+
+<div class="exclusive-page-header">
+    <div>
+        <h1 class="exclusive-page-title">Coleção Exclusiva</h1>
+        <p class="exclusive-page-sub">Gerencie até {{ max_slots }} imóveis que aparecem no carrossel principal do site.</p>
+    </div>
+    <span class="badge-sm badge-sm--gold">{{ slots|length }}/{{ max_slots }} slots</span>
+</div>
+
+<div class="exclusive-slots-grid">
+
+    <!-- Slots preenchidos -->
+    {% for slot in slots %}
+    <div class="exclusive-slot-card">
+
+        <!-- Capa -->
+        <div class="exclusive-slot-cover">
+            <span class="exclusive-slot-order">Slot #{{ slot.display_order }}</span>
+
+            {% if slot.cover_url %}
+                <img src="{{ slot.cover_url }}" alt="Capa">
+            {% elif slot.property and slot.property.image and slot.property.image.startswith('http') %}
+                <img src="{{ slot.property.image }}" alt="Foto do imóvel">
+            {% else %}
+                <div class="exclusive-slot-cover-empty">
+                    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <rect x="3" y="3" width="18" height="18" rx="2"/>
+                        <path d="M3 9l4-4 5 5 3-3 6 6"/>
+                    </svg>
+                    <span>Sem imagem de capa</span>
+                </div>
+            {% endif %}
+
+            <!-- Hover overlay com botão rápido de upload -->
+            <div class="exclusive-slot-overlay">
+                <form action="{{ url_for('admin.exclusive_update_cover', slot_id=slot.id) }}" method="POST" enctype="multipart/form-data">
+                    <label class="admin-btn admin-btn--gold admin-btn--sm" style="cursor:pointer;">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                            <polyline points="17 8 12 3 7 8"/>
+                            <line x1="12" y1="3" x2="12" y2="15"/>
+                        </svg>
+                        Trocar capa
+                        <input type="file" name="cover_image" accept="image/*" style="display:none" onchange="this.form.submit()">
+                    </label>
+                </form>
+            </div>
+        </div>
+
+        <!-- Info -->
+        <div class="exclusive-slot-body">
+            <div class="exclusive-slot-name">
+                {{ slot.property.title if slot.property else '—' }}
+            </div>
+            {% if slot.property %}
+            <div class="exclusive-slot-loc">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                    <circle cx="12" cy="10" r="3"/>
+                </svg>
+                {{ slot.property.neighborhood }}, {{ slot.property.city }}
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Ações -->
+        <div class="exclusive-slot-actions">
+            <!-- Trocar capa (botão alternativo) -->
+            <form action="{{ url_for('admin.exclusive_update_cover', slot_id=slot.id) }}" method="POST" enctype="multipart/form-data" style="margin:0">
+                <label class="upload-trigger">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                        <polyline points="17 8 12 3 7 8"/>
+                        <line x1="12" y1="3" x2="12" y2="15"/>
+                    </svg>
+                    Trocar capa
+                    <input type="file" name="cover_image" accept="image/*" style="display:none" onchange="this.form.submit()">
+                </label>
+            </form>
+
+            <!-- Remover -->
+            <form action="{{ url_for('admin.exclusive_remove', slot_id=slot.id) }}" method="POST"
+                  onsubmit="return confirm('Remover este imóvel da coleção exclusiva?')" style="margin:0">
+                <button type="submit" class="admin-btn admin-btn--ghost admin-btn--sm admin-btn--danger">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="3 6 5 6 21 6"/>
+                        <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+                    </svg>
+                    Remover
+                </button>
+            </form>
+        </div>
+    </div>
+    {% endfor %}
+
+    <!-- Slots vazios para adicionar -->
+    {% for i in range(max_slots - slots|length) %}
+    <div class="exclusive-slot-add">
+        <div class="exclusive-slot-add-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="12" y1="5" x2="12" y2="19"/>
+                <line x1="5" y1="12" x2="19" y2="12"/>
+            </svg>
+        </div>
+
+        <div>
+            <div class="exclusive-slot-add-title">Adicionar imóvel</div>
+            <div class="exclusive-slot-add-sub">Slot {{ slots|length + loop.index }} de {{ max_slots }}</div>
+        </div>
+
+        {% if available_props %}
+        <form action="{{ url_for('admin.exclusive_add') }}" method="POST" enctype="multipart/form-data"
+              class="exclusive-add-form">
+
+            <select name="property_id" required class="exclusive-add-select">
+                <option value="">Selecione o imóvel…</option>
+                {% for p in available_props %}
+                <option value="{{ p.id }}">{{ p.title|truncate(50) }} — {{ p.city }}</option>
+                {% endfor %}
+            </select>
+
+            <label class="exclusive-add-file-label">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="3" width="18" height="18" rx="2"/>
+                    <path d="M3 9l4-4 5 5 3-3 6 6"/>
+                </svg>
+                <span id="cover-label-{{ loop.index }}">Escolher imagem de capa</span>
+                <input type="file" name="cover_image" accept="image/*" style="display:none"
+                       onchange="document.getElementById('cover-label-{{ loop.index }}').textContent = this.files[0]?.name || 'Escolher imagem de capa'">
+            </label>
+
+            <button type="submit" class="exclusive-add-submit">
+                Adicionar à Coleção
+            </button>
+        </form>
+        {% else %}
+        <p style="font-size:0.82rem; color:var(--adm-text-2); text-align:center;">
+            Nenhum imóvel disponível.<br>
+            <a href="{{ url_for('admin.properties') }}" style="color:var(--adm-gold);">Sincronize os imóveis primeiro →</a>
+        </p>
+        {% endif %}
+    </div>
+    {% endfor %}
+
+</div>
+
+{% endblock %}

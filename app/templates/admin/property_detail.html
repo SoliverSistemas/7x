@@ -24,7 +24,14 @@
     <!-- Main info -->
     <div class="dash-card prop-detail-main">
         <div class="prop-detail-img-wrap">
-            <img src="{{ url_for('static', filename='img/' + property.image) }}"
+            {% if property.image and property.image.startswith('http') %}
+                {% set detail_img = property.image %}
+            {% elif property.image %}
+                {% set detail_img = url_for('static', filename='img/' + property.image) %}
+            {% else %}
+                {% set detail_img = url_for('static', filename='img/placeholder.jpg') %}
+            {% endif %}
+            <img src="{{ detail_img }}"
                  alt="{{ property.title }}" class="prop-detail-img">
             <div class="prop-detail-badges">
                 <span class="badge-sm badge-sm--{{ 'gold' if property.purpose == 'Venda' else 'blue' }}">{{ property.purpose }}</span>

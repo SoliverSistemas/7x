@@ -1,5 +1,7 @@
 from flask import Blueprint, render_template, request, flash, redirect, url_for, abort
 from app.models.property_model import PropertyRepository
+from app.models.db_models import ExclusiveCollection
+from app.services.tecimobi_service import TecimobService
 
 main_bp = Blueprint('main', __name__)
 
@@ -42,13 +44,12 @@ LANCAMENTOS = [
 
 @main_bp.route('/')
 def index():
-    featured_properties = PropertyRepository.filter(category="Destaque")
-    exclusive_properties = PropertyRepository.filter(category="Exclusivo")
-    high_end_properties = PropertyRepository.filter(category="Alto Padrão")
+    # Coleção Exclusiva: vem da tabela exclusive_collection (max 3, com capa personalizada)
+    exclusive_slots = ExclusiveCollection.query.order_by(ExclusiveCollection.display_order).limit(3).all()
+    exclusive_properties = [slot.to_dict() for slot in exclusive_slots]
     
-    # If no featured, fallback to get_featured() logic which is all_props[:3]
-    if not featured_properties:
-        featured_properties = PropertyRepository.get_featured()
+    high_end_properties = PropertyRepository.filter(category="Alto Padrão")['properties']
+    featured_properties = PropertyRepository.get_featured()
         
     all_properties = PropertyRepository.get_all()
     cities = PropertyRepository.get_cities()
@@ -75,7 +76,25 @@ def contact():
         email = request.form.get('email')
         phone = request.form.get('phone')
         message = request.form.get('message')
-        flash(f'Obrigado, {name}! Sua mensagem foi enviada com sucesso. Nossa equipe entrará em contato em breve.', 'success')
+
+        if not name or not phone:
+            flash('Nome e telefone são obrigatórios.', 'error')
+            return redirect(url_for('main.contact'))
+
+        # Tenta enviar o Lead para o Tecimob CRM
+        msg = f"Contato via site: {message}" if message else "Contato via página principal do site"
+        lead_sent = TecimobService.send_lead(
+            name=name,
+            phone=phone,
+            email=email,
+            message=msg
+        )
+
+        if lead_sent:
+            flash(f'Obrigado, {name}! Sua mensagem foi enviada com sucesso. Nossa equipe entrará em contato em breve.', 'success')
+        else:
+            flash(f'Recebemos sua mensagem, {name}. Nossa integração com o sistema está offline no momento, mas um corretor retornará em breve.', 'success')
+            
         return redirect(url_for('main.contact'))
     return render_template('main/contact.html')
 
