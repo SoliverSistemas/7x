@@ -23,8 +23,13 @@ function initPropertyLightbox() {
     const nextBtn = document.getElementById('lightboxNextBtn');
     const closeBtn = document.getElementById('lightboxCloseBtn');
 
-    // Collect all gallery image sources
-    const galleryItems = Array.from(document.querySelectorAll('[data-lightbox-src]'));
+    // Collect all gallery image sources — usa APENAS os spans ocultos em
+    // .gallery-lightbox-sources para evitar duplicar as imagens que também
+    // aparecem como data-lightbox-src nas células visíveis da grade.
+    const sourceContainer = document.querySelector('.gallery-lightbox-sources');
+    const galleryItems = sourceContainer
+        ? Array.from(sourceContainer.querySelectorAll('[data-lightbox-src]'))
+        : Array.from(document.querySelectorAll('[data-lightbox-src]'));
     if (galleryItems.length === 0) return;
 
     const images = galleryItems.map(el => el.getAttribute('data-lightbox-src'));
@@ -84,7 +89,8 @@ function initPropertyLightbox() {
     }
 
     // Trigger buttons
-    galleryItems.forEach(item => {
+    const triggerElements = document.querySelectorAll('[data-lightbox-src]');
+    triggerElements.forEach(item => {
         item.addEventListener('click', (e) => {
             e.preventDefault();
             const idx = parseInt(item.getAttribute('data-lightbox-index') || '0', 10);

@@ -192,8 +192,6 @@
     object-position: center;
     display: block;
     transition: opacity 0.3s ease;
-    /* Garante renderização sem suavização excessiva */
-    image-rendering: -webkit-optimize-contrast;
 }
 
 .gallery-main-stage:hover img { opacity: 0.97; }

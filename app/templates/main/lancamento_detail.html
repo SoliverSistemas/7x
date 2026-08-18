@@ -4,278 +4,552 @@
 {% block meta_description %}{{ lancamento.tagline }} — {{ lancamento.location }}. Lançamento exclusivo da 7X Patrimonial.{% endblock %}
 
 {% block extra_css %}
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600;1,700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
-/* ── Reset total ─────────────────────────────────────────── */
-.site-header,.top-bar,.site-footer,.fav-drawer,.fav-drawer-overlay,.modal-overlay{display:none!important}
-html,body{background:#09090f!important;color:#fff!important;margin:0!important;padding:0!important}
-main{margin:0!important;padding:0!important;background:#09090f!important}
+/* ── Reset e Animações Globais ─────────────────────────────── */
+.site-header,.top-bar,.site-footer,.fav-drawer,.fav-drawer-overlay,.modal-overlay,
+#chatbotToggle,#chatbotWindow{display:none!important}
+html,body{background:var(--bg-main)!important;color:var(--text-primary)!important;margin:0!important;padding:0!important}
+main{margin:0!important;padding:0!important;background:transparent!important}
 *{box-sizing:border-box}
 
-/* ── Tokens ──────────────────────────────────────────────── */
+@keyframes ld-fadeUp {
+  from { opacity: 0; transform: translateY(35px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes ld-scaleIn {
+  from { opacity: 0; transform: scale(1.08); }
+  to { opacity: 1; transform: scale(1); }
+}
+@keyframes ld-imgReveal {
+  from { opacity: 0; transform: scale(1.1); filter: saturate(0) brightness(0.5); }
+  to { opacity: 0.45; transform: scale(1); filter: saturate(0.9) brightness(1); }
+}
+
+/* ── Tokens ─────────────────────────────────────────────── */
 :root{
-  --gold:#c9ac77;
-  --gold2:#e8d5a8;
-  --ink:#09090f;
-  --ink2:#0f1117;
-  --serif:'Cormorant Garamond',Georgia,serif;
-  --sans:system-ui,-apple-system,sans-serif;
-  --ease:cubic-bezier(.4,0,.2,1);
+  --gold:     var(--primary);
+  --gold2:    var(--primary-hover);
+  --gold-lo:  rgba(201,172,119,.1);
+  --ink:      var(--bg-main);
+  --ink2:     var(--bg-surface);
+  --ink3:     var(--bg-card);
+  --serif:    'Playfair Display', Georgia, serif;
+  --sans:     'Inter', system-ui, sans-serif;
+  --ease:     cubic-bezier(.4,0,.2,1);
+  --ease-out: cubic-bezier(.22,1,.36,1);
 }
 
-/* ── VOLTA ───────────────────────────────────────────────── */
+/* ── Botão voltar ────────────────────────────────────────── */
 .ld-back{
-  position:fixed;top:1.5rem;left:1.75rem;z-index:200;
-  display:inline-flex;align-items:center;gap:.5rem;
-  font-size:.62rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;
-  color:rgba(255,255,255,.6);text-decoration:none;
-  border:1px solid rgba(255,255,255,.12);border-radius:100px;
-  padding:.4rem 1rem;background:rgba(9,9,15,.6);backdrop-filter:blur(8px);
-  transition:all .2s var(--ease);
+  position:fixed;top:1.6rem;left:2rem;z-index:200;
+  display:inline-flex;align-items:center;gap:.55rem;
+  font-family:var(--sans);font-size:.6rem;font-weight:500;
+  letter-spacing:.15em;text-transform:uppercase;
+  color:var(--text-muted);text-decoration:none;
+  border:1px solid var(--border-color);border-radius:100px;
+  padding:.42rem 1.15rem .42rem .8rem;
+  background:var(--bg-glass);backdrop-filter:blur(16px);
+  transition:all .22s var(--ease);
+  animation: ld-fadeUp 1s 1s both;
 }
-.ld-back:hover{color:var(--gold);border-color:rgba(201,172,119,.4);}
+.ld-back svg{opacity:.5;transition:opacity .2s,transform .2s;}
+.ld-back:hover{color:var(--gold);border-color:var(--gold);background:rgba(201,172,119,.05);}
+.ld-back:hover svg{opacity:1;transform:translateX(-3px);}
 
-/* ── HERO ────────────────────────────────────────────────── */
+/* ═══════════════════════════════════════════════════════════
+   HERO — fullscreen, tipografia grande, composição editorial
+═══════════════════════════════════════════════════════════ */
 .ld-hero{
-  width:100%;min-height:100vh;position:relative;
-  display:flex;align-items:flex-end;
-  background:#09090f;overflow:hidden;
+  width:100%;height:100vh;min-height:640px;
+  position:relative;display:flex;align-items:flex-end;
+  background:#000; /* O hero deve sempre ser escuro para a foto */
+  overflow:hidden;
 }
 .ld-hero-img{
   position:absolute;inset:0;width:100%;height:100%;
-  object-fit:cover;object-position:center;opacity:.45;
+  object-fit:cover;object-position:center 40%;
+  opacity:.45;
+  filter:saturate(.9);
+  animation: ld-imgReveal 1.8s cubic-bezier(0.22,1,0.36,1) forwards;
 }
+/* Overlay multicamada — mais dramático (sempre escuro no hero) */
 .ld-hero-overlay{
   position:absolute;inset:0;
-  background:linear-gradient(160deg,rgba(9,9,15,.2) 0%,rgba(9,9,15,.5) 40%,rgba(9,9,15,.95) 100%);
+  background:
+    linear-gradient(to top,  rgba(0,0,0,1)    0%,
+                             rgba(0,0,0,.85)  25%,
+                             rgba(0,0,0,.35)  55%,
+                             rgba(0,0,0,.05)  85%,
+                             transparent      100%),
+    linear-gradient(100deg,  rgba(0,0,0,.75)  0%,
+                             rgba(0,0,0,.1)   55%,
+                             transparent      100%);
+  animation: ld-scaleIn 2s cubic-bezier(0.22,1,0.36,1) forwards;
 }
+/* Linha lateral dourada */
+.ld-hero::after{
+  content:'';position:absolute;
+  left:0;top:0;bottom:0;width:2px;
+  background:linear-gradient(to bottom,transparent 10%,rgba(201,172,119,.4) 40%,rgba(201,172,119,.15) 75%,transparent);
+  pointer-events:none;
+}
+
 .ld-hero-content{
   position:relative;z-index:2;
-  width:100%;max-width:1200px;margin:0 auto;
-  padding:2rem 3rem 5rem;
+  width:100%;max-width:1300px;margin:0 auto;
+  padding:2rem 5rem 7rem;
 }
+
+/* Eyebrow */
 .ld-hero-eyebrow{
-  display:flex;align-items:center;gap:1rem;margin-bottom:2rem;
+  display:flex;align-items:center;gap:1.25rem;margin-bottom:2.8rem;
+  animation: ld-fadeUp 1s 0.3s both cubic-bezier(0.22,1,0.36,1);
 }
 .ld-hero-pill{
-  font-size:.58rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;
-  color:var(--gold);border:1px solid rgba(201,172,119,.35);
-  border-radius:100px;padding:.28rem .9rem;
-  background:rgba(201,172,119,.07);
+  font-family:var(--sans);
+  font-size:.58rem;font-weight:600;letter-spacing:.22em;text-transform:uppercase;
+  color:var(--gold);border:1px solid rgba(201,172,119,.3);
+  border-radius:100px;padding:.32rem 1.1rem;
+  background:rgba(0,0,0,.4);backdrop-filter:blur(4px);
 }
-.ld-hero-sep{width:40px;height:1px;background:rgba(255,255,255,.15);}
+.ld-hero-sep{width:36px;height:1px;background:rgba(255,255,255,.2);}
 .ld-hero-location{
-  font-size:.62rem;font-weight:500;letter-spacing:.12em;text-transform:uppercase;
-  color:rgba(255,255,255,.4);
+  font-family:var(--sans);
+  font-size:.6rem;font-weight:500;letter-spacing:.15em;text-transform:uppercase;
+  color:rgba(255,255,255,.6);
 }
+
+/* Título — Playfair grande */
 .ld-hero-title{
   font-family:var(--serif);
-  font-size:clamp(3.5rem,9vw,7.5rem);
-  font-weight:300;font-style:italic;
-  color:#fff;line-height:1;
-  margin:0 0 1.5rem;
-  letter-spacing:-.01em;
+  font-size:clamp(4.5rem,9vw,9.5rem);
+  font-weight:700;font-style:italic;
+  color:#fff;line-height:.9;
+  margin:0 0 2rem;
+  letter-spacing:-.03em;
+  text-shadow:0 8px 80px rgba(0,0,0,.8);
+  max-width:880px;
+  animation: ld-fadeUp 1s 0.5s both cubic-bezier(0.22,1,0.36,1);
 }
-.ld-hero-tagline{
-  font-size:1rem;color:rgba(255,255,255,.45);font-style:italic;
-  margin:0 0 2.5rem;max-width:540px;line-height:1.7;
-}
-.ld-hero-metas{
-  display:flex;align-items:center;gap:2rem;flex-wrap:wrap;
-}
-.ld-meta{display:flex;flex-direction:column;gap:.2rem;}
-.ld-meta-val{font-size:.9rem;font-weight:600;color:#fff;letter-spacing:.01em;}
-.ld-meta-key{font-size:.55rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.3);}
-.ld-meta-divider{width:1px;height:36px;background:rgba(255,255,255,.1);}
-.ld-hero-scroll{
-  position:absolute;bottom:2rem;right:3rem;z-index:2;
-  display:flex;flex-direction:column;align-items:center;gap:.5rem;
-}
-.ld-hero-scroll span{font-size:.55rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,.25);}
-.ld-scroll-line{width:1px;height:40px;background:linear-gradient(to bottom,rgba(201,172,119,.5),transparent);animation:scrollPulse 2s ease-in-out infinite;}
-@keyframes scrollPulse{0%,100%{opacity:.4;transform:scaleY(.8)}50%{opacity:1;transform:scaleY(1)}}
 
-/* ── SOBRE / DESCRIÇÃO ───────────────────────────────────── */
+/* Tagline */
+.ld-hero-tagline{
+  font-family:var(--sans);
+  font-size:1rem;font-weight:300;
+  color:rgba(255,255,255,.8);
+  margin:0 0 3.5rem;max-width:500px;line-height:1.9;
+  letter-spacing:.01em;
+  border-left:1px solid rgba(201,172,119,.4);
+  padding-left:1.25rem;
+  animation: ld-fadeUp 1s 0.7s both cubic-bezier(0.22,1,0.36,1);
+}
+
+/* Metas — linha horizontal */
+.ld-hero-metas{
+  display:flex;align-items:stretch;
+  gap:0;max-width:620px;
+  border:1px solid rgba(255,255,255,.15);
+  border-radius:3px;overflow:hidden;
+  background:rgba(0,0,0,.6);
+  backdrop-filter:blur(12px);
+  animation: ld-fadeUp 1s 0.9s both cubic-bezier(0.22,1,0.36,1);
+}
+.ld-meta{
+  flex:1;min-width:110px;
+  padding:1.1rem 1.6rem;
+  display:flex;flex-direction:column;gap:.4rem;
+  border-right:1px solid rgba(255,255,255,.15);
+}
+.ld-meta:last-child{border-right:none;}
+.ld-meta-val{
+  font-family:var(--serif);
+  font-size:1.1rem;font-weight:600;
+  color:rgba(255,255,255,.95);line-height:1.2;
+}
+.ld-meta-key{
+  font-family:var(--sans);
+  font-size:.5rem;font-weight:600;letter-spacing:.22em;text-transform:uppercase;
+  color:rgba(255,255,255,.5);
+}
+
+/* Scroll indicator */
+.ld-hero-scroll{
+  position:absolute;bottom:2.8rem;right:5rem;z-index:2;
+  display:flex;align-items:center;gap:.8rem;
+  animation: ld-fadeUp 1s 1.1s both cubic-bezier(0.22,1,0.36,1);
+}
+.ld-hero-scroll span{
+  font-family:var(--sans);
+  font-size:.52rem;font-weight:600;letter-spacing:.2em;text-transform:uppercase;
+  color:rgba(255,255,255,.4);
+}
+.ld-scroll-line{
+  width:50px;height:1px;
+  background:linear-gradient(to right,rgba(201,172,119,.8),transparent);
+  animation:scrollPulse 2s ease-in-out infinite;
+}
+@keyframes scrollPulse{
+  0%,100%{opacity:.3;transform:scaleX(.6);}
+  50%{opacity:1;transform:scaleX(1);}
+}
+
+/* ═══════════════════════════════════════════════════════════
+   SOBRE
+═══════════════════════════════════════════════════════════ */
 .ld-sobre{
-  background:#09090f;
-  padding:7rem 3rem;
-  border-bottom:1px solid rgba(255,255,255,.04);
+  background:var(--ink2);
+  padding:10rem 5rem;
+  position:relative;overflow:hidden;
+}
+.ld-sobre::before{
+  content:'';position:absolute;
+  top:0;left:5rem;width:1px;height:7rem;
+  background:linear-gradient(to bottom,var(--gold),transparent);
+  opacity:.6;
 }
 .ld-sobre-inner{
-  max-width:1100px;margin:0 auto;
-  display:grid;grid-template-columns:1fr 2fr;gap:5rem;align-items:start;
+  max-width:1200px;margin:0 auto;
+  display:grid;grid-template-columns:200px 1fr;gap:7rem;align-items:start;
 }
 .ld-sobre-label{
-  font-size:.58rem;font-weight:700;letter-spacing:.22em;text-transform:uppercase;
-  color:var(--gold);padding-top:.3rem;
+  font-family:var(--sans);
+  font-size:.54rem;font-weight:600;letter-spacing:.26em;text-transform:uppercase;
+  color:var(--gold);
+  position:sticky;top:2rem;
 }
 .ld-sobre-label::before{
-  content:'';display:block;width:32px;height:1px;
-  background:var(--gold);margin-bottom:.75rem;opacity:.6;
+  content:'';display:block;
+  width:24px;height:1px;
+  background:var(--gold);
+  margin-bottom:.85rem;opacity:.5;
 }
 .ld-sobre-text{
-  font-size:1.1rem;line-height:2;color:rgba(255,255,255,.5);
-  white-space:pre-line;font-family:var(--serif);font-weight:300;font-style:italic;
+  font-family:var(--serif);
+  font-size:1.75rem;line-height:1.75;
+  color:var(--text-primary); /* alterado para suportar light */
+  font-weight:400;font-style:italic;
+  white-space:pre-line;
+  letter-spacing:-.005em;
 }
 
-/* ── BLOCOS EDITORIAIS ───────────────────────────────────── */
+/* ═══════════════════════════════════════════════════════════
+   BLOCOS EDITORIAIS (3 primeiras fotos)
+═══════════════════════════════════════════════════════════ */
 .ld-block{
-  display:grid;grid-template-columns:55% 45%;
-  min-height:580px;
+  display:grid;grid-template-columns:56% 44%;
+  min-height:640px;
 }
-.ld-block.rev{grid-template-columns:45% 55%;}
-.ld-block-img{overflow:hidden;position:relative;}
+.ld-block.rev{grid-template-columns:44% 56%;}
+.ld-block-img{overflow:hidden;position:relative;background:var(--ink);}
 .ld-block-img img{
-  width:100%;height:100%;min-height:480px;
+  width:100%;height:100%;min-height:540px;
   object-fit:cover;display:block;
-  transition:transform .9s var(--ease);
+  transition:transform 1.2s var(--ease);
 }
-.ld-block:hover .ld-block-img img{transform:scale(1.04);}
+.ld-block:hover .ld-block-img img{transform:scale(1.06);}
 .ld-block-text{
-  padding:4rem 4.5rem;
+  padding:5.5rem 5.5rem;
   display:flex;flex-direction:column;justify-content:center;
-  background:#0f1117;
-  border-left:2px solid rgba(201,172,119,.2);
+  background:var(--ink3);
+  border-left:1px solid var(--border-color);
+  position:relative;
 }
 .ld-block.rev .ld-block-text{
-  border-left:none;border-right:2px solid rgba(201,172,119,.2);
+  border-left:none;
+  border-right:1px solid var(--border-color);
   order:-1;
 }
 .ld-block-num{
-  font-family:var(--serif);font-size:5rem;font-weight:700;
-  color:rgba(201,172,119,.06);line-height:1;
-  margin-bottom:-.5rem;
+  font-family:var(--serif);
+  font-size:8rem;font-weight:700;
+  color:var(--text-primary);
+  opacity: 0.03; /* Fantasma para claro/escuro */
+  line-height:1;position:absolute;
+  top:2.5rem;left:4.5rem;
+  pointer-events:none;letter-spacing:-.04em;
+  font-style:italic;
+}
+.ld-block.rev .ld-block-num{left:auto;right:4.5rem;}
+.ld-block-eyebrow{
+  font-family:var(--sans);
+  font-size:.54rem;font-weight:600;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--gold);margin-bottom:1.25rem;
+  display:flex;align-items:center;gap:.65rem;
+}
+.ld-block-eyebrow::before{
+  content:'';width:18px;height:1px;
+  background:var(--gold);opacity:.55;flex-shrink:0;
 }
 .ld-block-title{
-  font-family:var(--serif);font-size:1.9rem;font-weight:300;font-style:italic;
-  color:#fff;line-height:1.2;margin:0 0 1.25rem;
+  font-family:var(--serif);
+  font-size:2.8rem;font-weight:600;font-style:italic;
+  color:var(--text-primary);line-height:1.1;
+  margin:0 0 1.5rem;
+  letter-spacing:-.02em;
 }
 .ld-block-body{
-  font-size:.95rem;line-height:1.9;
-  color:rgba(255,255,255,.45);
-  white-space:pre-line;
+  font-family:var(--sans);
+  font-size:.9rem;line-height:2;
+  color:var(--text-secondary);
+  white-space:pre-line;font-weight:300;
 }
 .ld-block-cta{
-  display:inline-flex;align-items:center;gap:.6rem;
-  margin-top:2.5rem;font-size:.65rem;font-weight:700;
-  letter-spacing:.16em;text-transform:uppercase;
+  display:inline-flex;align-items:center;gap:.8rem;
+  margin-top:3rem;
+  font-family:var(--sans);
+  font-size:.6rem;font-weight:700;
+  letter-spacing:.18em;text-transform:uppercase;
   color:var(--gold);text-decoration:none;
-  border-bottom:1px solid rgba(201,172,119,.25);
-  padding-bottom:.25rem;
-  transition:all .2s;width:fit-content;
+  transition:all .22s;width:fit-content;
 }
-.ld-block-cta:hover{color:var(--gold2);border-color:var(--gold2);}
+.ld-block-cta-line{
+  width:28px;height:1px;
+  background:rgba(201,172,119,.4);
+  transition:width .3s var(--ease-out),background .2s;
+}
+.ld-block-cta:hover{color:var(--gold2);}
+.ld-block-cta:hover .ld-block-cta-line{width:48px;background:var(--gold);}
 .ld-block-cta svg{transition:transform .2s;}
-.ld-block-cta:hover svg{transform:translateX(4px);}
+.ld-block-cta:hover svg{transform:translateX(5px);}
 
-/* ── GALERIA EXTRA ───────────────────────────────────────── */
-.ld-gallery{padding:5rem 3rem;background:#09090f;}
-.ld-gallery-inner{max-width:1200px;margin:0 auto;}
+/* ═══════════════════════════════════════════════════════════
+   GALERIA COMPLETA — todas as fotos em grid premium
+═══════════════════════════════════════════════════════════ */
+.ld-gallery{
+  padding:7rem 5rem;background:var(--ink);
+  position:relative;
+}
+.ld-gallery-inner{max-width:1400px;margin:0 auto;}
 .ld-gallery-head{
-  display:flex;align-items:center;gap:1.5rem;margin-bottom:2rem;
+  display:flex;align-items:center;gap:2rem;margin-bottom:3rem;
 }
 .ld-gallery-head-label{
-  font-size:.58rem;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);
-  white-space:nowrap;
+  font-family:var(--sans);
+  font-size:.54rem;font-weight:600;letter-spacing:.26em;text-transform:uppercase;
+  color:var(--gold);white-space:nowrap;
 }
-.ld-gallery-head-line{flex:1;height:1px;background:linear-gradient(to right,rgba(201,172,119,.2),transparent);}
+.ld-gallery-head-line{
+  flex:1;height:1px;
+  background:linear-gradient(to right,rgba(201,172,119,.3),transparent);
+}
+.ld-gallery-head-count{
+  font-family:var(--sans);
+  font-size:.54rem;font-weight:500;letter-spacing:.1em;
+  color:var(--text-muted);white-space:nowrap;
+}
+/* Grid masonry-like com items grandes */
 .ld-gallery-grid{
-  display:grid;grid-template-columns:repeat(3,1fr);gap:4px;
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:4px;
 }
-.ld-gallery-item{aspect-ratio:4/3;overflow:hidden;cursor:zoom-in;}
-.ld-gallery-item:first-child:not(:only-child){grid-column:span 2;aspect-ratio:16/9;}
+/* Primeiro item maior */
+.ld-gallery-item{
+  overflow:hidden;cursor:zoom-in;position:relative;
+  aspect-ratio:4/3;background:#000;
+}
+.ld-gallery-item:first-child{
+  grid-column:span 2;
+  aspect-ratio:16/9;
+}
+/* Se tiver exatamente 4 itens, 2+2 */
+.ld-gallery-grid:has(.ld-gallery-item:nth-child(4)):not(:has(.ld-gallery-item:nth-child(5))) .ld-gallery-item{
+  grid-column:span 1 !important;
+  aspect-ratio:4/3;
+}
 .ld-gallery-item img{
   width:100%;height:100%;object-fit:cover;display:block;
-  transition:transform .6s var(--ease);
+  transition:transform .8s var(--ease), filter 0.3s;
 }
-.ld-gallery-item:hover img{transform:scale(1.06);}
+/* Overlay escuro no hover */
+.ld-gallery-item::after{
+  content:'';position:absolute;inset:0;
+  background:rgba(0,0,0,0);
+  transition:background .35s;
+}
+.ld-gallery-item:hover img{transform:scale(1.07);}
+.ld-gallery-item:hover::after{background:rgba(0,0,0,.2);}
+/* Ícone zoom */
+.ld-gallery-item-zoom{
+  position:absolute;top:50%;left:50%;
+  transform:translate(-50%,-50%) scale(0);
+  width:44px;height:44px;border-radius:50%;
+  background:rgba(201,172,119,.15);
+  border:1px solid rgba(201,172,119,.5);
+  backdrop-filter:blur(6px);
+  display:flex;align-items:center;justify-content:center;
+  color:var(--gold);z-index:2;
+  transition:transform .3s var(--ease-out);pointer-events:none;
+}
+.ld-gallery-item:hover .ld-gallery-item-zoom{transform:translate(-50%,-50%) scale(1);}
 
-/* ── CTA ─────────────────────────────────────────────────── */
+/* ═══════════════════════════════════════════════════════════
+   DIVISOR
+═══════════════════════════════════════════════════════════ */
+.ld-divider{
+  height:1px;
+  background:linear-gradient(to right,transparent,var(--border-highlight) 20%,var(--border-highlight) 80%,transparent);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   CTA FINAL
+═══════════════════════════════════════════════════════════ */
 .ld-cta{
-  padding:8rem 3rem;text-align:center;
-  background:linear-gradient(160deg,#0f1117 0%,#09090f 100%);
-  border-top:1px solid rgba(255,255,255,.04);
+  padding:11rem 5rem;text-align:center;
+  background:var(--ink2);position:relative;overflow:hidden;
+}
+.ld-cta::before{
+  content:'';position:absolute;
+  width:70vw;height:70vw;border-radius:50%;
+  background:radial-gradient(circle,rgba(201,172,119,.08) 0%,transparent 65%);
+  top:50%;left:50%;transform:translate(-50%,-50%);
+  pointer-events:none;
 }
 .ld-cta-eyebrow{
-  font-size:.58rem;font-weight:700;letter-spacing:.24em;text-transform:uppercase;
-  color:var(--gold);margin-bottom:1.5rem;
+  font-family:var(--sans);
+  font-size:.54rem;font-weight:600;letter-spacing:.3em;text-transform:uppercase;
+  color:var(--gold);margin-bottom:2.5rem;
+  display:flex;align-items:center;justify-content:center;gap:1.2rem;
+}
+.ld-cta-eyebrow::before,.ld-cta-eyebrow::after{
+  content:'';width:28px;height:1px;background:rgba(201,172,119,.4);
 }
 .ld-cta-title{
-  font-family:var(--serif);font-size:clamp(2.5rem,5vw,4rem);
-  font-weight:300;font-style:italic;
-  color:#fff;margin:0 0 1rem;line-height:1.1;
+  font-family:var(--serif);
+  font-size:clamp(3rem,6vw,5.5rem);
+  font-weight:700;font-style:italic;
+  color:var(--text-primary);margin:0 0 1.25rem;line-height:1;
+  letter-spacing:-.03em;
 }
+.ld-cta-title em{color:var(--gold);font-style:italic;}
 .ld-cta-sub{
-  font-size:.95rem;color:rgba(255,255,255,.35);
-  line-height:1.8;margin-bottom:3rem;
+  font-family:var(--sans);
+  font-size:.95rem;font-weight:300;
+  color:var(--text-secondary);
+  line-height:2;margin:0 auto 4rem;
+  max-width:460px;
 }
 .ld-cta-btns{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;}
 .ld-btn-fill{
-  display:inline-flex;align-items:center;gap:.6rem;
-  padding:.95rem 2.5rem;background:var(--gold);color:#09090f;
-  font-size:.72rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;
-  text-decoration:none;border:2px solid var(--gold);
-  transition:all .2s var(--ease);
+  display:inline-flex;align-items:center;gap:.65rem;
+  padding:1.1rem 3rem;
+  background:var(--gold);color:#000;
+  font-family:var(--sans);
+  font-size:.68rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
+  text-decoration:none;
+  transition:all .22s var(--ease);
+  position:relative;overflow:hidden;
 }
-.ld-btn-fill:hover{background:transparent;color:var(--gold);}
+.ld-btn-fill::before{
+  content:'';position:absolute;inset:0;
+  background:rgba(255,255,255,.15);
+  transform:translateX(-100%);transition:transform .35s var(--ease-out);
+}
+.ld-btn-fill:hover::before{transform:translateX(0);}
+.ld-btn-fill:hover{box-shadow:var(--shadow-glow);}
 .ld-btn-out{
-  display:inline-flex;align-items:center;gap:.6rem;
-  padding:.95rem 2.5rem;background:transparent;
-  border:1px solid rgba(255,255,255,.18);color:rgba(255,255,255,.6);
-  font-size:.72rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
-  text-decoration:none;transition:all .2s var(--ease);
+  display:inline-flex;align-items:center;gap:.65rem;
+  padding:1.1rem 3rem;background:transparent;
+  border:1px solid var(--border-color);color:var(--text-primary);
+  font-family:var(--sans);
+  font-size:.68rem;font-weight:500;letter-spacing:.14em;text-transform:uppercase;
+  text-decoration:none;transition:all .22s var(--ease);
 }
 .ld-btn-out:hover{border-color:var(--gold);color:var(--gold);}
 
-/* ── LIGHTBOX ────────────────────────────────────────────── */
+/* ═══════════════════════════════════════════════════════════
+   LIGHTBOX (sempre dark)
+═══════════════════════════════════════════════════════════ */
 #ld-lb{
   display:none;position:fixed;inset:0;z-index:9999;
-  background:rgba(0,0,0,.95);
+  background:rgba(0,0,0,.97);
   align-items:center;justify-content:center;
+  backdrop-filter:blur(6px);
 }
-#ld-lb.open{display:flex;}
-#ld-lb img{max-width:90vw;max-height:85vh;object-fit:contain;display:block;}
+#ld-lb.open{display:flex;flex-direction:column;gap:1rem;}
+#ld-lb img{
+  max-width:90vw;max-height:78vh;object-fit:contain;display:block;
+  box-shadow:0 40px 100px rgba(0,0,0,.9);
+}
+.ld-lb-counter{
+  font-family:var(--sans);
+  font-size:.6rem;font-weight:500;letter-spacing:.15em;
+  color:rgba(255,255,255,.5);text-transform:uppercase;
+}
 .ld-lb-x{
-  position:absolute;top:1.5rem;right:1.5rem;
+  position:absolute;top:1.75rem;right:1.75rem;
   width:44px;height:44px;border-radius:50%;
-  background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);
-  color:#fff;font-size:1rem;cursor:pointer;
+  background:rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.1);
+  color:rgba(255,255,255,.8);
+  cursor:pointer;
   display:flex;align-items:center;justify-content:center;
-  transition:background .2s;
+  transition:all .2s;font-family:var(--sans);font-size:.9rem;
 }
-.ld-lb-x:hover{background:rgba(201,172,119,.15);color:var(--gold);}
+.ld-lb-x:hover{background:rgba(201,172,119,.2);color:var(--gold);border-color:var(--gold);}
+.ld-lb-nav{
+  position:absolute;top:50%;
+  width:48px;height:48px;border-radius:50%;
+  background:rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.1);
+  color:rgba(255,255,255,.8);
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+  transition:all .2s;transform:translateY(-50%);
+}
+.ld-lb-prev{left:1.5rem;}
+.ld-lb-next{right:1.5rem;}
+.ld-lb-nav:hover{background:rgba(201,172,119,.2);color:var(--gold);border-color:var(--gold);}
 
-/* ── RESPONSIVE ──────────────────────────────────────────── */
-@media(max-width:900px){
-  .ld-hero-content{padding:2rem 1.5rem 4rem;}
-  .ld-hero-title{font-size:clamp(2.8rem,10vw,5rem);}
+
+/* ═══════════════════════════════════════════════════════════
+   RESPONSIVE
+═══════════════════════════════════════════════════════════ */
+@media(max-width:1024px){
+  .ld-hero-content,.ld-sobre,.ld-gallery,.ld-cta{padding-left:3rem;padding-right:3rem;}
+  .ld-block-text{padding:4rem 3.5rem;}
+  .ld-sobre-inner{grid-template-columns:160px 1fr;gap:4rem;}
+}
+@media(max-width:768px){
+  .ld-hero-content{padding:1.5rem 1.5rem 5rem;}
+  .ld-hero-title{font-size:clamp(3rem,12vw,5rem);}
+  .ld-hero-metas{flex-direction:column;max-width:100%;}
+  .ld-meta{border-right:none;border-bottom:1px solid rgba(255,255,255,.06);}
+  .ld-meta:last-child{border-bottom:none;}
+  .ld-hero-scroll{right:1.5rem;}
+  .ld-sobre{padding:5rem 1.75rem;}
   .ld-sobre-inner{grid-template-columns:1fr;gap:2rem;}
+  .ld-sobre-label{position:static;}
+  .ld-sobre-text{font-size:1.35rem;}
   .ld-block,.ld-block.rev{grid-template-columns:1fr;}
-  .ld-block.rev .ld-block-text{order:0;border-right:none;border-left:2px solid rgba(201,172,119,.2);}
+  .ld-block.rev .ld-block-text{order:0;}
   .ld-block-img{order:-1;}
-  .ld-block-text{padding:2.5rem 1.75rem;border-left:2px solid rgba(201,172,119,.2)!important;}
-  .ld-gallery{padding:3rem 1.25rem;}
+  .ld-block-img img{min-height:300px;}
+  .ld-block-text{padding:3rem 1.75rem;border-left:1px solid rgba(201,172,119,.1)!important;border-right:none!important;}
+  .ld-block-num{font-size:5rem;top:1.5rem;left:1.75rem;}
+  .ld-block-title{font-size:2rem;}
+  .ld-gallery{padding:4rem 1.25rem;}
   .ld-gallery-grid{grid-template-columns:repeat(2,1fr);}
-  .ld-gallery-item:first-child:not(:only-child){grid-column:span 2;}
-  .ld-cta{padding:5rem 1.5rem;}
-  .ld-sobre{padding:4rem 1.5rem;}
+  .ld-gallery-item:first-child{grid-column:span 2;}
+  .ld-cta{padding:7rem 1.75rem;}
+  .ld-back{left:1.25rem;}
 }
 </style>
 {% endblock %}
 
 {% block content %}
 {% set gallery = lancamento.gallery if lancamento.gallery else [] %}
+{% set all_gallery = gallery %}
 
-{# CSS inline de máxima prioridade #}
-<style>html,body,main{background:#09090f!important;color:#fff!important;margin:0!important;padding:0!important}</style>
+<style>html,body,main{background:#060810!important;color:#fff!important;margin:0!important;padding:0!important}</style>
 
-{# ── VOLTA ─────────────────────────────────────────────── #}
+{# ── Botão voltar ─────────────────────────────────────── #}
 <a href="{{ url_for('main.lancamentos') }}" class="ld-back">
-    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
     Lançamentos
 </a>
 
-{# ── HERO ──────────────────────────────────────────────── #}
+{# ══ HERO ═══════════════════════════════════════════════ #}
 <div class="ld-hero">
     {%- if lancamento.cover_url and (lancamento.cover_url.startswith('http') or lancamento.cover_url.startswith('/static')) -%}
     <img class="ld-hero-img" src="{{ lancamento.cover_url }}" alt="{{ lancamento.name }}">
@@ -297,6 +571,7 @@ main{margin:0!important;padding:0!important;background:#09090f!important}
         <p class="ld-hero-tagline">{{ lancamento.tagline }}</p>
         {% endif %}
 
+        {% if lancamento.location or lancamento.type or lancamento.units %}
         <div class="ld-hero-metas">
             {% if lancamento.location %}
             <div class="ld-meta">
@@ -305,20 +580,19 @@ main{margin:0!important;padding:0!important;background:#09090f!important}
             </div>
             {% endif %}
             {% if lancamento.type %}
-            <div class="ld-meta-divider"></div>
             <div class="ld-meta">
                 <span class="ld-meta-val">{{ lancamento.type }}</span>
                 <span class="ld-meta-key">Tipologia</span>
             </div>
             {% endif %}
             {% if lancamento.units %}
-            <div class="ld-meta-divider"></div>
             <div class="ld-meta">
                 <span class="ld-meta-val">{{ lancamento.units }}</span>
                 <span class="ld-meta-key">Unidades</span>
             </div>
             {% endif %}
         </div>
+        {% endif %}
     </div>
 
     <div class="ld-hero-scroll">
@@ -327,8 +601,9 @@ main{margin:0!important;padding:0!important;background:#09090f!important}
     </div>
 </div>
 
-{# ── SOBRE ─────────────────────────────────────────────── #}
+{# ══ SOBRE ══════════════════════════════════════════════ #}
 {% if lancamento.description %}
+<div class="ld-divider"></div>
 <div class="ld-sobre">
     <div class="ld-sobre-inner">
         <p class="ld-sobre-label">Sobre o<br>Empreendimento</p>
@@ -337,38 +612,50 @@ main{margin:0!important;padding:0!important;background:#09090f!important}
 </div>
 {% endif %}
 
-{# ── BLOCOS EDITORIAIS ─────────────────────────────────── #}
+{# ══ BLOCOS EDITORIAIS — até 3 fotos com título/texto ═══ #}
 {% if gallery %}
 
-{% set default_titles = ['Arquitetura & Design','Localização Privilegiada','Qualidade & Acabamento'] %}
-{% set default_bodies  = [
-    'Cada detalhe foi meticulosamente projetado para criar uma experiência única — onde estética sofisticada e funcionalidade se encontram em perfeita harmonia.',
-    'Um endereço que une prestígio, conveniência e qualidade de vida. Tudo o que você busca, a poucos passos.',
-    'Infraestrutura completa, materiais nobres e acabamentos que definem um novo padrão de sofisticação.'
+{% set default_eyebrows = ['Arquitetura', 'Localização', 'Acabamento'] %}
+{% set default_titles = ['Design & Sofisticação', 'Endereço Privilegiado', 'Excelência nos Detalhes'] %}
+{% set default_bodies = [
+    'Cada detalhe foi meticulosamente concebido para criar uma experiência única — onde estética sofisticada e funcionalidade se encontram em perfeita harmonia.',
+    'Um endereço que une prestígio, conveniência e qualidade de vida. Tudo o que você busca, com a exclusividade que você merece.',
+    'Infraestrutura completa, materiais nobres e acabamentos que definem um novo padrão de sofisticação e requinte.'
 ] %}
 
 {% for img in gallery[:3] %}
 {% set img_url   = img.url   if img is mapping else img %}
 {% set img_title = img.title if (img is mapping and img.title and img.title.strip()) else default_titles[loop.index0] %}
 {% set img_text  = img.text  if (img is mapping and img.text  and img.text.strip())  else default_bodies[loop.index0] %}
+{% set img_eye   = default_eyebrows[loop.index0] %}
 
+<div class="ld-divider"></div>
 <div class="ld-block {% if loop.index is even %}rev{% endif %}">
     <div class="ld-block-img">
         <img src="{{ img_url }}" alt="{{ img_title }}" loading="{% if loop.first %}eager{% else %}lazy{% endif %}">
     </div>
     <div class="ld-block-text">
-        <div class="ld-block-num">0{{ loop.index }}</div>
+        <span class="ld-block-num">0{{ loop.index }}</span>
+        <p class="ld-block-eyebrow">{{ img_eye }}</p>
         <h2 class="ld-block-title">{{ img_title }}</h2>
         <p class="ld-block-body">{{ img_text }}</p>
         {% if loop.index == 2 %}
         <a href="https://wa.me/{{ whatsapp_number }}?text=Olá!%20Quero%20saber%20mais%20sobre%20{{ lancamento.name | urlencode }}."
            target="_blank" class="ld-block-cta">
+            <span class="ld-block-cta-line"></span>
             Falar com especialista
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
+        {% elif loop.first %}
+        <a href="{{ url_for('main.contact') }}" class="ld-block-cta">
+            <span class="ld-block-cta-line"></span>
+            Solicitar informações
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
         </a>
         {% else %}
         <a href="{{ url_for('main.contact') }}" class="ld-block-cta">
-            {% if loop.first %}Solicitar informações{% else %}Agendar visita{% endif %}
+            <span class="ld-block-cta-line"></span>
+            Agendar visita
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
         </a>
         {% endif %}
@@ -376,60 +663,91 @@ main{margin:0!important;padding:0!important;background:#09090f!important}
 </div>
 {% endfor %}
 
-{# ── GALERIA EXTRA (fotos 4–6) ─────────────────────────── #}
-{% set extra = gallery[3:] %}
-{% if extra %}
+{# ══ GALERIA COMPLETA — TODAS as fotos ═══ #}
+<div class="ld-divider"></div>
 <div class="ld-gallery">
     <div class="ld-gallery-inner">
         <div class="ld-gallery-head">
-            <span class="ld-gallery-head-label">Galeria</span>
+            <span class="ld-gallery-head-label">Galeria do Empreendimento</span>
             <div class="ld-gallery-head-line"></div>
+            <span class="ld-gallery-head-count">{{ gallery|length }} foto{{ 's' if gallery|length != 1 else '' }}</span>
         </div>
         <div class="ld-gallery-grid">
-            {% for img in extra %}
+            {% for img in gallery %}
             {% set img_url = img.url if img is mapping else img %}
-            <div class="ld-gallery-item" onclick="ldLb('{{ img_url }}')">
+            <div class="ld-gallery-item" onclick="ldLb({{ loop.index0 }})">
                 <img src="{{ img_url }}" alt="{{ lancamento.name }}" loading="lazy">
+                <div class="ld-gallery-item-zoom">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+                </div>
             </div>
             {% endfor %}
         </div>
     </div>
 </div>
 {% endif %}
-{% endif %}
 
-{# ── CTA ───────────────────────────────────────────────── #}
+{# ══ CTA FINAL ══════════════════════════════════════════ #}
+<div class="ld-divider"></div>
 <div class="ld-cta">
     <p class="ld-cta-eyebrow">Interesse Confirmado?</p>
-    <h2 class="ld-cta-title">{{ lancamento.name }}<br><em style="color:var(--gold);font-style:italic;">aguarda por você.</em></h2>
-    <p class="ld-cta-sub">Nossa equipe de especialistas está pronta para apresentar<br>condições exclusivas e o dossiê completo do empreendimento.</p>
+    <h2 class="ld-cta-title">{{ lancamento.name }}<br><em>aguarda por você.</em></h2>
+    <p class="ld-cta-sub">Nossa equipe de especialistas está pronta para apresentar condições exclusivas e o dossiê completo do empreendimento.</p>
     <div class="ld-cta-btns">
         <a href="{{ url_for('main.contact') }}" class="ld-btn-fill">Quero ser contactado</a>
         <a href="https://wa.me/{{ whatsapp_number }}?text=Olá!%20Tenho%20interesse%20em%20{{ lancamento.name | urlencode }}."
            target="_blank" class="ld-btn-out">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
             WhatsApp
         </a>
     </div>
 </div>
 
-{# ── LIGHTBOX ──────────────────────────────────────────── #}
+{# ══ LIGHTBOX com navegação ══════════════════════════════ #}
 <div id="ld-lb">
     <button class="ld-lb-x" onclick="ldLbClose()">✕</button>
+    <button class="ld-lb-nav ld-lb-prev" onclick="ldLbNav(-1)">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15 18l-6-6 6-6"/></svg>
+    </button>
     <img id="ld-lb-img" src="" alt="">
+    <button class="ld-lb-nav ld-lb-next" onclick="ldLbNav(1)">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M9 18l6-6-6-6"/></svg>
+    </button>
+    <span class="ld-lb-counter" id="ld-lb-counter"></span>
 </div>
 
 <script>
-function ldLb(src){
-    document.getElementById('ld-lb-img').src=src;
+// Array de todas as imagens da galeria
+const ldImgs = [
+    {% if gallery %}{% for img in gallery %}{% set img_url = img.url if img is mapping else img %}'{{ img_url }}'{% if not loop.last %},{% endif %}{% endfor %}{% endif %}
+];
+let ldCurrent = 0;
+
+function ldLb(idx) {
+    if (!ldImgs.length) return;
+    ldCurrent = idx;
+    document.getElementById('ld-lb-img').src = ldImgs[ldCurrent];
+    document.getElementById('ld-lb-counter').textContent = (ldCurrent + 1) + ' / ' + ldImgs.length;
     document.getElementById('ld-lb').classList.add('open');
-    document.body.style.overflow='hidden';
+    document.body.style.overflow = 'hidden';
 }
-function ldLbClose(){
+function ldLbNav(dir) {
+    ldCurrent = (ldCurrent + dir + ldImgs.length) % ldImgs.length;
+    document.getElementById('ld-lb-img').src = ldImgs[ldCurrent];
+    document.getElementById('ld-lb-counter').textContent = (ldCurrent + 1) + ' / ' + ldImgs.length;
+}
+function ldLbClose() {
     document.getElementById('ld-lb').classList.remove('open');
-    document.body.style.overflow='';
+    document.body.style.overflow = '';
 }
-document.getElementById('ld-lb').addEventListener('click',function(e){if(e.target===this)ldLbClose();});
-document.addEventListener('keydown',function(e){if(e.key==='Escape')ldLbClose();});
+document.getElementById('ld-lb').addEventListener('click', function(e) {
+    if (e.target === this) ldLbClose();
+});
+document.addEventListener('keydown', function(e) {
+    if (!document.getElementById('ld-lb').classList.contains('open')) return;
+    if (e.key === 'Escape') ldLbClose();
+    if (e.key === 'ArrowLeft') ldLbNav(-1);
+    if (e.key === 'ArrowRight') ldLbNav(1);
+});
 </script>
 {% endblock %}
