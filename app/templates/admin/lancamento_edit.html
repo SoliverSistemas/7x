@@ -1,0 +1,521 @@
+{% extends 'admin/base_admin.html' %}
+
+{% block title %}{{ lancamento.name }} | Admin Lançamentos{% endblock %}
+
+{% block extra_css %}
+<style>
+/* ── Layout ──────────────────────────────────────────────────────────── */
+.edit-layout {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: 2rem;
+    align-items: start;
+}
+@media (max-width: 900px) { .edit-layout { grid-template-columns: 1fr; } }
+
+/* Back link */
+.back-link {
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    font-size: 0.72rem; font-weight: 700; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--text-secondary);
+    text-decoration: none; margin-bottom: 1.5rem;
+    transition: color 0.2s;
+}
+.back-link:hover { color: var(--primary); }
+
+/* Page header */
+.edit-page-header { margin-bottom: 1.5rem; }
+.edit-page-title { font-size: 1.5rem; font-weight: 700; color: var(--text-primary); margin: 0 0 0.25rem; }
+.edit-page-slug {
+    font-size: 0.72rem; color: var(--text-muted); font-family: monospace;
+    background: var(--bg-main); border: 1px solid var(--border-color);
+    border-radius: 4px; padding: 0.2rem 0.5rem; display: inline-block;
+}
+
+/* Panels */
+.edit-panel {
+    background: var(--bg-surface); border: 1px solid var(--border-color);
+    border-radius: 12px; overflow: hidden; margin-bottom: 1.5rem;
+}
+.edit-panel-head {
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid var(--border-color);
+    font-size: 0.72rem; font-weight: 700; letter-spacing: 0.12em;
+    text-transform: uppercase; color: var(--primary);
+}
+.edit-panel-body { padding: 1.25rem; }
+
+/* Cover sidebar */
+.cover-sidebar {
+    position: sticky; top: 80px;
+}
+.cover-wrap {
+    aspect-ratio: 3/5; border-radius: 10px; overflow: hidden;
+    background: var(--bg-main); border: 1px solid var(--border-color);
+    margin-bottom: 0.75rem; position: relative;
+}
+.cover-wrap img { width: 100%; height: 100%; object-fit: cover; }
+.cover-wrap-empty {
+    width: 100%; height: 100%;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 0.5rem;
+    color: var(--text-muted); font-size: 0.72rem; text-transform: uppercase;
+}
+.cover-wrap-empty svg { opacity: 0.25; }
+
+.cover-change-btn {
+    display: block; width: 100%; padding: 0.65rem;
+    text-align: center; font-size: 0.75rem; font-weight: 700;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    background: var(--bg-main); border: 1px solid var(--border-color);
+    border-radius: 8px; color: var(--text-secondary); cursor: pointer;
+    transition: all 0.2s; position: relative; overflow: hidden;
+}
+.cover-change-btn input[type="file"] {
+    position: absolute; inset: 0; opacity: 0; cursor: pointer;
+}
+.cover-change-btn:hover { border-color: var(--primary); color: var(--primary); }
+
+/* Form fields */
+.form-group { margin-bottom: 1rem; }
+.form-group label {
+    display: block; font-size: 0.68rem; font-weight: 700;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--text-secondary); margin-bottom: 0.4rem;
+}
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%; padding: 0.65rem 0.9rem;
+    background: var(--bg-main); border: 1px solid var(--border-color);
+    border-radius: 8px; color: var(--text-primary); font-size: 0.9rem;
+    font-family: var(--font-body); transition: border-color 0.2s;
+    box-sizing: border-box;
+}
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus { outline: none; border-color: var(--primary); }
+.form-group textarea { resize: vertical; min-height: 160px; line-height: 1.7; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+
+/* Save button */
+.btn-save {
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    padding: 0.7rem 1.5rem; background: var(--primary); color: #0b0f19;
+    border: none; border-radius: 8px; font-size: 0.82rem; font-weight: 700;
+    letter-spacing: 0.06em; text-transform: uppercase; cursor: pointer;
+    transition: background 0.2s, box-shadow 0.2s;
+}
+.btn-save:hover { background: var(--primary-hover); box-shadow: 0 4px 16px rgba(201,172,119,0.35); }
+
+/* Galeria */
+.gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.75rem;
+    margin-bottom: 1.25rem;
+}
+.gallery-slot {
+    aspect-ratio: 4/3; border-radius: 8px; overflow: hidden;
+    background: var(--bg-main); border: 1px solid var(--border-color);
+    position: relative;
+}
+.gallery-slot img { width: 100%; height: 100%; object-fit: cover; }
+.gallery-slot-empty {
+    width: 100%; height: 100%;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--text-muted);
+}
+.gallery-slot-empty svg { opacity: 0.2; }
+
+.gallery-slot-remove {
+    position: absolute; top: 0.4rem; right: 0.4rem;
+    width: 26px; height: 26px;
+    background: rgba(229,62,62,0.85); border: none; border-radius: 50%;
+    color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center;
+    transition: background 0.2s; font-size: 0;
+}
+.gallery-slot-remove:hover { background: #e53e3e; }
+.gallery-slot-number {
+    position: absolute; bottom: 0.4rem; left: 0.4rem;
+    font-size: 0.6rem; font-weight: 700;
+    background: rgba(11,15,25,0.6); color: rgba(255,255,255,0.7);
+    border-radius: 4px; padding: 0.15rem 0.4rem;
+}
+
+.gallery-add-row {
+    display: flex; align-items: center; gap: 0.75rem;
+}
+.gallery-add-input {
+    flex: 1; padding: 0.6rem 0.9rem;
+    background: var(--bg-main); border: 1px solid var(--border-color);
+    border-radius: 8px; color: var(--text-primary); font-size: 0.88rem;
+    box-sizing: border-box;
+}
+.gallery-add-btn {
+    display: flex; align-items: center; gap: 0.4rem;
+    padding: 0.6rem 1.1rem; background: var(--bg-main);
+    border: 1px solid rgba(201,172,119,0.35); border-radius: 8px;
+    color: var(--primary); font-size: 0.78rem; font-weight: 700;
+    cursor: pointer; white-space: nowrap;
+    letter-spacing: 0.06em; text-transform: uppercase;
+    transition: all 0.2s; position: relative; overflow: hidden;
+}
+.gallery-add-btn input[type="file"] {
+    position: absolute; inset: 0; opacity: 0; cursor: pointer;
+}
+.gallery-add-btn:hover { background: rgba(201,172,119,0.1); }
+.gallery-count-hint { font-size: 0.72rem; color: var(--text-muted); margin-top: 0.5rem; }
+
+/* Danger zone */
+.danger-zone {
+    border: 1px solid rgba(229,62,62,0.25);
+    border-radius: 12px; padding: 1.25rem;
+    background: rgba(229,62,62,0.04);
+}
+.danger-zone-title { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #e53e3e; margin-bottom: 0.5rem; }
+.danger-zone-desc { font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 1rem; line-height: 1.6; }
+.btn-danger {
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    padding: 0.6rem 1.2rem; background: transparent;
+    border: 1px solid rgba(229,62,62,0.4); border-radius: 8px;
+    color: #e53e3e; font-size: 0.8rem; font-weight: 700;
+    cursor: pointer; transition: all 0.2s;
+}
+.btn-danger:hover { background: rgba(229,62,62,0.1); border-color: #e53e3e; }
+
+/* Confirm dialog overlay */
+.confirm-backdrop {
+    display: none; position: fixed; inset: 0; z-index: 1100;
+    background: rgba(0,0,0,0.7); backdrop-filter: blur(4px);
+    align-items: center; justify-content: center;
+}
+.confirm-backdrop.active { display: flex; }
+.confirm-box {
+    background: var(--bg-surface); border: 1px solid rgba(229,62,62,0.3);
+    border-radius: 14px; padding: 2rem; max-width: 420px; width: 90%;
+    text-align: center;
+    box-shadow: 0 30px 60px rgba(0,0,0,0.5);
+}
+.confirm-box h3 { font-size: 1.1rem; color: var(--text-primary); margin: 0 0 0.5rem; }
+.confirm-box p { font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1.5rem; line-height: 1.6; }
+.confirm-actions { display: flex; gap: 0.75rem; justify-content: center; }
+.btn-cancel-sm { padding: 0.55rem 1.1rem; background: transparent; border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-secondary); font-size: 0.82rem; cursor: pointer; }
+
+/* Galeria: linha imagem + texto */
+.gallery-item-row {
+    display: grid;
+    grid-template-columns: 180px 1fr;
+    gap: 1.25rem;
+    padding: 1.25rem 0;
+    border-bottom: 1px solid var(--border-color);
+    align-items: start;
+}
+.gallery-item-row:last-of-type { border-bottom: none; }
+
+.gallery-item-thumb {
+    position: relative;
+    aspect-ratio: 4/3;
+    border-radius: 8px;
+    overflow: hidden;
+    background: var(--bg-main);
+    border: 1px solid var(--border-color);
+    flex-shrink: 0;
+}
+.gallery-item-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+.gallery-item-text label {
+    display: block; font-size: 0.68rem; font-weight: 700;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--text-secondary); margin-bottom: 0.4rem;
+}
+.gallery-item-text textarea {
+    width: 100%; padding: 0.65rem 0.9rem;
+    background: var(--bg-main); border: 1px solid var(--border-color);
+    border-radius: 8px; color: var(--text-primary); font-size: 0.9rem;
+    font-family: var(--font-body); transition: border-color 0.2s;
+    box-sizing: border-box; resize: vertical; line-height: 1.7;
+}
+.gallery-item-text textarea:focus { outline: none; border-color: var(--primary); }
+.gallery-text-hint { font-size: 0.68rem; color: var(--text-muted); margin-top: 0.35rem; }
+
+.gallery-empty-slots {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.75rem;
+    margin-bottom: 1.25rem;
+}
+
+@media (max-width: 600px) {
+    .gallery-item-row { grid-template-columns: 1fr; }
+    .gallery-item-thumb { aspect-ratio: 16/9; }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<a href="{{ url_for('admin.lancamentos_list') }}" class="back-link">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+    Voltar para Lançamentos
+</a>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}{% for cat, msg in messages %}
+<div style="margin-bottom:1rem; padding:0.75rem 1rem; border-radius:8px; font-size:0.88rem;
+    background:{% if cat == 'success' %}rgba(72,187,120,0.12){% else %}rgba(229,62,62,0.12){% endif %};
+    color:{% if cat == 'success' %}#48bb78{% else %}#e53e3e{% endif %};
+    border:1px solid {% if cat == 'success' %}rgba(72,187,120,0.25){% else %}rgba(229,62,62,0.25){% endif %};">
+    {{ msg }}
+</div>
+{% endfor %}{% endif %}
+{% endwith %}
+
+<div class="edit-page-header">
+    <h1 class="edit-page-title">{{ lancamento.name }}</h1>
+    <span class="edit-page-slug">slug: /lancamentos/{{ lancamento.slug }}</span>
+</div>
+
+<!-- ═══ FORMS AUXILIARES (fora do mainForm — HTML não permite nesting) ══════ -->
+
+<!-- Form oculto: remover imagem (preenchido por JS) -->
+<form method="POST" id="removeImgForm" style="display:none;">
+    <input type="hidden" name="_csrf" value="">
+</form>
+
+<!-- Form: adicionar imagem à galeria -->
+{% set gallery = lancamento.gallery %}
+{% if gallery|length < 6 %}
+<form method="POST"
+      action="{{ url_for('admin.lancamento_add_image', lancamento_id=lancamento.id) }}"
+      enctype="multipart/form-data"
+      id="addImgForm">
+    <input type="file" name="image" accept="image/*" id="galleryFileInput" style="display:none;"
+           onchange="this.closest('form').submit()">
+</form>
+{% endif %}
+
+<!-- ═══ FORM PRINCIPAL ════════════════════════════════════════════════════ -->
+<form method="POST"
+      action="{{ url_for('admin.lancamento_save', lancamento_id=lancamento.id) }}"
+      enctype="multipart/form-data"
+      id="mainForm">
+
+<div class="edit-layout">
+
+    <!-- ── Coluna esquerda: Capa ──────────────────────────────────────── -->
+    <div class="cover-sidebar">
+        <div class="edit-panel">
+            <div class="edit-panel-head">Capa Vertical (3:5)</div>
+            <div class="edit-panel-body">
+                <div class="cover-wrap">
+                    {% if lancamento.cover_url %}
+                    <img src="{{ lancamento.cover_url }}" alt="Capa" id="coverImg">
+                    {% else %}
+                    <div class="cover-wrap-empty" id="coverEmpty">
+                        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                        <span>Sem capa</span>
+                    </div>
+                    {% endif %}
+                </div>
+                <label class="cover-change-btn">
+                    <input type="file" name="cover_image" accept="image/*" onchange="previewCover(this)">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                    Selecionar capa
+                </label>
+                <p style="font-size:0.65rem; color:var(--text-muted); margin-top:0.5rem; text-align:center;">Ideal: 600×1000 px · proporção 3:5</p>
+                <p id="coverFileName" style="font-size:0.65rem; color:var(--primary); margin-top:0.25rem; text-align:center; display:none;"></p>
+            </div>
+        </div>
+
+        <!-- Danger Zone -->
+        <div class="danger-zone">
+            <p class="danger-zone-title">Excluir Lançamento</p>
+            <p class="danger-zone-desc">Remove o lançamento, a capa e todas as imagens da galeria permanentemente.</p>
+            <button type="button" class="btn-danger" onclick="document.getElementById('confirmBackdrop').classList.add('active')">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+                Excluir lançamento
+            </button>
+        </div>
+    </div>
+
+    <!-- ── Coluna direita: Info + Galeria ─────────────────────────────── -->
+    <div>
+
+        <!-- Informações -->
+        <div class="edit-panel">
+            <div class="edit-panel-head">Informações do Card (exibidas no site)</div>
+            <div class="edit-panel-body">
+                <div class="form-group">
+                    <label>Nome do Empreendimento *</label>
+                    <input type="text" name="name" value="{{ lancamento.name }}" required maxlength="255">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Tagline</label>
+                        <input type="text" name="tagline" value="{{ lancamento.tagline or '' }}" placeholder="Frase de efeito" maxlength="500">
+                    </div>
+                    <div class="form-group">
+                        <label>Localização</label>
+                        <input type="text" name="location" value="{{ lancamento.location or '' }}" placeholder="Ex: Ipanema · Rio de Janeiro" maxlength="255">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Tipo</label>
+                        <input type="text" name="type" value="{{ lancamento.type or '' }}" placeholder="Ex: Alto Padrão" maxlength="100">
+                    </div>
+                    <div class="form-group">
+                        <label>Status</label>
+                        <select name="status">
+                            {% for opt in ['Lançamento','Pré-lançamento','Breve','Em obras','Pronto para morar'] %}
+                            <option value="{{ opt }}" {% if lancamento.status == opt %}selected{% endif %}>{{ opt }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Unidades</label>
+                    <input type="text" name="units" value="{{ lancamento.units or '' }}" placeholder="Ex: 24 unidades exclusivas" maxlength="100">
+                </div>
+                <div class="form-group" style="margin-top:1.5rem; padding-top:1.5rem; border-top:1px solid var(--border-color);">
+                    <label>Descrição (página de detalhe)</label>
+                    <textarea name="description" placeholder="Texto sobre o empreendimento, diferenciais, arquitetura, etc.">{{ lancamento.description or '' }}</textarea>
+                    <p style="font-size:0.7rem; color:var(--text-muted); margin-top:0.35rem;">Aceita texto simples. Quebras de linha são preservadas.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Textos e títulos da galeria -->
+        {% if gallery %}
+        <div class="edit-panel">
+            <div class="edit-panel-head">Galeria &middot; {{ gallery|length }}/6 &mdash; Títulos e Textos</div>
+            <div class="edit-panel-body">
+                {% for img in gallery %}
+                {% set img_url  = img.url   if img is mapping else img %}
+                {% set img_text = img.text  if img is mapping else '' %}
+                {% set img_ttl  = img.title if img is mapping else '' %}
+                <div class="gallery-item-row">
+                    <div class="gallery-item-thumb">
+                        <img src="{{ img_url }}" alt="Imagem {{ loop.index }}" loading="lazy">
+                        <span class="gallery-slot-number">{{ loop.index }}</span>
+                        <!-- Botão remover: JS dispara removeImgForm fora do mainForm -->
+                        <button type="button" class="gallery-slot-remove" title="Remover imagem"
+                            onclick="removeImg('{{ url_for('admin.lancamento_remove_image', lancamento_id=lancamento.id, img_index=loop.index0) }}')">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                        </button>
+                    </div>
+                    <div class="gallery-item-text">
+                        <label>Título do bloco <span style="color:var(--text-muted);font-weight:400;">(opcional)</span></label>
+                        <input type="text"
+                               name="title_{{ loop.index0 }}"
+                               value="{{ img_ttl }}"
+                               placeholder="Ex: Arquitetura & Design, Vista Panorâmica..."
+                               style="margin-bottom:0.75rem;">
+                        <label>Texto ao lado desta imagem <span style="color:var(--text-muted);font-weight:400;">(opcional)</span></label>
+                        <textarea name="text_{{ loop.index0 }}"
+                            placeholder="Ex: Arquitetura assinada, acabamento em pedra natural, vista privilegiada..."
+                            rows="4">{{ img_text }}</textarea>
+                        <p class="gallery-text-hint">Título e texto aparecem ao lado desta imagem na página do lançamento.</p>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Adicionar imagens -->
+        <div class="edit-panel">
+            <div class="edit-panel-head">Adicionar Imagem à Galeria</div>
+            <div class="edit-panel-body">
+                {% if gallery|length < 6 %}
+                <div class="gallery-empty-slots" style="margin-bottom:1rem;">
+                    {% for i in range(gallery|length, 6) %}
+                    <div class="gallery-slot">
+                        <div class="gallery-slot-empty">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                <div class="gallery-add-row">
+                    <input type="text" class="gallery-add-input"
+                           placeholder="Clique para adicionar imagem..." readonly
+                           onclick="document.getElementById('galleryFileInput').click()">
+                    <label class="gallery-add-btn" onclick="document.getElementById('galleryFileInput').click()">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                        Adicionar Foto
+                    </label>
+                </div>
+                <p class="gallery-count-hint">{{ 6 - gallery|length }} vaga(s) restante(s)</p>
+                {% else %}
+                <p class="gallery-count-hint" style="color:var(--primary);">&#10003; Galeria completa &mdash; remova uma imagem para adicionar outra.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Botão Salvar único -->
+        <div style="display:flex; justify-content:flex-end; padding-bottom:2rem;">
+            <button type="submit" class="btn-save" style="padding:0.9rem 2.5rem; font-size:0.9rem;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                Salvar Lançamento
+            </button>
+        </div>
+
+    </div><!-- /col-direita -->
+</div><!-- /edit-layout -->
+
+</form><!-- /mainForm -->
+
+<!-- Confirm delete modal -->
+<div class="confirm-backdrop" id="confirmBackdrop">
+    <div class="confirm-box">
+        <h3>Excluir "{{ lancamento.name }}"?</h3>
+        <p>Esta ação é irreversível. A capa, as {{ lancamento.gallery|length }} imagem(ns) da galeria e todos os dados serão removidos permanentemente.</p>
+        <div class="confirm-actions">
+            <button class="btn-cancel-sm" onclick="document.getElementById('confirmBackdrop').classList.remove('active')">Cancelar</button>
+            <form method="POST" action="{{ url_for('admin.lancamento_delete', lancamento_id=lancamento.id) }}" style="display:inline;">
+                <button type="submit" class="btn-danger">Sim, excluir tudo</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+// Preview da capa — sem submeter; botão Salvar envia tudo
+function previewCover(input) {
+    if (!input.files || !input.files[0]) return;
+    const reader = new FileReader();
+    reader.onload = e => {
+        let img = document.getElementById('coverImg');
+        const empty = document.getElementById('coverEmpty');
+        const nameEl = document.getElementById('coverFileName');
+        if (empty) empty.style.display = 'none';
+        if (!img) {
+            img = document.createElement('img');
+            img.id = 'coverImg';
+            img.style.cssText = 'width:100%;height:100%;object-fit:cover;';
+            const wrap = document.querySelector('.cover-wrap');
+            if (wrap) wrap.appendChild(img);
+        }
+        if (img) img.src = e.target.result;
+        if (nameEl) { nameEl.textContent = '📎 ' + input.files[0].name; nameEl.style.display = 'block'; }
+    };
+    reader.readAsDataURL(input.files[0]);
+}
+
+// Remover imagem — cria form POST dinâmico fora do mainForm
+function removeImg(action) {
+    if (!confirm('Remover esta imagem da galeria?')) return;
+    const f = document.createElement('form');
+    f.method = 'POST';
+    f.action = action;
+    document.body.appendChild(f);
+    f.submit();
+}
+
+// Confirm delete modal
+document.getElementById('confirmBackdrop').addEventListener('click', function(e) {
+    if (e.target === this) this.classList.remove('active');
+});
+</script>
+{% endblock %}

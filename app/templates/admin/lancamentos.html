@@ -1,0 +1,330 @@
+{% extends 'admin/base_admin.html' %}
+
+{% block title %}Lançamentos | Admin 7X{% endblock %}
+
+{% block extra_css %}
+<style>
+.lanc-page-header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    margin-bottom: 2rem;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+.lanc-page-title { font-size: 1.6rem; font-weight: 700; color: var(--text-primary); margin: 0; }
+.lanc-page-sub   { font-size: 0.85rem; color: var(--text-secondary); margin: 0.25rem 0 0; }
+.lanc-counter {
+    display: inline-flex; align-items: center; gap: 0.4rem;
+    font-size: 0.75rem; font-weight: 700; letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--primary);
+    background: rgba(201,172,119,0.1);
+    border: 1px solid rgba(201,172,119,0.25);
+    border-radius: 100px; padding: 0.3rem 0.85rem;
+}
+.lanc-counter.full { color: #e53e3e; background: rgba(229,62,62,0.08); border-color: rgba(229,62,62,0.2); }
+
+.lanc-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.lanc-card {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+    text-decoration: none;
+    display: block;
+    position: relative;
+}
+.lanc-card:hover {
+    border-color: rgba(201,172,119,0.4);
+    transform: translateY(-3px);
+    box-shadow: 0 12px 32px rgba(0,0,0,0.25);
+}
+
+.lanc-cover {
+    aspect-ratio: 3 / 5;
+    background: var(--bg-main);
+    overflow: hidden;
+    position: relative;
+}
+.lanc-cover img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+.lanc-card:hover .lanc-cover img { transform: scale(1.04); }
+.lanc-cover-empty {
+    width: 100%; height: 100%;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 0.5rem;
+    color: var(--text-muted); font-size: 0.72rem;
+    letter-spacing: 0.08em; text-transform: uppercase;
+}
+.lanc-cover-empty svg { opacity: 0.3; }
+
+.lanc-status-badge {
+    position: absolute; top: 0.75rem; left: 0.75rem;
+    font-size: 0.6rem; font-weight: 700; letter-spacing: 0.14em;
+    text-transform: uppercase;
+    background: rgba(11,15,25,0.75); backdrop-filter: blur(8px);
+    color: var(--primary);
+    border: 1px solid rgba(201,172,119,0.3);
+    border-radius: 100px; padding: 0.25rem 0.65rem;
+}
+
+.lanc-card-body { padding: 1rem; }
+.lanc-card-name {
+    font-size: 0.92rem; font-weight: 700;
+    color: var(--text-primary); margin: 0 0 0.3rem;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.lanc-card-loc {
+    font-size: 0.72rem; color: var(--text-muted);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.lanc-card-edit {
+    display: flex; align-items: center; justify-content: center; gap: 0.4rem;
+    margin-top: 0.75rem;
+    font-size: 0.72rem; font-weight: 700; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--primary);
+    background: rgba(201,172,119,0.08);
+    border: 1px solid rgba(201,172,119,0.2);
+    border-radius: 6px; padding: 0.4rem;
+    transition: background 0.2s;
+}
+.lanc-card:hover .lanc-card-edit { background: rgba(201,172,119,0.18); }
+
+.lanc-new-btn {
+    display: flex; align-items: center; gap: 0.5rem;
+    padding: 0.6rem 1.2rem;
+    background: var(--primary); color: #0b0f19;
+    border: none; border-radius: 8px;
+    font-size: 0.8rem; font-weight: 700; letter-spacing: 0.06em;
+    text-transform: uppercase; cursor: pointer;
+    transition: background 0.2s, box-shadow 0.2s;
+}
+.lanc-new-btn:hover { background: var(--primary-hover); box-shadow: 0 4px 16px rgba(201,172,119,0.4); }
+
+.lanc-card-add {
+    background: transparent;
+    border: 2px dashed var(--border-color);
+    border-radius: 12px;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 0.75rem; cursor: pointer; padding: 2rem;
+    transition: border-color 0.2s, background 0.2s;
+    min-height: 200px;
+}
+.lanc-card-add:hover { border-color: var(--primary); background: rgba(201,172,119,0.04); }
+.lanc-card-add-text { font-size: 0.75rem; font-weight: 600; color: var(--text-muted); letter-spacing: 0.08em; text-transform: uppercase; }
+
+/* Modal */
+.lanc-modal-backdrop {
+    display: none; position: fixed; inset: 0; z-index: 1000;
+    background: rgba(0,0,0,0.65); backdrop-filter: blur(4px);
+    align-items: center; justify-content: center;
+}
+.lanc-modal-backdrop.active { display: flex; }
+.lanc-modal {
+    background: var(--bg-surface); border: 1px solid var(--border-color);
+    border-radius: 16px; padding: 2rem; width: 100%; max-width: 580px;
+    max-height: 90vh; overflow-y: auto;
+    box-shadow: 0 40px 80px rgba(0,0,0,0.5);
+}
+.lanc-modal-title { font-size: 1.2rem; font-weight: 700; margin: 0 0 1.5rem; color: var(--text-primary); }
+.lanc-modal .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.lanc-modal .form-group { margin-bottom: 1rem; }
+.lanc-modal .form-group label {
+    display: block; font-size: 0.68rem; font-weight: 700;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--text-secondary); margin-bottom: 0.4rem;
+}
+.lanc-modal .form-group input,
+.lanc-modal .form-group select {
+    width: 100%; padding: 0.65rem 0.9rem;
+    background: var(--bg-main); border: 1px solid var(--border-color);
+    border-radius: 8px; color: var(--text-primary); font-size: 0.88rem;
+    font-family: var(--font-body); transition: border-color 0.2s;
+    box-sizing: border-box;
+}
+.lanc-modal .form-group input:focus,
+.lanc-modal .form-group select:focus { outline: none; border-color: var(--primary); }
+
+.cover-upload-area {
+    border: 2px dashed var(--border-color); border-radius: 10px;
+    padding: 1.5rem; text-align: center; cursor: pointer;
+    transition: border-color 0.2s; position: relative; overflow: hidden;
+}
+.cover-upload-area:hover { border-color: var(--primary); }
+.cover-upload-area input[type="file"] {
+    position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%;
+}
+.cover-preview {
+    width: 100%; aspect-ratio: 3/5; object-fit: cover;
+    border-radius: 8px; display: none; margin: 0 auto;
+    max-width: 140px;
+}
+.cover-preview.visible { display: block; }
+.cover-hint { font-size: 0.72rem; color: var(--text-muted); margin-top: 0.5rem; }
+
+.lanc-modal-actions { display: flex; gap: 0.75rem; justify-content: flex-end; margin-top: 1.5rem; }
+.btn-cancel { padding: 0.6rem 1.2rem; background: transparent; border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-secondary); font-size: 0.82rem; cursor: pointer; transition: all 0.2s; }
+.btn-cancel:hover { border-color: var(--text-secondary); color: var(--text-primary); }
+.btn-submit { padding: 0.6rem 1.4rem; background: var(--primary); color: #0b0f19; border: none; border-radius: 8px; font-size: 0.82rem; font-weight: 700; cursor: pointer; transition: background 0.2s; }
+.btn-submit:hover { background: var(--primary-hover); }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="lanc-page-header">
+    <div>
+        <h1 class="lanc-page-title">Lançamentos</h1>
+        <p class="lanc-page-sub">Gerencie os empreendimentos exibidos no site · máximo {{ max_lancamentos }}</p>
+    </div>
+    <div style="display:flex; align-items:center; gap:0.75rem;">
+        <span class="lanc-counter {% if count >= max_lancamentos %}full{% endif %}">{{ count }}/{{ max_lancamentos }}</span>
+        {% if count < max_lancamentos %}
+        <button class="lanc-new-btn" onclick="document.getElementById('lancModalBackdrop').classList.add('active')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Novo Lançamento
+        </button>
+        {% endif %}
+    </div>
+</div>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}{% for cat, msg in messages %}
+<div class="alert alert-{{ cat }}" style="margin-bottom:1rem; padding:0.75rem 1rem; border-radius:8px; font-size:0.88rem; background:{% if cat == 'success' %}rgba(72,187,120,0.12){% else %}rgba(229,62,62,0.12){% endif %}; color:{% if cat == 'success' %}#48bb78{% else %}#e53e3e{% endif %}; border:1px solid {% if cat == 'success' %}rgba(72,187,120,0.25){% else %}rgba(229,62,62,0.25){% endif %};">{{ msg }}</div>
+{% endfor %}{% endif %}
+{% endwith %}
+
+<div class="lanc-grid">
+    {% for item in lancamentos %}
+    <a href="{{ url_for('admin.lancamento_edit', lancamento_id=item.id) }}" class="lanc-card">
+        <div class="lanc-cover">
+            {% if item.cover_url %}
+            <img src="{{ item.cover_url }}" alt="{{ item.name }}" loading="lazy">
+            {% else %}
+            <div class="lanc-cover-empty">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                <span>Sem capa</span>
+            </div>
+            {% endif %}
+            {% if item.status %}<span class="lanc-status-badge">{{ item.status }}</span>{% endif %}
+        </div>
+        <div class="lanc-card-body">
+            <p class="lanc-card-name">{{ item.name }}</p>
+            <p class="lanc-card-loc">{{ item.location or '—' }}</p>
+            <div class="lanc-card-edit">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                Editar
+            </div>
+        </div>
+    </a>
+    {% endfor %}
+
+    {% if count < max_lancamentos %}
+    <button class="lanc-card-add" onclick="document.getElementById('lancModalBackdrop').classList.add('active')">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="color:var(--text-muted)"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+        <span class="lanc-card-add-text">Adicionar Lançamento</span>
+    </button>
+    {% endif %}
+
+    {% if count == 0 %}
+    <div style="grid-column:1/-1; text-align:center; padding:3rem 0; color:var(--text-muted);">
+        <p style="font-size:0.9rem;">Nenhum lançamento cadastrado ainda. Clique em "Novo Lançamento" para começar!</p>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Modal: Novo Lançamento -->
+<div class="lanc-modal-backdrop" id="lancModalBackdrop">
+    <div class="lanc-modal">
+        <h2 class="lanc-modal-title">✦ Novo Lançamento</h2>
+        <form method="POST" action="{{ url_for('admin.lancamento_create') }}" enctype="multipart/form-data">
+
+            <div class="form-group">
+                <label>Capa Vertical (3:5) *</label>
+                <div class="cover-upload-area" id="coverUploadArea">
+                    <input type="file" name="cover_image" accept="image/*" id="coverInput" onchange="previewCover(this)">
+                    <img class="cover-preview" id="coverPreview" src="" alt="Preview">
+                    <div id="coverHintText">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="color:var(--text-muted); margin-bottom:0.5rem;"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                        <p class="cover-hint">Clique para selecionar a capa<br><small>Ideal: 600×1000 px · proporção 3:5</small></p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Nome do Empreendimento *</label>
+                <input type="text" name="name" required placeholder="Ex: Sky Residences" maxlength="255">
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Tagline</label>
+                    <input type="text" name="tagline" placeholder="Ex: O topo redefinido" maxlength="500">
+                </div>
+                <div class="form-group">
+                    <label>Localização</label>
+                    <input type="text" name="location" placeholder="Ex: Ipanema · Rio de Janeiro" maxlength="255">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Tipo</label>
+                    <input type="text" name="type" placeholder="Ex: Alto Padrão" maxlength="100">
+                </div>
+                <div class="form-group">
+                    <label>Status</label>
+                    <select name="status">
+                        <option value="Lançamento">Lançamento</option>
+                        <option value="Pré-lançamento">Pré-lançamento</option>
+                        <option value="Breve">Breve</option>
+                        <option value="Em obras">Em obras</option>
+                        <option value="Pronto para morar">Pronto para morar</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Unidades</label>
+                <input type="text" name="units" placeholder="Ex: 24 unidades exclusivas" maxlength="100">
+            </div>
+
+            <div class="lanc-modal-actions">
+                <button type="button" class="btn-cancel" onclick="document.getElementById('lancModalBackdrop').classList.remove('active')">Cancelar</button>
+                <button type="submit" class="btn-submit">Criar Lançamento →</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+function previewCover(input) {
+    const preview = document.getElementById('coverPreview');
+    const hint = document.getElementById('coverHintText');
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = e => {
+            preview.src = e.target.result;
+            preview.classList.add('visible');
+            hint.style.display = 'none';
+        };
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+document.getElementById('lancModalBackdrop').addEventListener('click', function(e) {
+    if (e.target === this) this.classList.remove('active');
+});
+</script>
+{% endblock %}

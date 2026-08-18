@@ -105,6 +105,17 @@ class SyncService:
                     prop.amenities = p_data.get('amenities', [])
                     prop.gallery = p_data.get('gallery', [])
                     prop.agent = p_data.get('agent', {})
+                    prop.establishments = p_data.get('establishments', [])
+
+                    # Novos campos
+                    prop.profile = p_data.get('profile')
+                    prop.situation = p_data.get('situation')
+                    prop.is_corner = p_data.get('is_corner', False)
+                    prop.is_deeded = p_data.get('is_deeded', False)
+                    prop.is_titled = p_data.get('is_titled', False)
+                    prop.total_monthly_cost = p_data.get('total_monthly_cost')
+                    prop.iptu_type = p_data.get('iptu_type')
+
 
                     total_synced += 1
 

@@ -323,10 +323,24 @@
                 <!-- Toolbar -->
                 <div class="catalog-toolbar">
                     <p class="results-info">
-                        <strong>{{ properties|length }}</strong>
-                        imóvel{{ 's' if properties|length != 1 else '' }} encontrado{{ 's' if properties|length != 1 else '' }}
+                        <strong>{{ pagination.total }}</strong>
+                        imóvel{{ 's' if pagination.total != 1 else '' }} encontrado{{ 's' if pagination.total != 1 else '' }}
                     </p>
                     <div class="toolbar-right">
+                        <!-- Ordenação -->
+                        <div class="sort-control">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                <line x1="3" y1="6" x2="21" y2="6"/>
+                                <line x1="6" y1="12" x2="21" y2="12"/>
+                                <line x1="9" y1="18" x2="21" y2="18"/>
+                            </svg>
+                            <select id="toolbarSort" onchange="applySort(this.value)">
+                                <option value="recent"     {% if current_filters.sort == 'recent'     %}selected{% endif %}>Mais recentes</option>
+                                <option value="price-asc"  {% if current_filters.sort == 'price-asc'  %}selected{% endif %}>Menor preço</option>
+                                <option value="price-desc" {% if current_filters.sort == 'price-desc' %}selected{% endif %}>Maior preço</option>
+                                <option value="area-desc"  {% if current_filters.sort == 'area-desc'  %}selected{% endif %}>Maior área</option>
+                            </select>
+                        </div>
                         <!-- View toggle -->
                         <div class="view-toggle" role="group" aria-label="Visualização">
                             <button type="button" class="view-btn view-btn--active" id="viewGrid" title="Grade" aria-pressed="true">
@@ -356,6 +370,16 @@
                         </button>
                     </div>
                 </div>
+
+                <script>
+                // Coleta todos os params atuais e substitui apenas 'sort'
+                function applySort(val) {
+                    const url = new URL(window.location.href);
+                    url.searchParams.set('sort', val);
+                    url.searchParams.set('page', '1'); // volta para página 1
+                    window.location.href = url.toString();
+                }
+                </script>
 
                 <!-- Category Navigation -->
                 <div class="category-nav">

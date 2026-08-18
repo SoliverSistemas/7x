@@ -41,12 +41,19 @@ def create_app(config_name='dev'):
     # Register Context Processors (global variables for templates)
     @app.context_processor
     def inject_global_vars():
+        import re
+        wa_url = app.config.get('LINK_WHATSAPP_URL', 'https://wa.me/5521990570909')
+        # Extrai só os dígitos do número do WhatsApp (ex: 5521990570909)
+        wa_number_match = re.search(r'wa\.me/(\d+)', wa_url)
+        wa_number = wa_number_match.group(1) if wa_number_match else '5521990570909'
         return {
             'site_name': app.config.get('SITE_NAME', '7X Imóveis'),
             'site_slogan': app.config.get('SITE_SLOGAN', ''),
             'contact_phone': app.config.get('CONTACT_PHONE', ''),
             'contact_email': app.config.get('CONTACT_EMAIL', ''),
-            'contact_address': app.config.get('CONTACT_ADDRESS', '')
+            'contact_address': app.config.get('CONTACT_ADDRESS', ''),
+            'whatsapp_url': wa_url,
+            'whatsapp_number': wa_number,
         }
 
     # Register Blueprints
@@ -71,6 +78,6 @@ def create_app(config_name='dev'):
 
     # Import models so Flask-Migrate can detect them
     with app.app_context():
-        from app.models.db_models import Property, ExclusiveCollection  # noqa: F401
+        from app.models.db_models import Property, ExclusiveCollection, Lancamento  # noqa: F401
 
     return app

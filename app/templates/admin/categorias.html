@@ -1,0 +1,574 @@
+{% extends 'admin/base_admin.html' %}
+
+{% block title %}Categorias de Imóveis · Admin 7X{% endblock %}
+
+{% block extra_css %}
+<style>
+/* ── Page header ──────────────────────────────────────────────────────────── */
+.cat-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+.cat-header-title { font-size: 1.4rem; font-weight: 700; color: var(--text-primary); }
+.cat-header-sub   { font-size: 0.78rem; color: var(--text-muted); margin-top: .2rem; }
+.cat-header-actions { display: flex; gap: .75rem; flex-wrap: wrap; }
+
+/* ── Alert flash ──────────────────────────────────────────────────────────── */
+.cat-flash {
+    padding: .75rem 1.25rem;
+    border-radius: 8px;
+    font-size: .85rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: .6rem;
+}
+.cat-flash.success { background: rgba(16,185,129,.1); color: #10b981; border: 1px solid rgba(16,185,129,.25); }
+.cat-flash.error   { background: rgba(239,68,68,.1);  color: #ef4444; border: 1px solid rgba(239,68,68,.25); }
+
+/* ── Empty state ──────────────────────────────────────────────────────────── */
+.cat-empty {
+    text-align: center;
+    padding: 4rem 2rem;
+    border: 1px dashed var(--border-color);
+    border-radius: 12px;
+    color: var(--text-muted);
+}
+.cat-empty svg { opacity: .3; margin-bottom: 1rem; }
+.cat-empty h3  { font-size: 1.1rem; color: var(--text-primary); margin-bottom: .5rem; }
+.cat-empty p   { font-size: .85rem; }
+
+/* ── Categories table ─────────────────────────────────────────────────────── */
+.cat-table-wrap {
+    background: var(--panel-bg, #1a1f2e);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 2rem;
+}
+.cat-table { width: 100%; border-collapse: collapse; }
+.cat-table th {
+    text-align: left;
+    font-size: .65rem;
+    font-weight: 700;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    padding: .85rem 1.25rem;
+    border-bottom: 1px solid var(--border-color);
+    background: rgba(255,255,255,.02);
+}
+.cat-table td {
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid rgba(255,255,255,.04);
+    vertical-align: middle;
+    font-size: .88rem;
+    color: var(--text-primary);
+}
+.cat-table tr:last-child td { border-bottom: none; }
+.cat-table tbody tr { transition: background .15s; }
+.cat-table tbody tr:hover { background: rgba(255,255,255,.03); }
+
+/* Badge de nome com cor */
+.cat-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: .45rem;
+    padding: .28rem .75rem;
+    border-radius: 100px;
+    font-size: .72rem;
+    font-weight: 700;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    background: rgba(255,255,255,.06);
+    border: 1px solid rgba(255,255,255,.1);
+}
+.cat-badge-dot {
+    width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+}
+
+/* Critério */
+.cat-criteria {
+    font-size: .8rem;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: .4rem;
+}
+.cat-criteria svg { flex-shrink: 0; opacity: .5; }
+
+/* Prioridade badge */
+.cat-priority {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    background: rgba(255,255,255,.06);
+    font-size: .78rem;
+    font-weight: 800;
+    color: var(--primary, #c9ac77);
+}
+
+/* Ações por linha */
+.cat-row-actions { display: flex; gap: .5rem; }
+.cat-btn-edit {
+    display: inline-flex;
+    align-items: center;
+    gap: .35rem;
+    padding: .38rem .85rem;
+    border-radius: 6px;
+    font-size: .72rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all .15s;
+    border: 1px solid rgba(255,255,255,.12);
+    background: transparent;
+    color: var(--text-primary);
+}
+.cat-btn-edit:hover { background: rgba(255,255,255,.06); border-color: rgba(255,255,255,.2); }
+.cat-btn-del {
+    display: inline-flex;
+    align-items: center;
+    gap: .35rem;
+    padding: .38rem .7rem;
+    border-radius: 6px;
+    font-size: .72rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all .15s;
+    border: 1px solid rgba(239,68,68,.2);
+    background: rgba(239,68,68,.06);
+    color: #ef4444;
+}
+.cat-btn-del:hover { background: rgba(239,68,68,.14); border-color: rgba(239,68,68,.4); }
+
+/* ── Formulário inline (modal) ────────────────────────────────────────────── */
+.cat-modal-backdrop {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.7);
+    backdrop-filter: blur(4px);
+    z-index: 900;
+    align-items: center;
+    justify-content: center;
+}
+.cat-modal-backdrop.open { display: flex; }
+.cat-modal {
+    background: var(--panel-bg, #1a1f2e);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    width: 100%;
+    max-width: 560px;
+    padding: 2rem;
+    box-shadow: 0 24px 64px rgba(0,0,0,.5);
+    animation: catModalIn .2s ease both;
+}
+@keyframes catModalIn {
+    from { opacity: 0; transform: translateY(-16px) scale(.98); }
+    to   { opacity: 1; transform: none; }
+}
+.cat-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+}
+.cat-modal-title {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+.cat-modal-close {
+    width: 32px; height: 32px; border-radius: 8px;
+    background: transparent; border: 1px solid rgba(255,255,255,.1);
+    color: var(--text-muted); cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: all .15s;
+}
+.cat-modal-close:hover { background: rgba(255,255,255,.08); color: var(--text-primary); }
+
+.cat-form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.cat-form-group { display: flex; flex-direction: column; gap: .4rem; margin-bottom: 1rem; }
+.cat-form-group label { font-size: .68rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--text-muted); }
+.cat-form-group input[type=text],
+.cat-form-group input[type=number] {
+    background: rgba(255,255,255,.04);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: .6rem .9rem;
+    font-size: .88rem;
+    color: var(--text-primary);
+    width: 100%;
+    transition: border-color .15s;
+}
+.cat-form-group input:focus {
+    outline: none;
+    border-color: var(--primary, #c9ac77);
+    background: rgba(201,172,119,.05);
+}
+.cat-form-group input[type=color] {
+    height: 42px;
+    width: 100%;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    background: transparent;
+    cursor: pointer;
+    padding: 2px 4px;
+}
+.cat-check-row {
+    display: flex;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+    margin-bottom: 1.25rem;
+}
+.cat-check-label {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+    cursor: pointer;
+    font-size: .82rem;
+    color: var(--text-primary);
+    user-select: none;
+}
+.cat-check-label input[type=checkbox] {
+    width: 16px; height: 16px; accent-color: var(--primary, #c9ac77);
+}
+.cat-form-hint {
+    font-size: .72rem;
+    color: var(--text-muted);
+    margin-top: -.5rem;
+    margin-bottom: .5rem;
+    line-height: 1.5;
+}
+.cat-modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: .75rem;
+    margin-top: 1.5rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--border-color);
+}
+.btn-primary {
+    display: inline-flex; align-items: center; gap: .45rem;
+    padding: .65rem 1.5rem;
+    background: var(--primary, #c9ac77);
+    color: #09090f;
+    border: none;
+    border-radius: 8px;
+    font-size: .8rem;
+    font-weight: 800;
+    letter-spacing: .04em;
+    cursor: pointer;
+    transition: all .15s;
+}
+.btn-primary:hover { background: var(--primary-hover, #b8924a); }
+.btn-ghost {
+    display: inline-flex; align-items: center; gap: .45rem;
+    padding: .65rem 1.25rem;
+    background: transparent;
+    border: 1px solid rgba(255,255,255,.12);
+    border-radius: 8px;
+    font-size: .8rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all .15s;
+}
+.btn-ghost:hover { border-color: rgba(255,255,255,.25); color: var(--text-primary); }
+
+/* Botões do header */
+.btn-recalc {
+    display: inline-flex; align-items: center; gap: .45rem;
+    padding: .6rem 1.25rem;
+    background: rgba(16,185,129,.12);
+    border: 1px solid rgba(16,185,129,.3);
+    border-radius: 8px;
+    color: #10b981;
+    font-size: .75rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all .15s;
+}
+.btn-recalc:hover { background: rgba(16,185,129,.2); }
+.btn-padroes {
+    display: inline-flex; align-items: center; gap: .45rem;
+    padding: .6rem 1.25rem;
+    background: rgba(201,172,119,.1);
+    border: 1px solid rgba(201,172,119,.3);
+    border-radius: 8px;
+    color: var(--primary, #c9ac77);
+    font-size: .75rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all .15s;
+}
+.btn-padroes:hover { background: rgba(201,172,119,.2); }
+.btn-new {
+    display: inline-flex; align-items: center; gap: .45rem;
+    padding: .6rem 1.25rem;
+    background: var(--primary, #c9ac77);
+    border: none;
+    border-radius: 8px;
+    color: #09090f;
+    font-size: .75rem;
+    font-weight: 800;
+    cursor: pointer;
+    transition: all .15s;
+}
+.btn-new:hover { background: var(--primary-hover, #b8924a); }
+
+/* Info box */
+.cat-info {
+    background: rgba(59,130,246,.07);
+    border: 1px solid rgba(59,130,246,.2);
+    border-radius: 10px;
+    padding: 1rem 1.25rem;
+    font-size: .82rem;
+    color: rgba(255,255,255,.6);
+    line-height: 1.6;
+    margin-bottom: 2rem;
+    display: flex;
+    gap: .75rem;
+    align-items: flex-start;
+}
+.cat-info svg { flex-shrink: 0; color: #3b82f6; margin-top: 1px; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div style="max-width:1000px;margin:0 auto;padding:2rem 1.5rem;">
+
+    {# Flash messages #}
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% for cat_name, msg in messages %}
+    <div class="cat-flash {{ cat_name }}">
+        {% if cat_name == 'success' %}
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+        {% else %}
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        {% endif %}
+        {{ msg }}
+    </div>
+    {% endfor %}
+    {% endwith %}
+
+    {# Header #}
+    <div class="cat-header">
+        <div>
+            <div class="cat-header-title">Categorias de Imóveis</div>
+            <div class="cat-header-sub">Defina as faixas de preço e critérios para classificar os imóveis automaticamente.</div>
+        </div>
+        <div class="cat-header-actions">
+            {% if categories %}
+            <form method="POST" action="{{ url_for('admin.categorias_recalcular') }}" style="display:inline;">
+                <button type="submit" class="btn-recalc"
+                    onclick="return confirm('Recalcular a categoria de TODOS os imóveis com as regras atuais?')">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+                    Recalcular Todos
+                </button>
+            </form>
+            {% endif %}
+            {% if not categories %}
+            <form method="POST" action="{{ url_for('admin.categorias_criar_padroes') }}" style="display:inline;">
+                <button type="submit" class="btn-padroes">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+                    Criar Padrões
+                </button>
+            </form>
+            {% endif %}
+            <button type="button" class="btn-new" onclick="openCatModal()">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                Nova Categoria
+            </button>
+        </div>
+    </div>
+
+    {# Info box #}
+    <div class="cat-info">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="8"/><line x1="12" y1="12" x2="12" y2="16"/></svg>
+        <span>
+            As categorias são verificadas em ordem de <strong>prioridade</strong> (menor número primeiro). 
+            Um imóvel recebe a primeira categoria cujos critérios ele atender.
+            Após criar ou editar categorias, clique em <strong>Recalcular Todos</strong> para aplicar as mudanças aos imóveis existentes.
+        </span>
+    </div>
+
+    {# Tabela #}
+    {% if categories %}
+    <div class="cat-table-wrap">
+        <table class="cat-table">
+            <thead>
+                <tr>
+                    <th style="width:42px;">Ord.</th>
+                    <th>Categoria</th>
+                    <th>Critério</th>
+                    <th style="width:100px;">Cor</th>
+                    <th style="width:160px;">Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for cat in categories %}
+                <tr>
+                    <td><span class="cat-priority">{{ cat.priority }}</span></td>
+                    <td>
+                        <span class="cat-badge">
+                            <span class="cat-badge-dot" style="background:{{ cat.color }};"></span>
+                            {{ cat.name }}
+                        </span>
+                    </td>
+                    <td>
+                        <div class="cat-criteria">
+                            {% if cat.is_exclusive_flag %}
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                            Imóvel marcado como <strong>Exclusivo</strong>
+                            {% elif cat.is_featured_flag %}
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                            Imóvel marcado como <strong>Destaque</strong>
+                            {% else %}
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                            {{ cat.criteria_label() }}
+                            {% endif %}
+                        </div>
+                    </td>
+                    <td>
+                        <div style="display:flex;align-items:center;gap:.5rem;">
+                            <div style="width:20px;height:20px;border-radius:50%;background:{{ cat.color }};border:2px solid rgba(255,255,255,.15);flex-shrink:0;"></div>
+                            <code style="font-size:.72rem;color:var(--text-muted);">{{ cat.color }}</code>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="cat-row-actions">
+                            <button type="button" class="cat-btn-edit"
+                                onclick="openCatModal({{ cat.id }}, '{{ cat.name|e }}', '{{ cat.color }}', {{ cat.priority }}, {{ cat.min_price or 'null' }}, {{ cat.max_price or 'null' }}, {{ 'true' if cat.is_exclusive_flag else 'false' }}, {{ 'true' if cat.is_featured_flag else 'false' }})">
+                                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                                Editar
+                            </button>
+                            <form method="POST" action="{{ url_for('admin.categoria_delete', cat_id=cat.id) }}" style="display:inline;">
+                                <button type="submit" class="cat-btn-del"
+                                    onclick="return confirm('Excluir a categoria \"{{ cat.name }}\"?')">
+                                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/></svg>
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="cat-empty">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2">
+            <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/>
+            <line x1="7" y1="7" x2="7.01" y2="7"/>
+        </svg>
+        <h3>Nenhuma categoria cadastrada</h3>
+        <p>Clique em <strong>Criar Padrões</strong> para começar com as categorias padrão do sistema,<br>ou em <strong>Nova Categoria</strong> para criar do zero.</p>
+    </div>
+    {% endif %}
+
+</div>
+
+{# ── Modal de criação/edição ─────────────────────────────────────────────── #}
+<div class="cat-modal-backdrop" id="catModalBackdrop">
+    <div class="cat-modal">
+        <div class="cat-modal-header">
+            <span class="cat-modal-title" id="catModalTitle">Nova Categoria</span>
+            <button class="cat-modal-close" type="button" onclick="closeCatModal()">✕</button>
+        </div>
+
+        <form method="POST" action="{{ url_for('admin.categoria_save') }}" id="catForm">
+            <input type="hidden" name="id" id="catId" value="">
+
+            <div class="cat-form-group">
+                <label>Nome da Categoria *</label>
+                <input type="text" name="name" id="catName" placeholder="Ex: Alto Padrão, Médio Padrão, Econômico..." required>
+            </div>
+
+            <div class="cat-form-row">
+                <div class="cat-form-group">
+                    <label>Prioridade</label>
+                    <input type="number" name="priority" id="catPriority" value="10" min="1" max="999">
+                    <span class="cat-form-hint">Menor número = verificado primeiro.</span>
+                </div>
+                <div class="cat-form-group">
+                    <label>Cor do Badge</label>
+                    <input type="color" name="color" id="catColor" value="#c9ac77">
+                </div>
+            </div>
+
+            <div class="cat-check-row">
+                <label class="cat-check-label">
+                    <input type="checkbox" name="is_exclusive_flag" id="catExclusiveFlag">
+                    Aplicar a imóveis Exclusivos
+                </label>
+                <label class="cat-check-label">
+                    <input type="checkbox" name="is_featured_flag" id="catFeaturedFlag">
+                    Aplicar a imóveis Destaque
+                </label>
+            </div>
+            <div class="cat-form-hint" style="margin-bottom:1rem;">
+                Se uma flag estiver marcada, as faixas de preço abaixo são ignoradas para este critério.
+            </div>
+
+            <div class="cat-form-row">
+                <div class="cat-form-group">
+                    <label>Preço Mínimo (R$)</label>
+                    <input type="number" name="min_price" id="catMinPrice" placeholder="Ex: 500000" min="0" step="1000">
+                    <span class="cat-form-hint">Deixe em branco para sem limite inferior.</span>
+                </div>
+                <div class="cat-form-group">
+                    <label>Preço Máximo (R$)</label>
+                    <input type="number" name="max_price" id="catMaxPrice" placeholder="Ex: 1999999" min="0" step="1000">
+                    <span class="cat-form-hint">Deixe em branco para sem limite superior.</span>
+                </div>
+            </div>
+
+            <div class="cat-modal-footer">
+                <button type="button" class="btn-ghost" onclick="closeCatModal()">Cancelar</button>
+                <button type="submit" class="btn-primary">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                    Salvar Categoria
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+function openCatModal(id, name, color, priority, minPrice, maxPrice, isExclusive, isFeatured) {
+    const isNew = !id;
+    document.getElementById('catModalTitle').textContent = isNew ? 'Nova Categoria' : 'Editar Categoria';
+    document.getElementById('catId').value        = isNew ? '' : id;
+    document.getElementById('catName').value      = name     || '';
+    document.getElementById('catColor').value     = color    || '#c9ac77';
+    document.getElementById('catPriority').value  = priority || 10;
+    document.getElementById('catMinPrice').value  = (minPrice !== null && minPrice !== undefined) ? minPrice : '';
+    document.getElementById('catMaxPrice').value  = (maxPrice !== null && maxPrice !== undefined) ? maxPrice : '';
+    document.getElementById('catExclusiveFlag').checked = !!isExclusive;
+    document.getElementById('catFeaturedFlag').checked  = !!isFeatured;
+    document.getElementById('catModalBackdrop').classList.add('open');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeCatModal() {
+    document.getElementById('catModalBackdrop').classList.remove('open');
+    document.body.style.overflow = '';
+}
+
+document.getElementById('catModalBackdrop').addEventListener('click', function(e) {
+    if (e.target === this) closeCatModal();
+});
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') closeCatModal();
+});
+</script>
+{% endblock %}

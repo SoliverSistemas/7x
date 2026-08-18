@@ -7,621 +7,636 @@
 {% endblock %}
 
 {% block content %}
+
+{# ── Helpers ─────────────────────────────────────────────────────────────── #}
+{% set prop_img = property.image if property.image and property.image.startswith('http') else (url_for('static', filename='img/' + property.image) if property.image else url_for('static', filename='img/placeholder.jpg')) %}
+{% set gallery_imgs = property.gallery if property.gallery else [] %}
+{% set all_imgs = ([property.image] + gallery_imgs) | unique | list if property.image and property.image not in gallery_imgs else gallery_imgs %}
+{% if not all_imgs %}{% set all_imgs = [property.image] %}{% endif %}
+
+{# Monta amenities: separado ou fallback para campo único #}
+{% set amen_unit = property.amenities_property if property.amenities_property else property.amenities %}
+{% set amen_condo = property.amenities_condo if property.amenities_condo else [] %}
+
+{# WhatsApp link para este imóvel #}
+{% set wa_text = "Olá! Tenho interesse no imóvel: " ~ property.title ~ " (Ref: " ~ (property.reference or property.id) ~ ") — " ~ (property.price|currency) ~ ". Gostaria de mais informações." %}
+{% set wa_link = "https://wa.me/" ~ whatsapp_number ~ "?text=" ~ (wa_text|urlencode) %}
+
 <article class="detail-page">
-    <div class="container">
 
-        <!-- ══ 0. Breadcrumb & Top Bar ═════════════════════════════════════ -->
-        <nav class="detail-nav-bar" aria-label="Navegação do Imóvel">
-            <div class="detail-nav-breadcrumb">
-                <a href="{{ url_for('main.index') }}">Início</a>
-                <span class="separator">/</span>
-                <a href="{{ url_for('properties.list_properties') }}">Imóveis</a>
-                <span class="separator">/</span>
-                <a href="{{ url_for('properties.list_properties', city=property.city) }}">{{ property.city }}</a>
-                <span class="separator">/</span>
-                <span style="color: var(--text-primary); font-weight: 700;">Ref: {{ property.reference or property.id }}</span>
-            </div>
+  <!-- ══ 0. Breadcrumb ══════════════════════════════════════════════════════ -->
+  <div class="container">
+    <nav class="detail-breadcrumb" aria-label="Navegação">
+      <a href="{{ url_for('main.index') }}">Início</a>
+      <span class="bc-sep">›</span>
+      <a href="{{ url_for('properties.list_properties') }}">Imóveis</a>
+      <span class="bc-sep">›</span>
+      <a href="{{ url_for('properties.list_properties', city=property.city) }}">{{ property.city }}</a>
+      <span class="bc-sep">›</span>
+      <span class="bc-current">{{ property.title | truncate(45, true, '…') }}</span>
+    </nav>
+  </div>
 
-            <div class="detail-nav-actions">
-                <button type="button" class="detail-nav-btn copy-reference-btn" data-ref="{{ property.reference or property.id }}" title="Copiar código de referência">
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect width="14" height="14" x="8" y="8"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
-                    Ref: {{ property.reference or property.id }}
-                </button>
-                <button type="button" class="detail-nav-btn" id="shareLinkBtn" title="Compartilhar Imóvel">
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" x2="15.42" y1="13.51" y2="17.49"/><line x1="15.41" x2="8.59" y1="6.51" y2="10.49"/></svg>
-                    Compartilhar
-                </button>
-                <button type="button" class="detail-nav-btn card-favorite-btn" data-id="{{ property.id }}" title="Salvar Favorito">
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
-                    Favorito
-                </button>
-            </div>
-        </nav>
-
-        <!-- ══ 1. Main Header Title & Pricing ══════════════════════════════ -->
-        <header class="detail-main-header">
-            <div>
-                <div class="detail-header-eyebrow">
-                    <span>{{ property.city }}</span>
-                    <span>•</span>
-                    <span>{{ property.neighborhood }}</span>
-                    {% if property.condominium_name %}
-                        <span>•</span>
-                        <span>{{ property.condominium_name }}</span>
-                    {% endif %}
-                </div>
-
-                <h1 class="detail-property-title">{{ property.title }}</h1>
-
-                <div class="detail-header-location">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
-                    <span>{{ property.address }} — {{ property.neighborhood }}, {{ property.city }}/{{ property.state }}{% if property.zip_code %} • CEP {{ property.zip_code }}{% endif %}</span>
-                </div>
-            </div>
-
-            <div class="detail-price-box">
-                <span class="detail-price-badge">Valor de {{ property.purpose }}</span>
-                <div class="detail-price-display">{{ property.price|currency }}</div>
-                {% if price_per_sqm and price_per_sqm > 0 %}
-                    <div class="detail-sqm-rate">{{ price_per_sqm|currency }} / m²</div>
-                {% endif %}
-            </div>
-        </header>
-
-        <!-- ══ 2. Cinema Photo Viewer & Gallery ════════════════════════════ -->
-        <section class="detail-cinema-gallery">
-            <!-- Main Stage Photo -->
-            <div class="cinema-stage" id="cinemaMainStage" data-lightbox-src="{{ url_for('static', filename='img/' + property.image) if not property.image.startswith('http') else property.image }}" data-lightbox-index="0">
-                <div class="cinema-overlay-badges">
-                    <span class="cinema-badge gold">{{ property.purpose }}</span>
-                    <span class="cinema-badge">{{ property.type }}</span>
-                    {% if property.badge %}
-                        <span class="cinema-badge">{{ property.badge }}</span>
-                    {% endif %}
-                </div>
-
-                <img id="activeCinemaImage" src="{{ url_for('static', filename='img/' + property.image) if not property.image.startswith('http') else property.image }}" alt="{{ property.title }}">
-
-                <button type="button" class="cinema-expand-btn" id="openFullGalleryBtn" aria-label="Abrir galeria completa">
-                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
-                    <span>Ver Fotos ({{ property.gallery|length if property.gallery else 1 }})</span>
-                </button>
-            </div>
-
-            <!-- Thumbnail Switcher Strip -->
-            {% if property.gallery and property.gallery|length > 1 %}
-                <div class="cinema-thumbs-row">
-                    {% for img in property.gallery %}
-                        {% set img_url = url_for('static', filename='img/' + img) if not img.startswith('http') else img %}
-                        <div class="cinema-thumb-slot {% if loop.first %}active{% endif %}"
-                             data-src="{{ img_url }}"
-                             data-lightbox-src="{{ img_url }}"
-                             data-lightbox-index="{{ loop.index0 }}"
-                             onclick="switchCinemaPhoto('{{ img_url }}', this)">
-                            <img src="{{ img_url }}" alt="Miniatura {{ loop.index }}" loading="lazy">
-                        </div>
-                    {% endfor %}
-                </div>
-            {% endif %}
-
-            <!-- Hidden container storing all gallery sources for the lightbox -->
-            <div style="display: none;">
-                {% for img in property.gallery %}
-                    {% set full_img_url = url_for('static', filename='img/' + img) if not img.startswith('http') else img %}
-                    <span data-lightbox-src="{{ full_img_url }}" data-lightbox-index="{{ loop.index0 }}"></span>
-                {% endfor %}
-            </div>
-        </section>
-
-        <!-- ══ 3. Luxury Specs Ribbon Bar ══════════════════════════════════ -->
-        <section class="detail-specs-ribbon" aria-label="Ficha Rápida do Imóvel">
-            <div class="spec-ribbon-item">
-                <div class="spec-ribbon-icon">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 3H3v18h18V3z"/><path d="M9 3v18"/><path d="M15 3v18"/><path d="M3 9h18"/><path d="M3 15h18"/></svg>
-                </div>
-                <div class="spec-ribbon-val">{{ property.area|area_format }}</div>
-                <div class="spec-ribbon-lbl">Área Privativa</div>
-            </div>
-
-            {% if property.area_total and property.area_total > property.area %}
-                <div class="spec-ribbon-item">
-                    <div class="spec-ribbon-icon">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="3"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
-                    </div>
-                    <div class="spec-ribbon-val">{{ property.area_total|area_format }}</div>
-                    <div class="spec-ribbon-lbl">Área Total</div>
-                </div>
-            {% endif %}
-
-            <div class="spec-ribbon-item">
-                <div class="spec-ribbon-icon">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 4v16"/><path d="M2 8h18a2 2 0 0 1 2 2v10"/><path d="M2 17h20"/><path d="M6 8v9"/></svg>
-                </div>
-                <div class="spec-ribbon-val">{{ property.bedrooms }}</div>
-                <div class="spec-ribbon-lbl">Dormitórios</div>
-            </div>
-
-            <div class="spec-ribbon-item">
-                <div class="spec-ribbon-icon">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><path d="M12 2v10"/><path d="M9 5l3-3 3 3"/></svg>
-                </div>
-                <div class="spec-ribbon-val">{{ property.suites or 0 }}</div>
-                <div class="spec-ribbon-lbl">Suítes</div>
-            </div>
-
-            <div class="spec-ribbon-item">
-                <div class="spec-ribbon-icon">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6 6.5 3.5a1.5 1.5 0 0 0-1-.5C4.67 3 4 3.67 4 4.5V17a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V4.5c0-.83-.67-1.5-1.5-1.5-.4 0-.77.16-1.04.44L15 6"/><path d="M4 14h16"/></svg>
-                </div>
-                <div class="spec-ribbon-val">{{ property.bathrooms }}</div>
-                <div class="spec-ribbon-lbl">Banheiros</div>
-            </div>
-
-            <div class="spec-ribbon-item">
-                <div class="spec-ribbon-icon">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="16" height="12" x="4" y="3" rx="0"/><circle cx="8" cy="18" r="2"/><circle cx="16" cy="18" r="2"/><path d="M4 15h16"/></svg>
-                </div>
-                <div class="spec-ribbon-val">{{ property.garage }}</div>
-                <div class="spec-ribbon-lbl">Vagas</div>
-            </div>
-
-            {% if property.solar_position %}
-                <div class="spec-ribbon-item">
-                    <div class="spec-ribbon-icon">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>
-                    </div>
-                    <div class="spec-ribbon-val" style="font-size: 0.95rem;">{{ property.solar_position }}</div>
-                    <div class="spec-ribbon-lbl">Posição Solar</div>
-                </div>
-            {% endif %}
-
-            {% if property.floor_number %}
-                <div class="spec-ribbon-item">
-                    <div class="spec-ribbon-icon">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="16" height="20" x="4" y="2" rx="0"/><path d="M9 22v-4h6v4"/><path d="M8 6h.01"/><path d="M16 6h.01"/><path d="M8 10h.01"/><path d="M16 10h.01"/></svg>
-                    </div>
-                    <div class="spec-ribbon-val" style="font-size: 0.95rem;">{{ property.floor_number }}</div>
-                    <div class="spec-ribbon-lbl">Pavimento</div>
-                </div>
-            {% endif %}
-        </section>
-
-        <!-- ══ 4. Main 2-Column Content Layout ═════════════════════════════ -->
-        <div class="detail-columns">
-
-            <!-- ── Left Column: Editorial & Technical Info ───────────────── -->
-            <div class="detail-body-col">
-
-                <!-- 01 // Visão Geral -->
-                <section class="editorial-block">
-                    <div class="editorial-section-header">
-                        <h2 class="editorial-section-title">
-                            <span class="editorial-number">01</span>
-                            <span>Visão Geral do Imóvel</span>
-                        </h2>
-                        <span class="editorial-tag">Apresentação Exclusiva</span>
-                    </div>
-
-                    <div class="editorial-text">
-                        {{ property.description }}
-                    </div>
-                </section>
-
-                <!-- 02 // Ficha Técnica Tecimob -->
-                <section class="editorial-block">
-                    <div class="editorial-section-header">
-                        <h2 class="editorial-section-title">
-                            <span class="editorial-number">02</span>
-                            <span>Ficha Técnica Completa</span>
-                        </h2>
-                        <span class="editorial-tag">Dados Oficiais Tecimob CRM</span>
-                    </div>
-
-                    <div class="tecimob-data-table">
-                        <div class="data-row">
-                            <span class="data-key">Código de Referência</span>
-                            <span class="data-value accent">{{ property.reference or property.id }}</span>
-                        </div>
-                        <div class="data-row">
-                            <span class="data-key">Finalidade</span>
-                            <span class="data-value">{{ property.purpose }}</span>
-                        </div>
-                        <div class="data-row">
-                            <span class="data-key">Tipo de Imóvel</span>
-                            <span class="data-value">{{ property.subtype or property.type }}</span>
-                        </div>
-                        <div class="data-row">
-                            <span class="data-key">Status do Anúncio</span>
-                            <span class="data-value">{{ property.status or 'Disponível' }}</span>
-                        </div>
-                        {% if property.condominium_name %}
-                            <div class="data-row">
-                                <span class="data-key">Edifício / Condomínio</span>
-                                <span class="data-value">{{ property.condominium_name }}</span>
-                            </div>
-                        {% endif %}
-                        <div class="data-row">
-                            <span class="data-key">Área Privativa / Útil</span>
-                            <span class="data-value">{{ property.area|area_format }}</span>
-                        </div>
-                        <div class="data-row">
-                            <span class="data-key">Área Total</span>
-                            <span class="data-value">{{ property.area_total|area_format if property.area_total else property.area|area_format }}</span>
-                        </div>
-                        <div class="data-row">
-                            <span class="data-key">Dormitórios</span>
-                            <span class="data-value">{{ property.bedrooms }}</span>
-                        </div>
-                        <div class="data-row">
-                            <span class="data-key">Suítes</span>
-                            <span class="data-value">{{ property.suites or 0 }}</span>
-                        </div>
-                        <div class="data-row">
-                            <span class="data-key">Banheiros</span>
-                            <span class="data-value">{{ property.bathrooms }}</span>
-                        </div>
-                        <div class="data-row">
-                            <span class="data-key">Vagas de Garagem</span>
-                            <span class="data-value">{{ property.garage_type or (property.garage ~ ' vagas') }}</span>
-                        </div>
-                        <div class="data-row">
-                            <span class="data-key">Financiamento Bancário</span>
-                            <span class="data-value accent">{{ 'Aceita Financiamento' if property.is_financeable else 'Sob consulta' }}</span>
-                        </div>
-                        <div class="data-row">
-                            <span class="data-key">Permuta / Troca</span>
-                            <span class="data-value">{{ 'Analisa Proposta' if property.accepts_exchange else 'Não aceita permuta' }}</span>
-                        </div>
-                        {% if property.solar_position %}
-                            <div class="data-row">
-                                <span class="data-key">Orientação Solar</span>
-                                <span class="data-value">{{ property.solar_position }}</span>
-                            </div>
-                        {% endif %}
-                        {% if property.furnished %}
-                            <div class="data-row">
-                                <span class="data-key">Mobiliário</span>
-                                <span class="data-value">{{ property.furnished }}</span>
-                            </div>
-                        {% endif %}
-                        {% if property.floor_number %}
-                            <div class="data-row">
-                                <span class="data-key">Andar / Pavimento</span>
-                                <span class="data-value">{{ property.floor_number }}</span>
-                            </div>
-                        {% endif %}
-                    </div>
-                </section>
-
-                <!-- 03 // Diferenciais & Comodidades -->
-                <section class="editorial-block">
-                    <div class="editorial-section-header">
-                        <h2 class="editorial-section-title">
-                            <span class="editorial-number">03</span>
-                            <span>Diferenciais & Comodidades</span>
-                        </h2>
-                        <span class="editorial-tag">Infraestrutura Selecionada</span>
-                    </div>
-
-                    <div class="amenities-split">
-                        <!-- Na Unidade Privativa -->
-                        <div class="amenity-panel">
-                            <div class="amenity-panel-heading">
-                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-                                <span>Na Unidade Privativa</span>
-                            </div>
-                            <ul class="amenity-checklist">
-                                {% for item in property.amenities_property or property.amenities %}
-                                    <li>
-                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
-                                        <span>{{ item }}</span>
-                                    </li>
-                                {% endfor %}
-                            </ul>
-                        </div>
-
-                        <!-- No Condomínio & Lazer -->
-                        <div class="amenity-panel">
-                            <div class="amenity-panel-heading">
-                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect width="16" height="20" x="4" y="2"/><path d="M9 22v-4h6v4"/></svg>
-                                <span>No Condomínio & Lazer</span>
-                            </div>
-                            <ul class="amenity-checklist">
-                                {% for item in property.amenities_condo or property.amenities %}
-                                    <li>
-                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
-                                        <span>{{ item }}</span>
-                                    </li>
-                                {% endfor %}
-                            </ul>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- 04 // Localização & Entorno -->
-                <section class="editorial-block">
-                    <div class="editorial-section-header">
-                        <h2 class="editorial-section-title">
-                            <span class="editorial-number">04</span>
-                            <span>Localização & Entorno</span>
-                        </h2>
-                        <span class="editorial-tag">{{ property.neighborhood }} • {{ property.city }}</span>
-                    </div>
-
-                    <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.25rem;">
-                        <div>
-                            <strong style="font-size: 1rem; color: var(--text-primary);">{{ property.address }}</strong>
-                            <div style="color: var(--text-muted); font-size: 0.85rem; margin-top: 0.2rem;">
-                                {{ property.neighborhood }}, {{ property.city }} - {{ property.state }} {% if property.zip_code %}(CEP: {{ property.zip_code }}){% endif %}
-                            </div>
-                        </div>
-                        <a href="https://maps.google.com/?q={{ property.address }}+{{ property.neighborhood }}+{{ property.city }}" target="_blank" rel="noopener" class="detail-nav-btn">
-                            Abrir no Google Maps ↗
-                        </a>
-                    </div>
-
-                    <div class="map-embed-wrapper">
-                        <iframe
-                            title="Mapa da Localização do Imóvel"
-                            src="https://maps.google.com/maps?q={{ property.latitude or -23.5857 }},{{ property.longitude or -46.6785 }}&hl=pt-BR&z=15&output=embed"
-                            loading="lazy"
-                            allowfullscreen>
-                        </iframe>
-                    </div>
-                </section>
-
-                <!-- 05 // Financiamento Bancário (Redirecionamento para Bancos) -->
-                {% if property.purpose == 'Venda' %}
-                    <section class="editorial-block">
-                        <div class="editorial-section-header">
-                            <h2 class="editorial-section-title">
-                                <span class="editorial-number">05</span>
-                                <span>Financiamento Bancário</span>
-                            </h2>
-                            <span class="editorial-tag">Simulação Direta com Instituições Financeiras</span>
-                        </div>
-
-                        <div class="fin-sim-box">
-                            <p style="font-size: 0.95rem; color: var(--text-secondary); line-height: 1.7; margin-bottom: 1.75rem;">
-                                Este imóvel aceita financiamento bancário através dos principais bancos e instituições financeiras de Private Banking. Escolha seu banco de preferência para realizar a simulação oficial com as melhores taxas do mercado:
-                            </p>
-
-                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
-                                <!-- Itaú -->
-                                <a href="https://www.itau.com.br/creditos/financiamento-imobiliario/simulador" target="_blank" rel="noopener noreferrer" class="bank-sim-card">
-                                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem;">
-                                        <strong style="font-size: 0.95rem; color: var(--text-primary);">Itaú Personnalité</strong>
-                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="color: var(--primary);"><path d="M7 17l9.2-9.2M17 17V7H7"/></svg>
-                                    </div>
-                                    <span style="font-size: 0.78rem; color: var(--text-muted);">Simulador Oficial Itaú Crédito Imobiliário</span>
-                                </a>
-
-                                <!-- Santander -->
-                                <a href="https://www.santander.com.br/creditos-e-financiamentos/para-sua-casa/simulador-financiamento-imobiliario" target="_blank" rel="noopener noreferrer" class="bank-sim-card">
-                                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem;">
-                                        <strong style="font-size: 0.95rem; color: var(--text-primary);">Santander Select</strong>
-                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="color: var(--primary);"><path d="M7 17l9.2-9.2M17 17V7H7"/></svg>
-                                    </div>
-                                    <span style="font-size: 0.78rem; color: var(--text-muted);">Simulador Oficial Santander Imóveis</span>
-                                </a>
-
-                                <!-- Bradesco -->
-                                <a href="https://banco.bradesco/html/prime/produtos-servicos/emprestimo-e-financiamento/imoveis/simulador.shtm" target="_blank" rel="noopener noreferrer" class="bank-sim-card">
-                                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem;">
-                                        <strong style="font-size: 0.95rem; color: var(--text-primary);">Bradesco Prime</strong>
-                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="color: var(--primary);"><path d="M7 17l9.2-9.2M17 17V7H7"/></svg>
-                                    </div>
-                                    <span style="font-size: 0.78rem; color: var(--text-muted);">Simulador Oficial Bradesco Habitacional</span>
-                                </a>
-
-                                <!-- Caixa -->
-                                <a href="https://www.caixa.gov.br/voce/habitacao/simulador/Paginas/default.aspx" target="_blank" rel="noopener noreferrer" class="bank-sim-card">
-                                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem;">
-                                        <strong style="font-size: 0.95rem; color: var(--text-primary);">Caixa Econômica</strong>
-                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="color: var(--primary);"><path d="M7 17l9.2-9.2M17 17V7H7"/></svg>
-                                    </div>
-                                    <span style="font-size: 0.78rem; color: var(--text-muted);">Simulador Oficial Caixa Habitação</span>
-                                </a>
-                            </div>
-
-                            <div style="padding-top: 1rem; border-top: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
-                                <span style="font-size: 0.82rem; color: var(--text-muted);">Precisa de assessoria de crédito com aprovação rápida?</span>
-                                {% set wa_fin_text = "Olá! Gostaria de auxílio e assessoria para financiamento bancário do imóvel: " ~ property.title ~ " (Ref: " ~ (property.reference or property.id) ~ ") no valor de " ~ (property.price|currency) ~ "." %}
-                                <a href="https://wa.me/5511999997777?text={{ wa_fin_text|urlencode }}" target="_blank" rel="noopener" class="detail-nav-btn" style="border-color: var(--primary); color: var(--primary);">
-                                    Solicitar Assessoria de Crédito 7X →
-                                </a>
-                            </div>
-                        </div>
-                    </section>
-                {% endif %}
-
-            </div>
-
-            <!-- ── Right Column: Sticky Sidebar ──────────────────────────── -->
-            <aside class="detail-sidebar-col">
-                <div class="sidebar-luxury-card">
-
-                    <!-- Financial Breakdown Header -->
-                    <div class="sidebar-price-header">
-                        <span class="sidebar-price-label">Valor de {{ property.purpose }}</span>
-                        <div class="sidebar-price-val">{{ property.price|currency }}</div>
-
-                        <div class="monthly-cost-list">
-                            {% if property.condo_fee and property.condo_fee > 0 %}
-                                <div class="cost-row">
-                                    <span>Condomínio Mensal:</span>
-                                    <strong style="color: var(--text-primary);">{{ property.condo_fee|currency }}</strong>
-                                </div>
-                            {% endif %}
-
-                            {% if property.iptu and property.iptu > 0 %}
-                                <div class="cost-row">
-                                    <span>IPTU Mensal:</span>
-                                    <strong style="color: var(--text-primary);">{{ property.iptu|currency }}</strong>
-                                </div>
-                            {% endif %}
-
-                            {% if monthly_cost and monthly_cost > 0 %}
-                                <div class="cost-row sum-total">
-                                    <span>Total Encargos / Mês:</span>
-                                    <strong style="color: var(--primary);">{{ monthly_cost|currency }}</strong>
-                                </div>
-                            {% endif %}
-                        </div>
-
-                        <div style="display: flex; gap: 0.4rem; flex-wrap: wrap; margin-top: 1rem;">
-                            {% if property.is_financeable %}
-                                <span style="font-size: 0.72rem; font-weight: 700; color: #34d399; background: rgba(52, 211, 153, 0.08); border: 1px solid rgba(52, 211, 153, 0.3); padding: 0.25rem 0.55rem;">✓ Financiável</span>
-                            {% endif %}
-                            {% if property.accepts_exchange %}
-                                <span style="font-size: 0.72rem; font-weight: 700; color: #34d399; background: rgba(52, 211, 153, 0.08); border: 1px solid rgba(52, 211, 153, 0.3); padding: 0.25rem 0.55rem;">✓ Analisa Permuta</span>
-                            {% endif %}
-                        </div>
-                    </div>
-
-                    <!-- Direct Agent Box -->
-                    <div class="sidebar-agent-row">
-                        <div class="sidebar-agent-avatar">
-                            {% if property.agent.avatar and not property.agent.avatar.startswith('agent_') %}
-                                <img src="{{ property.agent.avatar }}" alt="{{ property.agent.name }}">
-                            {% else %}
-                                <span>{{ property.agent.name[0] }}</span>
-                            {% endif %}
-                        </div>
-                        <div>
-                            <div class="sidebar-agent-name">{{ property.agent.name }}</div>
-                            <div class="sidebar-agent-creci">{{ property.agent.creci or 'CRECI 34.567-J' }}</div>
-                            <div class="sidebar-agent-spec">Especialista de Alto Padrão</div>
-                        </div>
-                    </div>
-
-                    <!-- CTA Actions -->
-                    <div class="sidebar-cta-stack">
-                        {% set wa_text = "Olá! Gostaria de atendimento exclusivo sobre o imóvel: " ~ property.title ~ " (Ref: " ~ (property.reference or property.id) ~ ") no valor de " ~ (property.price|currency) ~ "." %}
-                        <a href="https://wa.me/5511999997777?text={{ wa_text|urlencode }}" target="_blank" rel="noopener" class="btn-luxury-wa">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"/></svg>
-                            <span>Falar no WhatsApp</span>
-                        </a>
-
-                        <button type="button" class="btn btn-outline btn-full" data-modal-target="scheduleVisitModal" onclick="document.getElementById('modal-property-id').value='{{ property.id }}'">
-                            Agendar Visita Guiada
-                        </button>
-                    </div>
-
-                    <div class="sidebar-contact-direct">
-                        <div>Telefone Direto: <a href="tel:{{ property.agent.phone }}">{{ property.agent.phone }}</a></div>
-                        <div>E-mail: <a href="mailto:{{ property.agent.email }}">{{ property.agent.email }}</a></div>
-                    </div>
-                </div>
-
-                <!-- Fast Proposal Box -->
-                <div class="sidebar-luxury-card">
-                    <h4 style="font-size: 0.95rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 0.5rem; color: var(--text-primary);">Apresentar Proposta</h4>
-                    <p style="font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 1.25rem; line-height: 1.6;">
-                        Nossos consultores jurídicos e de negócios formatam sua proposta com total sigilo e compliance.
-                    </p>
-                    <a href="{{ url_for('main.contact') }}?ref={{ property.reference or property.id }}" class="btn btn-primary btn-full btn-sm">
-                        Enviar Carta de Intenção →
-                    </a>
-                </div>
-            </aside>
-
+  <!-- ══ 1. Hero — Título + Preço ══════════════════════════════════════════ -->
+  <div class="container">
+    <header class="detail-hero-header">
+      <div class="detail-hero-left">
+        <div class="detail-eyebrow">
+          <span class="eyebrow-pill">{{ property.purpose }}</span>
+          <span class="eyebrow-pill eyebrow-type">{{ property.type }}</span>
+          {% if property.badge %}<span class="eyebrow-pill eyebrow-badge">{{ property.badge }}</span>{% endif %}
         </div>
+        <h1 class="detail-title">{{ property.title }}</h1>
+        <div class="detail-location-line">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+          <span>{{ property.address }}{% if property.neighborhood %}, {{ property.neighborhood }}{% endif %} — {{ property.city }}/{{ property.state }}</span>
+        </div>
+      </div>
+      <div class="detail-hero-right">
+        <span class="detail-price-label">Valor de {{ property.purpose }}</span>
+        <div class="detail-price-main">{{ property.price|currency }}</div>
+        {% if price_per_sqm and price_per_sqm > 0 %}
+          <div class="detail-price-sqm">{{ price_per_sqm|currency }}/m²</div>
+        {% endif %}
+        <div class="detail-hero-actions">
+          <button class="hero-action-btn copy-reference-btn" data-ref="{{ property.reference or property.id }}" title="Copiar referência">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect width="14" height="14" x="8" y="8"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+            Ref. {{ property.reference or property.id }}
+          </button>
+          <button class="hero-action-btn" id="shareLinkBtn" title="Compartilhar">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" x2="15.42" y1="13.51" y2="17.49"/><line x1="15.41" x2="8.59" y1="6.51" y2="10.49"/></svg>
+            Compartilhar
+          </button>
+          <button class="hero-action-btn card-favorite-btn" data-id="{{ property.id }}" title="Favoritar">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
+            Favoritar
+          </button>
+        </div>
+      </div>
+    </header>
+  </div>
 
-        <!-- ══ 5. Related Properties ═══════════════════════════════════════ -->
-        {% if related_properties %}
-            <section style="margin-top: 5rem; padding-top: 3.5rem; border-top: 1px solid var(--border-color);">
-                <div style="display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 2.5rem; flex-wrap: wrap; gap: 1rem;">
-                    <div>
-                        <div style="font-size: 0.72rem; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: var(--primary); margin-bottom: 0.35rem;">Curadoria 7X</div>
-                        <h2 style="font-size: 1.85rem; font-weight: 800; letter-spacing: -0.5px;">Oportunidades Semelhantes</h2>
-                    </div>
-                    <a href="{{ url_for('properties.list_properties', city=property.city) }}" class="detail-nav-btn">
-                        Ver Mais em {{ property.city }} →
-                    </a>
-                </div>
+  <!-- ══ 2. Galeria de Fotos ════════════════════════════════════════════════ -->
+  <div class="detail-gallery-wrapper">
 
-                <div class="properties-grid">
-                    {% for p in related_properties %}
-                        <div class="property-card" data-href="{{ url_for('properties.detail', property_id=p.id) }}">
-                            <div class="card-img-wrapper">
-                                <div class="card-badges">
-                                    <span class="badge badge-gold">{{ p.purpose }}</span>
-                                    {% if p.badge %}
-                                        <span class="badge badge-blue">{{ p.badge }}</span>
-                                    {% endif %}
-                                </div>
-                                <button class="card-favorite-btn" data-id="{{ p.id }}" title="Salvar Favorito">♡</button>
-                                <img src="{{ p.image if p.image and p.image.startswith('http') else (url_for('static', filename='img/' + p.image) if p.image else url_for('static', filename='img/placeholder.jpg')) }}" alt="{{ p.title }}" loading="lazy">
-                            </div>
-                            <div class="card-body">
-                                <div class="card-location">📍 {{ p.neighborhood }}, {{ p.city }}</div>
-                                <h3 class="card-title">
-                                    <a href="{{ url_for('properties.detail', property_id=p.id) }}">{{ p.title }}</a>
-                                </h3>
-                                <div class="card-specs">
-                                    <div class="card-spec-item">📐 {{ p.area|area_format }}</div>
-                                    <div class="card-spec-item">🛏️ {{ p.bedrooms }} dorms</div>
-                                    <div class="card-spec-item">🛁 {{ p.bathrooms }} banhos</div>
-                                    <div class="card-spec-item">🚗 {{ p.garage }} vagas</div>
-                                </div>
-                                <div class="card-footer">
-                                    <div class="card-price">{{ p.price|currency }}</div>
-                                    <a href="{{ url_for('properties.detail', property_id=p.id) }}" class="btn btn-primary btn-sm">Detalhes</a>
-                                </div>
-                            </div>
-                        </div>
-                    {% endfor %}
-                </div>
-            </section>
+    {# Imagem principal #}
+    {% set main_src = all_imgs[0] if all_imgs[0].startswith('http') else url_for('static', filename='img/' + all_imgs[0]) %}
+    <div class="gallery-main-stage" id="cinemaMainStage"
+         data-lightbox-src="{{ main_src }}" data-lightbox-index="0">
+      <img id="activeCinemaImage" src="{{ main_src }}" alt="{{ property.title }}" loading="eager">
+
+      <button class="gallery-expand-btn" id="openFullGalleryBtn" aria-label="Ver todas as fotos">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
+        <span>{{ all_imgs|length }} foto{% if all_imgs|length != 1 %}s{% endif %}</span>
+      </button>
+    </div>
+
+    {# Grid lateral de miniaturas (máx 4 visíveis) #}
+    {% if all_imgs|length > 1 %}
+      <div class="gallery-side-grid">
+        {% for img in all_imgs[1:5] %}
+          {% set img_src = img if img.startswith('http') else url_for('static', filename='img/' + img) %}
+          <div class="gallery-side-cell {% if loop.index == 4 and all_imgs|length > 5 %}gallery-side-more{% endif %}"
+               onclick="switchCinemaPhoto('{{ img_src }}', {{ loop.index }})"
+               data-lightbox-src="{{ img_src }}" data-lightbox-index="{{ loop.index }}">
+            <img src="{{ img_src }}" alt="Foto {{ loop.index + 1 }}" loading="lazy">
+            {% if loop.index == 4 and all_imgs|length > 5 %}
+              <div class="gallery-more-overlay">+{{ all_imgs|length - 4 }}</div>
+            {% endif %}
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    {# Hidden: fontes para o lightbox #}
+    <div class="gallery-lightbox-sources" hidden>
+      {% for img in all_imgs %}
+        {% set src = img if img.startswith('http') else url_for('static', filename='img/' + img) %}
+        <span data-lightbox-src="{{ src }}" data-lightbox-index="{{ loop.index0 }}"></span>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- ══ 3. Specs Ribbon ═══════════════════════════════════════════════════ -->
+  <div class="container">
+    <div class="detail-specs-ribbon">
+      <div class="spec-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 3H3v18h18V3z"/><path d="M9 3v18"/><path d="M15 3v18"/><path d="M3 9h18"/><path d="M3 15h18"/></svg>
+        <span class="spec-val">{{ property.area|area_format }}</span>
+        <span class="spec-lbl">Área Privativa</span>
+      </div>
+      {% if property.area_total and property.area_total > property.area %}
+      <div class="spec-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="3"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
+        <span class="spec-val">{{ property.area_total|area_format }}</span>
+        <span class="spec-lbl">Área Total</span>
+      </div>
+      {% endif %}
+      <div class="spec-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 4v16"/><path d="M2 8h18a2 2 0 0 1 2 2v10"/><path d="M2 17h20"/><path d="M6 8v9"/></svg>
+        <span class="spec-val">{{ property.bedrooms }}</span>
+        <span class="spec-lbl">Dorm.</span>
+      </div>
+      <div class="spec-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><path d="M12 2v10"/><path d="M9 5l3-3 3 3"/></svg>
+        <span class="spec-val">{{ property.suites or 0 }}</span>
+        <span class="spec-lbl">Suítes</span>
+      </div>
+      <div class="spec-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6 6.5 3.5a1.5 1.5 0 0 0-1-.5C4.67 3 4 3.67 4 4.5V17a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V4.5c0-.83-.67-1.5-1.5-1.5-.4 0-.77.16-1.04.44L15 6"/><path d="M4 14h16"/></svg>
+        <span class="spec-val">{{ property.bathrooms }}</span>
+        <span class="spec-lbl">Banheiros</span>
+      </div>
+      <div class="spec-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="16" height="12" x="4" y="3" rx="2"/><circle cx="8" cy="18" r="2"/><circle cx="16" cy="18" r="2"/><path d="M4 15h16"/></svg>
+        <span class="spec-val">{{ property.garage }}</span>
+        <span class="spec-lbl">Vagas</span>
+      </div>
+      {% if property.floor_number %}
+      <div class="spec-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="16" height="20" x="4" y="2" rx="2"/><path d="M9 22v-4h6v4"/><path d="M8 6h.01"/><path d="M16 6h.01"/></svg>
+        <span class="spec-val">{{ property.floor_number }}</span>
+        <span class="spec-lbl">Pavimento</span>
+      </div>
+      {% endif %}
+      {% if property.solar_position %}
+      <div class="spec-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2m-8-8H2m20 0h-2M4.93 4.93l1.41 1.41m11.32 11.32 1.41 1.41M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+        <span class="spec-val" style="font-size:0.85rem">{{ property.solar_position }}</span>
+        <span class="spec-lbl">Sol</span>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- ══ 4. Layout Principal 2 Colunas ════════════════════════════════════ -->
+  <div class="container">
+    <div class="detail-layout">
+
+      <!-- ── Coluna Principal ─────────────────────────────────────────────── -->
+      <div class="detail-main-col">
+
+        <!-- 01 › Descrição -->
+        <section class="d-section">
+          <div class="d-section-header">
+            <div class="d-section-num">01</div>
+            <h2 class="d-section-title">Visão Geral</h2>
+            <span class="d-section-tag">Apresentação Exclusiva</span>
+          </div>
+          <div class="d-description">{{ property.description | safe if property.description else 'Imóvel premium com acabamento de alto padrão. Entre em contato para mais detalhes.' }}</div>
+        </section>
+
+        <!-- 02 › Ficha Técnica -->
+        <section class="d-section">
+          <div class="d-section-header">
+            <div class="d-section-num">02</div>
+            <h2 class="d-section-title">Ficha Técnica</h2>
+            <span class="d-section-tag">Dados Oficiais</span>
+          </div>
+
+          <div class="d-specs-table">
+            <div class="d-spec-row">
+              <span class="d-spec-key">Referência</span>
+              <span class="d-spec-val gold">{{ property.reference or property.id }}</span>
+            </div>
+            <div class="d-spec-row">
+              <span class="d-spec-key">Finalidade</span>
+              <span class="d-spec-val">{{ property.purpose }}</span>
+            </div>
+            <div class="d-spec-row">
+              <span class="d-spec-key">Tipo</span>
+              <span class="d-spec-val">{{ property.subtype or property.type }}</span>
+            </div>
+            {% if property.profile %}
+            <div class="d-spec-row">
+              <span class="d-spec-key">Perfil</span>
+              <span class="d-spec-val">{{ property.profile }}</span>
+            </div>
+            {% endif %}
+            <div class="d-spec-row">
+              <span class="d-spec-key">Status</span>
+              <span class="d-spec-val">{{ property.status or 'Disponível' }}</span>
+            </div>
+            {% if property.situation %}
+            <div class="d-spec-row">
+              <span class="d-spec-key">Situação</span>
+              <span class="d-spec-val gold">{{ property.situation }}</span>
+            </div>
+            {% endif %}
+            {% if property.condominium_name %}
+            <div class="d-spec-row">
+              <span class="d-spec-key">Condomínio / Edifício</span>
+              <span class="d-spec-val">{{ property.condominium_name }}</span>
+            </div>
+            {% endif %}
+            <div class="d-spec-row">
+              <span class="d-spec-key">Área Privativa</span>
+              <span class="d-spec-val">{{ property.area|area_format }}</span>
+            </div>
+            {% if property.area_total and property.area_total != property.area %}
+            <div class="d-spec-row">
+              <span class="d-spec-key">Área Total</span>
+              <span class="d-spec-val">{{ property.area_total|area_format }}</span>
+            </div>
+            {% endif %}
+            <div class="d-spec-row">
+              <span class="d-spec-key">Dormitórios</span>
+              <span class="d-spec-val">{{ property.bedrooms }}</span>
+            </div>
+            <div class="d-spec-row">
+              <span class="d-spec-key">Suítes</span>
+              <span class="d-spec-val">{{ property.suites or 0 }}</span>
+            </div>
+            <div class="d-spec-row">
+              <span class="d-spec-key">Banheiros</span>
+              <span class="d-spec-val">{{ property.bathrooms }}</span>
+            </div>
+            <div class="d-spec-row">
+              <span class="d-spec-key">Vagas de Garagem</span>
+              <span class="d-spec-val">{{ property.garage_type or (property.garage|string ~ ' vaga(s)') }}</span>
+            </div>
+            {% if property.floor_number %}
+            <div class="d-spec-row">
+              <span class="d-spec-key">Andar</span>
+              <span class="d-spec-val">{{ property.floor_number }}º</span>
+            </div>
+            {% endif %}
+            {% if property.solar_position %}
+            <div class="d-spec-row">
+              <span class="d-spec-key">Orientação Solar</span>
+              <span class="d-spec-val">{{ property.solar_position }}</span>
+            </div>
+            {% endif %}
+            {% if property.furnished and property.furnished != 'Não Mobiliado' %}
+            <div class="d-spec-row">
+              <span class="d-spec-key">Mobiliário</span>
+              <span class="d-spec-val">{{ property.furnished }}</span>
+            </div>
+            {% endif %}
+            <div class="d-spec-row">
+              <span class="d-spec-key">Aceita Financiamento</span>
+              <span class="d-spec-val {% if property.is_financeable %}green{% endif %}">
+                {{ 'Sim — Financiável' if property.is_financeable else 'Consultar' }}
+              </span>
+            </div>
+            <div class="d-spec-row">
+              <span class="d-spec-key">Aceita Permuta</span>
+              <span class="d-spec-val {% if property.accepts_exchange %}green{% endif %}">
+                {{ 'Analisa Proposta' if property.accepts_exchange else 'Não aceita' }}
+              </span>
+            </div>
+            {% if property.iptu and property.iptu > 0 %}
+            <div class="d-spec-row">
+              <span class="d-spec-key">IPTU {% if property.iptu_type %}({{ property.iptu_type }}){% endif %}</span>
+              <span class="d-spec-val">{{ property.iptu|currency }}</span>
+            </div>
+            {% endif %}
+            {% if property.is_deeded %}
+            <div class="d-spec-row">
+              <span class="d-spec-key">Escritura</span>
+              <span class="d-spec-val green">✓ Escriturado</span>
+            </div>
+            {% endif %}
+            {% if property.is_titled %}
+            <div class="d-spec-row">
+              <span class="d-spec-key">Título</span>
+              <span class="d-spec-val green">✓ Titulado</span>
+            </div>
+            {% endif %}
+            {% if property.is_corner %}
+            <div class="d-spec-row">
+              <span class="d-spec-key">Posição</span>
+              <span class="d-spec-val">Imóvel de Esquina</span>
+            </div>
+            {% endif %}
+
+          </div>
+        </section>
+
+        <!-- 03 › Diferenciais & Comodidades -->
+        {% if amen_unit or amen_condo or property.establishments %}
+        <section class="d-section">
+          <div class="d-section-header">
+            <div class="d-section-num">03</div>
+            <h2 class="d-section-title">Diferenciais & Comodidades</h2>
+            <span class="d-section-tag">Infraestrutura</span>
+          </div>
+
+          <div class="d-amenities-grid">
+            {% if amen_unit %}
+            <div class="d-amenity-panel">
+              <div class="d-amenity-panel-title">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                Na Unidade
+              </div>
+              <ul class="d-amenity-list">
+                {% for item in amen_unit %}
+                <li>
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                  {{ item }}
+                </li>
+                {% endfor %}
+              </ul>
+            </div>
+            {% endif %}
+            {% if amen_condo %}
+            <div class="d-amenity-panel">
+              <div class="d-amenity-panel-title">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect width="16" height="20" x="4" y="2"/><path d="M9 22v-4h6v4"/></svg>
+                No Condomínio
+              </div>
+              <ul class="d-amenity-list">
+                {% for item in amen_condo %}
+                <li>
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                  {{ item }}
+                </li>
+                {% endfor %}
+              </ul>
+            </div>
+            {% endif %}
+            {% if property.establishments %}
+            <div class="d-amenity-panel">
+              <div class="d-amenity-panel-title">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+                Vizinhança
+              </div>
+              <ul class="d-amenity-list">
+                {% for item in property.establishments %}
+                <li>
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+                  {{ item }}
+                </li>
+                {% endfor %}
+              </ul>
+            </div>
+            {% endif %}
+          </div>
+        </section>
         {% endif %}
 
-    </div>
+
+        <!-- 04 › Localização -->
+        <section class="d-section">
+          <div class="d-section-header">
+            <div class="d-section-num">04</div>
+            <h2 class="d-section-title">Localização</h2>
+            <span class="d-section-tag">{{ property.neighborhood }} · {{ property.city }}</span>
+          </div>
+
+          <div class="d-location-header">
+            <div>
+              <strong class="d-location-address">{{ property.address }}</strong>
+              <span class="d-location-sub">{{ property.neighborhood }}, {{ property.city }} — {{ property.state }}{% if property.zip_code %} · CEP {{ property.zip_code }}{% endif %}</span>
+            </div>
+            <a href="https://maps.google.com/?q={{ property.address|urlencode }}+{{ property.neighborhood|urlencode }}+{{ property.city|urlencode }}"
+               target="_blank" rel="noopener" class="d-map-link">
+              Abrir no Maps
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M7 17l9.2-9.2M17 17V7H7"/></svg>
+            </a>
+          </div>
+
+          <div class="d-map-embed">
+            <iframe
+              title="Localização do imóvel"
+              src="https://maps.google.com/maps?q={{ property.latitude or '-22.9' }},{{ property.longitude or '-43.1' }}&hl=pt-BR&z=15&output=embed"
+              loading="lazy" allowfullscreen>
+            </iframe>
+          </div>
+        </section>
+
+        <!-- 05 › Financiamento (só quando Venda) -->
+        {% if property.purpose == 'Venda' %}
+        <section class="d-section d-section-last">
+          <div class="d-section-header">
+            <div class="d-section-num">05</div>
+            <h2 class="d-section-title">Financiamento Bancário</h2>
+            <span class="d-section-tag">Simulação Direta</span>
+          </div>
+
+          <p class="d-fin-intro">Simule diretamente nas plataformas oficiais dos principais bancos e aproveite as melhores taxas do mercado.</p>
+
+          <div class="d-banks-grid">
+            <a href="https://www.itau.com.br/creditos/financiamento-imobiliario/simulador" target="_blank" rel="noopener" class="d-bank-card">
+              <span class="d-bank-name">Itaú Personnalité</span>
+              <span class="d-bank-desc">Simulador Oficial Crédito Imobiliário</span>
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M7 17l9.2-9.2M17 17V7H7"/></svg>
+            </a>
+            <a href="https://www.santander.com.br/creditos-e-financiamentos/para-sua-casa/simulador-financiamento-imobiliario" target="_blank" rel="noopener" class="d-bank-card">
+              <span class="d-bank-name">Santander Select</span>
+              <span class="d-bank-desc">Simulador Oficial Imóveis</span>
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M7 17l9.2-9.2M17 17V7H7"/></svg>
+            </a>
+            <a href="https://banco.bradesco/html/prime/produtos-servicos/emprestimo-e-financiamento/imoveis/simulador.shtm" target="_blank" rel="noopener" class="d-bank-card">
+              <span class="d-bank-name">Bradesco Prime</span>
+              <span class="d-bank-desc">Simulador Oficial Habitacional</span>
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M7 17l9.2-9.2M17 17V7H7"/></svg>
+            </a>
+            <a href="https://www.caixa.gov.br/voce/habitacao/simulador/Paginas/default.aspx" target="_blank" rel="noopener" class="d-bank-card">
+              <span class="d-bank-name">Caixa Econômica</span>
+              <span class="d-bank-desc">Simulador Oficial Caixa Habitação</span>
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M7 17l9.2-9.2M17 17V7H7"/></svg>
+            </a>
+          </div>
+
+          <div class="d-fin-footer">
+            <span>Precisa de assessoria de crédito com aprovação rápida?</span>
+            {% set wa_fin = "Olá! Gostaria de assessoria para financiamento do imóvel: " ~ property.title ~ " (Ref: " ~ (property.reference or property.id) ~ ") — " ~ (property.price|currency) ~ "." %}
+            <a href="https://wa.me/{{ whatsapp_number }}?text={{ wa_fin|urlencode }}" target="_blank" rel="noopener" class="d-fin-cta">
+              Solicitar Assessoria 7X →
+            </a>
+          </div>
+        </section>
+        {% endif %}
+
+      </div><!-- /detail-main-col -->
+
+      <!-- ── Sidebar Sticky ───────────────────────────────────────────────── -->
+      <aside class="detail-sidebar">
+
+        <!-- Card Principal: Preço + CTA -->
+        <div class="sidebar-card sidebar-card-main">
+          <div class="sb-price-block">
+            <span class="sb-price-label">Valor de {{ property.purpose }}</span>
+            <div class="sb-price">{{ property.price|currency }}</div>
+            {% if price_per_sqm and price_per_sqm > 0 %}
+              <div class="sb-price-sqm">{{ price_per_sqm|currency }} / m²</div>
+            {% endif %}
+          </div>
+
+          {% if property.condo_fee or property.iptu %}
+          <div class="sb-costs">
+            {% if property.condo_fee and property.condo_fee > 0 %}
+            <div class="sb-cost-row">
+              <span>Condomínio/mês</span>
+              <strong>{{ property.condo_fee|currency }}</strong>
+            </div>
+            {% endif %}
+            {% if property.iptu and property.iptu > 0 %}
+            <div class="sb-cost-row">
+              <span>IPTU/mês</span>
+              <strong>{{ property.iptu|currency }}</strong>
+            </div>
+            {% endif %}
+            {% if monthly_cost and monthly_cost > 0 %}
+            <div class="sb-cost-row sb-cost-total">
+              <span>Total encargos/mês</span>
+              <strong>{{ monthly_cost|currency }}</strong>
+            </div>
+            {% endif %}
+          </div>
+          {% endif %}
+
+          {% if property.is_financeable or property.accepts_exchange %}
+          <div class="sb-tags">
+            {% if property.is_financeable %}
+              <span class="sb-tag green">✓ Financiável</span>
+            {% endif %}
+            {% if property.accepts_exchange %}
+              <span class="sb-tag green">✓ Analisa Permuta</span>
+            {% endif %}
+          </div>
+          {% endif %}
+
+          <!-- Agente -->
+          <div class="sb-agent">
+            <div class="sb-agent-avatar">
+              {% if property.agent.avatar and not property.agent.avatar.startswith('agent_') %}
+                <img src="{{ property.agent.avatar }}" alt="{{ property.agent.name }}">
+              {% else %}
+                <span>{{ (property.agent.name or 'C')[0] | upper }}</span>
+              {% endif %}
+            </div>
+            <div class="sb-agent-info">
+              <div class="sb-agent-name">{{ property.agent.name or 'Consultor 7X' }}</div>
+              <div class="sb-agent-creci">{{ property.agent.creci or 'CRECI 34.567-J' }}</div>
+              <div class="sb-agent-role">Especialista Alto Padrão</div>
+            </div>
+          </div>
+
+          <!-- CTAs -->
+          <div class="sb-cta-stack">
+            <a href="{{ wa_link }}" target="_blank" rel="noopener" class="sb-btn-wa">
+              <svg width="19" height="19" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"/></svg>
+              Falar no WhatsApp
+            </a>
+            <button type="button" class="sb-btn-outline" data-modal-target="scheduleVisitModal"
+                    onclick="document.getElementById('modal-property-id').value='{{ property.id }}'">
+              📅 Agendar Visita
+            </button>
+          </div>
+
+          <div class="sb-contact-direct">
+            {% if property.agent.phone %}
+            <a href="tel:{{ property.agent.phone }}">📞 {{ property.agent.phone }}</a>
+            {% endif %}
+            {% if property.agent.email %}
+            <a href="mailto:{{ property.agent.email }}">✉ {{ property.agent.email }}</a>
+            {% endif %}
+          </div>
+        </div><!-- /sidebar-card-main -->
+
+        <!-- Card Secundário: Carta de Intenção -->
+        <div class="sidebar-card sidebar-card-proposal">
+          <div class="sb-proposal-icon">📋</div>
+          <h3 class="sb-proposal-title">Apresentar Proposta</h3>
+          <p class="sb-proposal-desc">Nossos consultores formatam sua carta de intenção com sigilo total e compliance jurídico.</p>
+          <a href="{{ url_for('main.contact') }}?ref={{ property.reference or property.id }}" class="sb-btn-gold">
+            Enviar Carta de Intenção →
+          </a>
+        </div>
+
+      </aside>
+
+    </div><!-- /detail-layout -->
+
+    <!-- ══ 5. Imóveis Relacionados ══════════════════════════════════════════ -->
+    {% if related_properties %}
+    <section class="detail-related">
+      <div class="detail-related-header">
+        <div>
+          <div class="related-eyebrow">Curadoria 7X</div>
+          <h2 class="related-title">Oportunidades Semelhantes</h2>
+        </div>
+        <a href="{{ url_for('properties.list_properties', city=property.city) }}" class="related-link">
+          Ver mais em {{ property.city }} →
+        </a>
+      </div>
+
+      <div class="properties-grid">
+        {% for p in related_properties %}
+          {% set p_img = p.image if p.image and p.image.startswith('http') else (url_for('static', filename='img/' + p.image) if p.image else url_for('static', filename='img/placeholder.jpg')) %}
+          <div class="property-card" data-href="{{ url_for('properties.detail', property_id=p.id) }}">
+            <div class="card-img-wrapper">
+              <div class="card-badges">
+                <span class="badge badge-gold">{{ p.purpose }}</span>
+                {% if p.badge %}<span class="badge badge-blue">{{ p.badge }}</span>{% endif %}
+              </div>
+              <button class="card-favorite-btn" data-id="{{ p.id }}" title="Favoritar">♡</button>
+              <img src="{{ p_img }}" alt="{{ p.title }}" loading="lazy">
+            </div>
+            <div class="card-body">
+              <div class="card-location">📍 {{ p.neighborhood }}, {{ p.city }}</div>
+              <h3 class="card-title">
+                <a href="{{ url_for('properties.detail', property_id=p.id) }}">{{ p.title }}</a>
+              </h3>
+              <div class="card-specs">
+                <div class="card-spec-item">📐 {{ p.area|area_format }}</div>
+                <div class="card-spec-item">🛏️ {{ p.bedrooms }} dorms</div>
+                <div class="card-spec-item">🛁 {{ p.bathrooms }} banh</div>
+                <div class="card-spec-item">🚗 {{ p.garage }} vagas</div>
+              </div>
+              <div class="card-footer">
+                <div class="card-price">{{ p.price|currency }}</div>
+                <a href="{{ url_for('properties.detail', property_id=p.id) }}" class="btn btn-primary btn-sm">Ver</a>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    </section>
+    {% endif %}
+
+  </div><!-- /container -->
 </article>
 
-<!-- ══ Fullscreen Interactive Photo Lightbox Modal ═════════════════════════ -->
-<div class="lightbox-modal" id="propertyLightboxModal" role="dialog" aria-modal="true" aria-label="Galeria de fotos em tela cheia">
-    <div class="lightbox-topbar">
-        <span class="lightbox-counter" id="lightboxCounter">1 / 1</span>
-        <div style="font-weight: 700; font-size: 0.88rem; letter-spacing: 0.04em; text-transform: uppercase; color: #fff; max-width: 60%; text-align: center; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">
-            {{ property.title }} (Ref: {{ property.reference or property.id }})
-        </div>
-        <button class="lightbox-close-btn" id="lightboxCloseBtn" aria-label="Fechar galeria">&times;</button>
-    </div>
-
-    <div class="lightbox-stage">
-        <button class="lightbox-nav-btn lightbox-nav-prev" id="lightboxPrevBtn" aria-label="Foto anterior">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
-        </button>
-        <img id="lightboxActiveImage" src="" alt="Visualização ampliada do imóvel">
-        <button class="lightbox-nav-btn lightbox-nav-next" id="lightboxNextBtn" aria-label="Próxima foto">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
-        </button>
-    </div>
-
-    <div class="lightbox-thumbs-bar" id="lightboxThumbs">
-        <!-- Thumbnails injected via JS -->
-    </div>
+<!-- ══ Lightbox Modal ═══════════════════════════════════════════════════════ -->
+<div class="lightbox-modal" id="propertyLightboxModal" role="dialog" aria-modal="true" aria-label="Galeria de fotos">
+  <div class="lightbox-topbar">
+    <span class="lightbox-counter" id="lightboxCounter">1 / 1</span>
+    <div class="lightbox-title">{{ property.title }}</div>
+    <button class="lightbox-close-btn" id="lightboxCloseBtn" aria-label="Fechar">&times;</button>
+  </div>
+  <div class="lightbox-stage">
+    <button class="lightbox-nav-btn lightbox-nav-prev" id="lightboxPrevBtn" aria-label="Anterior">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+    </button>
+    <img id="lightboxActiveImage" src="" alt="Foto do imóvel">
+    <button class="lightbox-nav-btn lightbox-nav-next" id="lightboxNextBtn" aria-label="Próxima">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+    </button>
+  </div>
+  <div class="lightbox-thumbs-bar" id="lightboxThumbs"></div>
 </div>
+
 {% endblock %}
 
 {% block extra_js %}
 <script src="{{ url_for('static', filename='js/property_detail.js') }}"></script>
 <script>
-function switchCinemaPhoto(src, thumbElement) {
+function switchCinemaPhoto(src, index) {
     const activeImg = document.getElementById('activeCinemaImage');
     const mainStage = document.getElementById('cinemaMainStage');
     if (activeImg) {
-        activeImg.style.opacity = '0.3';
+        activeImg.style.opacity = '0.2';
         activeImg.src = src;
         activeImg.onload = () => { activeImg.style.opacity = '1'; };
     }
     if (mainStage) {
         mainStage.setAttribute('data-lightbox-src', src);
-        mainStage.setAttribute('data-lightbox-index', thumbElement.getAttribute('data-lightbox-index') || '0');
+        mainStage.setAttribute('data-lightbox-index', index);
     }
-    document.querySelectorAll('.cinema-thumb-slot').forEach(el => el.classList.remove('active'));
-    thumbElement.classList.add('active');
+    document.querySelectorAll('.gallery-side-cell').forEach(el => el.classList.remove('active'));
 }
 </script>
 {% endblock %}

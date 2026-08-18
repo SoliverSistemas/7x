@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" data-whatsapp="{{ whatsapp_number }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -18,6 +18,9 @@
 
     <!-- CSS por Pagina: cada template filho injeta seu proprio arquivo aqui -->
     {% block extra_css %}{% endblock %}
+
+    <!-- Chatbot -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/chatbot.css') }}">
 
     <!-- themes.js: anti-flash + conecta o botao de tema -->
     <!-- carregado no <head> para aplicar o tema ANTES do primeiro paint -->
@@ -50,6 +53,7 @@
                 <a href="{{ url_for('properties.list_properties') }}" class="nav-link {% if 'properties' in request.endpoint %}active{% endif %}">Imóveis</a>
                 <a href="{{ url_for('main.about') }}" class="nav-link {% if request.endpoint == 'main.about' %}active{% endif %}">Sobre Nós</a>
                 <a href="{{ url_for('main.contact') }}" class="nav-link {% if request.endpoint == 'main.contact' %}active{% endif %}">Contato</a>
+                <a href="{{ url_for('main.publique') }}" class="nav-link {% if request.endpoint == 'main.publique' %}active{% endif %}">Publique seu Imóvel</a>
             </nav>
 
             <div class="header-actions">
@@ -191,7 +195,7 @@
                         <a href="#" class="footer-social-link" aria-label="LinkedIn" title="LinkedIn">
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
                         </a>
-                        <a href="https://wa.me/5511999999999" class="footer-social-link" aria-label="WhatsApp" title="WhatsApp" target="_blank" rel="noopener">
+                        <a href="{{ whatsapp_url }}" class="footer-social-link" aria-label="WhatsApp" title="WhatsApp" target="_blank" rel="noopener">
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"/></svg>
                         </a>
                     </div>
@@ -206,6 +210,7 @@
                         <a href="{{ url_for('properties.list_properties', purpose='Aluguel') }}">Imóveis para Alugar</a>
                         <a href="{{ url_for('main.about') }}">Sobre a 7X</a>
                         <a href="{{ url_for('main.contact') }}">Fale Conosco</a>
+                        <a href="{{ url_for('main.publique') }}" style="color: var(--primary); font-weight: 600;">📣 Publique seu Imóvel</a>
                     </div>
                 </div>
 
@@ -257,8 +262,60 @@
         </div>
     </footer>
 
+    <!-- ══ Chatbot Widget ═══════════════════════════════════════════════════ -->
+    <!-- Botão flutuante -->
+    <button id="chatbotToggle" aria-label="Abrir chat" title="Fale com a Ana">
+        <!-- Ícone chat -->
+        <svg class="icon-open" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0f1113" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+        </svg>
+        <!-- Ícone fechar -->
+        <svg class="icon-close" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0f1113" stroke-width="2.5" stroke-linecap="round">
+            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+        <span class="chat-btn-label">Assistente</span>
+        <span id="chatNotifBadge" class="hidden">1</span>
+    </button>
+
+    <!-- Janela do chat -->
+    <div id="chatbotWindow" role="dialog" aria-label="Chat 7X Imóveis">
+        <!-- Header -->
+        <div class="chat-header">
+            <div class="chat-avatar">🏠</div>
+            <div class="chat-header-info">
+                <div class="chat-header-name">Ana &middot; 7X Imóveis</div>
+                <div class="chat-header-status">
+                    <span class="chat-status-dot"></span>
+                    Online agora
+                </div>
+            </div>
+            <button class="chat-header-close" id="chatClose" aria-label="Fechar chat">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+        </div>
+
+        <!-- Mensagens -->
+        <div class="chat-messages" id="chatMessages"></div>
+
+        <!-- Input -->
+        <div class="chat-input-area">
+            <input
+                type="text"
+                id="chatInput"
+                class="chat-input"
+                placeholder="Selecione uma opção acima…"
+                disabled
+                autocomplete="off"
+                maxlength="300"
+            >
+            <button id="chatSendBtn" class="chat-send-btn" disabled aria-label="Enviar">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+            </button>
+        </div>
+    </div>
+
     <!-- Floating WhatsApp CTA -->
-    <a href="https://wa.me/5511999999999" target="_blank" rel="noopener" class="whatsapp-float" title="Fale pelo WhatsApp" aria-label="Fale pelo WhatsApp">
+    <a href="{{ whatsapp_url }}" target="_blank" rel="noopener" class="whatsapp-float" title="Fale pelo WhatsApp" aria-label="Fale pelo WhatsApp">
         <svg class="wa-icon" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
             <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"/>
         </svg>
@@ -274,5 +331,8 @@
     <script src="{{ url_for('static', filename='js/animations.js') }}"></script>
     <script src="{{ url_for('static', filename='js/interactions.js') }}"></script>
     {% block extra_js %}{% endblock %}
+
+    <!-- ══ Chatbot Widget ══════════════════════════════════════════ -->
+    <script src="{{ url_for('static', filename='js/chatbot.js') }}" defer></script>
 </body>
 </html>

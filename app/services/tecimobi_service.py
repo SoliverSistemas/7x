@@ -249,40 +249,58 @@ class TecimobService:
 
         # ── Características (quartos, suítes, banheiros, vagas, área) ──
         characteristics = item.get('characteristics') or []
-        rooms_map = {}
-        for c in characteristics:
-            title_lower = (c.get('title') or '').lower()
-            qty = c.get('quantity')
-            if qty is not None:
-                rooms_map[title_lower] = qty
 
-        # Extrair áreas (somente no detalhe)
+        # rooms[] usa campo 'name' (bedroom/suite/bathroom/garage) e 'value'
+        # characteristics[] usa campo 'title' e 'quantity' — fallback
+        rooms_list = item.get('rooms') or []
+        rooms_by_name = {}   # keyed por 'name' (bedroom, suite, bathroom, garage)
+        rooms_by_title = {}  # keyed por 'title' lowercase
+        for r in rooms_list:
+            n = (r.get('name') or '').lower().strip()
+            v = r.get('value')
+            if n and v is not None:
+                rooms_by_name[n] = int(v)
+            t = (r.get('title') or '').lower().strip()
+            if t and v is not None:
+                rooms_by_title[t] = int(v)
+        # fallback: characteristics com 'quantity'
+        for c in characteristics:
+            t = (c.get('title') or '').lower().strip()
+            q = c.get('quantity')
+            if t and q is not None:
+                rooms_by_title[t] = int(q)
+
+        bedrooms = (rooms_by_name.get('bedroom') or
+                    rooms_by_title.get('dormitório') or
+                    rooms_by_title.get('dormitorios') or
+                    rooms_by_title.get('quartos') or 0)
+        suites   = (rooms_by_name.get('suite') or
+                    rooms_by_title.get('sendo suíte') or
+                    rooms_by_title.get('suítes') or
+                    rooms_by_title.get('suites') or 0)
+        bathrooms = (rooms_by_name.get('bathroom') or
+                     rooms_by_title.get('banheiro') or
+                     rooms_by_title.get('banheiros') or 0)
+        garage   = (rooms_by_name.get('garage') or
+                    rooms_by_title.get('garagem') or
+                    rooms_by_title.get('vagas') or 0)
+
+        # ── Áreas ──────────────────────────────────────
+        # A API retorna areas[] com campo 'name' (built_area, private_area, total_area)
         areas = item.get('areas') or []
-        area_built = 0
-        area_total = 0
+        area_private = 0
+        area_built   = 0
+        area_total   = 0
         for a in areas:
             name = (a.get('name') or '').lower()
-            val = a.get('value') or 0
-            if 'built' in name or 'construida' in name or 'util' in name:
+            val  = a.get('value') or 0
+            if 'private' in name:
+                area_private = val
+            elif 'built' in name or 'construida' in name or 'util' in name:
                 area_built = val
             elif 'total' in name:
                 area_total = val
-        area = area_built or area_total or 0
-
-        # Rooms também pode vir como array no detalhe
-        rooms_detail = item.get('rooms') or []
-        if isinstance(rooms_detail, list):
-            for r in rooms_detail:
-                title_lower = (r.get('title') or '').lower()
-                qty = r.get('quantity')
-                if qty is not None:
-                    rooms_map[title_lower] = qty
-
-        bedrooms = int(rooms_map.get('quartos', rooms_map.get('dormitórios',
-                       rooms_map.get('dormitorios', 0))) or 0)
-        suites = int(rooms_map.get('suítes', rooms_map.get('suites', 0)) or 0)
-        bathrooms = int(rooms_map.get('banheiros', 0) or 0)
-        garage = int(rooms_map.get('vagas', rooms_map.get('garagem', 0)) or 0)
+        area = area_private or area_built or area_total or 0
 
         # ── Imagens ───────────────────────────────────
         # Na listagem: sem imagens (campo 'images' só vem no detalhe)
@@ -321,60 +339,91 @@ class TecimobService:
             'avatar_url': user.get('file_url') or ''
         }
 
-        # ── Comodidades (características + condomínio) ──
+        # ── Comodidades ────────────────────────────────
+        # characteristics[] = itens da unidade
+        # condo_characteristics[] = itens do condomínio
         condo_chars = item.get('condo_characteristics') or []
-        amenities_property = [c['title'] for c in characteristics if c.get('title') and not c.get('quantity')]
-        amenities_condo = [c['title'] for c in condo_chars if c.get('title') and not c.get('quantity')]
-        all_chars = characteristics + condo_chars
-        amenities = [c['title'] for c in all_chars if c.get('title') and not c.get('quantity')]
-        if not amenities:
-            amenities = ['Portaria 24h', 'Garagem Coberta']
-        if not amenities_property:
-            amenities_property = amenities[:4]
-        if not amenities_condo:
-            amenities_condo = amenities[4:] or ['Portaria 24h', 'Segurança']
+        # Filtra apenas itens sem 'quantity' (quantidade=None significa que é uma feature, não cômodo)
+        amenities_property = [c['title'] for c in characteristics if c.get('title') and c.get('quantity') is None]
+        amenities_condo    = [c['title'] for c in condo_chars    if c.get('title') and c.get('quantity') is None]
+        amenities          = list(dict.fromkeys(amenities_property + amenities_condo))  # union sem duplicatas
 
-        # ── Dados exclusivos do detalhe ───────────────
+        # establishments[] = vizinhança próxima
+        establishments = item.get('establishments') or []
+        if isinstance(establishments, list) and establishments and isinstance(establishments[0], dict):
+            establishments = [e.get('title') or e.get('name') or str(e) for e in establishments]
+
+        # ── Dados do detalhe ──────────────────────────
         description = ''
         condominium_price = 0.0
         iptu_price = 0.0
+        total_monthly_cost = 0.0
+        iptu_type = ''
         is_financeable = False
         accepts_exchange = False
         latitude = None
         longitude = None
-        situation = ''
+        situation = item.get('situation') or ''
         condominium_name = ''
         solar_position = item.get('solar_position') or ''
-        furnished = item.get('furniture_note') or ('Mobiliado' if item.get('has_furniture') else 'Não Mobiliado')
+        profile = item.get('profile') or ''
+        is_corner = bool(item.get('is_corner'))
+        is_deeded = bool(item.get('is_deeded'))
+        is_titled = bool(item.get('is_property_titled'))
+
+        # floor_number: a API às vezes retorna em informations[]
         floor_number = item.get('floor') or ''
+        for info in (item.get('informations') or []):
+            if (info.get('name') or '').lower() in ('floor', 'andar'):
+                floor_number = str(info.get('value') or '')
+                break
+
+        # furnished: a API usa 'furniture' (objeto) ou 'has_furniture' boolean
+        furniture_obj = item.get('furniture')
+        if isinstance(furniture_obj, dict):
+            furnished = furniture_obj.get('title') or furniture_obj.get('name') or 'Não Mobiliado'
+        elif item.get('has_furniture'):
+            furnished = 'Mobiliado'
+        elif item.get('furniture_note'):
+            furnished = item['furniture_note']
+        else:
+            furnished = 'Não Mobiliado'
 
         if detailed:
             raw_desc = item.get('description') or ''
-            # Remove HTML tags se vier com HTML
-            description = re.sub(r'<[^>]+>', '', raw_desc).strip()
+            # Mantém HTML — o template usa | safe
+            description = raw_desc.strip()
 
             raw_condo = item.get('condominium_price') or ''
             try:
-                clean_c = re.sub(r'[^\d,]', '', raw_condo).replace(',', '.')
+                clean_c = re.sub(r'[^\d,]', '', str(raw_condo)).replace(',', '.')
                 condominium_price = float(clean_c) if clean_c else 0.0
             except ValueError:
                 condominium_price = 0.0
 
             raw_iptu = item.get('territorial_tax_price') or ''
             try:
-                clean_i = re.sub(r'[^\d,]', '', raw_iptu).replace(',', '.')
+                clean_i = re.sub(r'[^\d,]', '', str(raw_iptu)).replace(',', '.')
                 iptu_price = float(clean_i) if clean_i else 0.0
             except ValueError:
                 iptu_price = 0.0
 
-            is_financeable = bool(item.get('is_financeable'))
-            accepts_exchange = bool(item.get('accepts_exchange') or item.get('permuta'))
+            raw_total = item.get('total_taxes_price') or ''
+            try:
+                clean_t = re.sub(r'[^\d,]', '', str(raw_total)).replace(',', '.')
+                total_monthly_cost = float(clean_t) if clean_t else 0.0
+            except ValueError:
+                total_monthly_cost = 0.0
+
+            iptu_type = item.get('territorial_tax_type') or ''
+            is_financeable = bool(item.get('is_financeable') or item.get('has_finance'))
+            accepts_exchange = bool(item.get('accepts_exchange') or item.get('is_exchangeable') or item.get('permuta'))
             latitude = item.get('maps_latitude')
             longitude = item.get('maps_longitude')
             situation = item.get('situation') or ''
 
             condo_obj = item.get('condominium') or {}
-            condominium_name = condo_obj.get('title') or ''
+            condominium_name = condo_obj.get('title') or condo_obj.get('name') or ''
 
         return {
             # Identificação
@@ -414,7 +463,7 @@ class TecimobService:
 
             # Características
             'area': area,
-            'area_total': area_total or area,
+            'area_total': area_total or area_built or area,
             'bedrooms': bedrooms,
             'suites': suites,
             'bathrooms': bathrooms,
@@ -428,13 +477,24 @@ class TecimobService:
             'amenities_condo': amenities_condo,
             'featured': False,
 
+            # Perfil / Situação / Características adicionais
+            'profile': profile,
+            'situation': situation,
+            'is_corner': is_corner,
+            'is_deeded': is_deeded,
+            'is_titled': is_titled,
+            'total_monthly_cost': total_monthly_cost,
+            'iptu_type': iptu_type,
+            'establishments': establishments,
+
             # Imagens
             'image': main_image,
-            'gallery': gallery_urls if gallery_urls else [main_image],
+            'gallery': gallery_urls if gallery_urls else ([main_image] if main_image else []),
 
             # Agente/Corretor
             'agent': agent
         }
+
 
     @classmethod
     def _build_title(cls, prop_type, neighborhood, city, reference):

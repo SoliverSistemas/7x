@@ -8,7 +8,7 @@
 
 {% block content %}
 
-<!-- ══ Hero Section - Video Carousel ════════════════════════════════════ -->
+<!-- ══ Hero Section ══════════════════════════════════════════════════════ -->
 <section class="hero-section" id="hero-slider">
     <div class="hero-video-wrapper">
         <video class="hero-video active" autoplay muted playsinline preload="auto" data-index="0"
@@ -25,65 +25,58 @@
 
     <div class="hero-overlay"></div>
 
-    <div class="hero-content">
-        <div class="container">
+    <!-- Barra de busca flutuante — sobrepõe hero + seção seguinte -->
+    <div class="hero-search-float" id="heroSearchWrapper">
+        <!-- Título elegante acima da barra -->
+        <p class="hero-search-label">Encontre o seu lar.</p>
 
-            <!-- Search Bar compacta e limpa integrada com suporte Sticky -->
-            <div class="hero-search-wrapper" id="heroSearchWrapper">
-                <div class="hero-search-bar" id="heroSearchBar">
-                    <h1 class="hero-simple-title">Encontre seu lar</h1>
+        <div class="hero-search-bar" id="heroSearchBar">
+            <form action="{{ url_for('properties.list_properties') }}" method="GET" class="hero-form">
+                <div class="hero-fields">
+                    <!-- Comprar / Alugar -->
+                    <div class="hero-purpose-toggle">
+                        <button type="button" class="purpose-btn active" onclick="setSearchPurpose('Comprar', this)">Comprar</button>
+                        <button type="button" class="purpose-btn" onclick="setSearchPurpose('Alugar', this)">Alugar</button>
+                        <input type="hidden" name="purpose" id="search-purpose" value="Venda">
+                    </div>
 
-                    <form action="{{ url_for('properties.list_properties') }}" method="GET" class="hero-form">
+                    <div class="hero-divider"></div>
 
-                        <div class="hero-fields">
-                            <!-- Segmented Control Integrado: Comprar / Alugar -->
-                            <div class="hero-purpose-toggle">
-                                <button type="button" class="purpose-btn active" onclick="setSearchPurpose('Comprar', this)">Comprar</button>
-                                <button type="button" class="purpose-btn" onclick="setSearchPurpose('Alugar', this)">Alugar</button>
-                                <input type="hidden" name="purpose" id="search-purpose" value="Venda">
-                            </div>
+                    <div class="hero-field">
+                        <label>Localização</label>
+                        <input type="text" name="q" placeholder="Bairro, cidade ou condomínio...">
+                    </div>
 
-                            <div class="hero-divider"></div>
+                    <div class="hero-divider"></div>
 
-                            <div class="hero-field">
-                                <label>Localização</label>
-                                <input type="text" name="q" placeholder="Bairro, cidade ou condomínio...">
-                            </div>
+                    <div class="hero-field">
+                        <label>Tipo</label>
+                        <select name="type">
+                            <option value="">Qualquer tipo</option>
+                            {% for t in types %}
+                                <option value="{{ t }}">{{ t }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
 
-                            <div class="hero-divider"></div>
+                    <div class="hero-divider"></div>
 
-                            <div class="hero-field">
-                                <label>Tipo</label>
-                                <select name="type">
-                                    <option value="">Qualquer tipo</option>
-                                    {% for t in types %}
-                                        <option value="{{ t }}">{{ t }}</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
+                    <div class="hero-field">
+                        <label>Cidade</label>
+                        <select name="city">
+                            <option value="">Todas</option>
+                            {% for c in cities %}
+                                <option value="{{ c }}">{{ c }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
 
-                            <div class="hero-divider"></div>
-
-                            <div class="hero-field">
-                                <label>Cidade</label>
-                                <select name="city">
-                                    <option value="">Todas</option>
-                                    {% for c in cities %}
-                                        <option value="{{ c }}">{{ c }}</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-
-                            <button type="submit" class="hero-search-btn">
-                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="square"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-                                <span>Buscar</span>
-                            </button>
-                        </div>
-
-                    </form>
+                    <button type="submit" class="hero-search-btn">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="square"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                        <span>Buscar</span>
+                    </button>
                 </div>
-            </div>
-
+            </form>
         </div>
     </div>
 
@@ -117,11 +110,6 @@
             </button>
         </div>
     </div>
-
-    <div class="hero-scroll-hint">
-        <span class="scroll-line"></span>
-        <span class="scroll-label">Role</span>
-    </div>
 </section>
 
 
@@ -132,9 +120,10 @@
     {'eyebrow': 'OPORTUNIDADES', 'title': 'Imóveis em ', 'em': 'Destaque', 'items': featured_properties}
 ] %}
 
+{% set ns = namespace(first=true) %}
 {% for sec in home_sections %}
 {% if sec['items'] %}
-<section class="section" {% if loop.index > 1 %}style="padding-top: 2rem;"{% endif %}>
+<section class="section" style="{% if ns.first %}padding-top: 180px;{% set ns.first = false %}{% elif loop.index > 1 %}padding-top: 3rem;{% endif %}">
     <div class="container">
         <div class="section-header-flex reveal">
             <div>
@@ -266,9 +255,13 @@
                data-delay="{{ loop.index0 * 120 }}">
 
                 <div class="lancamento-cover">
-                    <img src="{{ url_for('static', filename=item.cover) }}"
-                         alt="{{ item.name }}"
-                         loading="lazy">
+                    {% if item.cover_url and (item.cover_url.startswith('http') or item.cover_url.startswith('/static')) %}
+                    <img src="{{ item.cover_url }}" alt="{{ item.name }}" loading="lazy">
+                    {% elif item.cover %}
+                    <img src="{{ url_for('static', filename=item.cover) }}" alt="{{ item.name }}" loading="lazy">
+                    {% else %}
+                    <img src="{{ url_for('static', filename='img/placeholder.jpg') }}" alt="{{ item.name }}" loading="lazy">
+                    {% endif %}
                     <div class="lancamento-cover-overlay"></div>
 
                     <!-- Tudo posicionado DENTRO da cover (overflow:hidden correto) -->

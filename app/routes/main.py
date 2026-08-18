@@ -1,12 +1,14 @@
-from flask import Blueprint, render_template, request, flash, redirect, url_for, abort
+from flask import Blueprint, render_template, request, flash, redirect, url_for, abort, jsonify
+import os
 from app.models.property_model import PropertyRepository
-from app.models.db_models import ExclusiveCollection
+from app.models.db_models import ExclusiveCollection, Lancamento, ChatLead
 from app.services.tecimobi_service import TecimobService
+from app import db
 
 main_bp = Blueprint('main', __name__)
 
-# ── Dados dos lançamentos (futuramente viram modelo/DB) ──────────────────
-LANCAMENTOS = [
+# ── Fallback estático (usado apenas enquanto o DB não tiver lançamentos) ──
+_LANCAMENTOS_STATIC = [
     {
         'slug': 'eden-residences',
         'name': 'Eden Residences',
@@ -16,6 +18,7 @@ LANCAMENTOS = [
         'status': 'Lançamento',
         'units': '48 unidades',
         'cover': 'img/lancamento_eden.jpg',
+        'cover_url': None,
         'accent': '#c9ac77',
     },
     {
@@ -27,6 +30,7 @@ LANCAMENTOS = [
         'status': 'Pré-lançamento',
         'units': '12 unidades exclusivas',
         'cover': 'img/lancamento_sky.jpg',
+        'cover_url': None,
         'accent': '#c9ac77',
     },
     {
@@ -38,19 +42,32 @@ LANCAMENTOS = [
         'status': 'Breve',
         'units': '6 residências',
         'cover': 'img/lancamento_villa.jpg',
+        'cover_url': None,
         'accent': '#c9ac77',
     },
 ]
+
+
+def _get_lancamentos():
+    """Retorna lançamentos do DB; usa fallback estático se vazio."""
+    try:
+        db_items = Lancamento.query.order_by(Lancamento.display_order, Lancamento.id).all()
+        if db_items:
+            return [l.to_dict() for l in db_items]
+    except Exception:
+        pass
+    return _LANCAMENTOS_STATIC
+
 
 @main_bp.route('/')
 def index():
     # Coleção Exclusiva: vem da tabela exclusive_collection (max 3, com capa personalizada)
     exclusive_slots = ExclusiveCollection.query.order_by(ExclusiveCollection.display_order).limit(3).all()
     exclusive_properties = [slot.to_dict() for slot in exclusive_slots]
-    
+
     high_end_properties = PropertyRepository.filter(category="Alto Padrão")['properties']
     featured_properties = PropertyRepository.get_featured()
-        
+
     all_properties = PropertyRepository.get_all()
     cities = PropertyRepository.get_cities()
     types = PropertyRepository.get_types()
@@ -62,7 +79,7 @@ def index():
         total_properties=len(all_properties),
         cities=cities,
         types=types,
-        lancamentos=LANCAMENTOS
+        lancamentos=_get_lancamentos()
     )
 
 @main_bp.route('/sobre')
@@ -94,7 +111,7 @@ def contact():
             flash(f'Obrigado, {name}! Sua mensagem foi enviada com sucesso. Nossa equipe entrará em contato em breve.', 'success')
         else:
             flash(f'Recebemos sua mensagem, {name}. Nossa integração com o sistema está offline no momento, mas um corretor retornará em breve.', 'success')
-            
+
         return redirect(url_for('main.contact'))
     return render_template('main/contact.html')
 
@@ -110,13 +127,53 @@ def links():
     }
     return render_template('main/links.html', links=links_data)
 
+@main_bp.route('/publique-seu-imovel')
+def publique():
+    return render_template('main/publique.html')
+
 @main_bp.route('/lancamentos')
 def lancamentos():
-    return render_template('main/lancamentos.html', lancamentos=LANCAMENTOS)
+    return render_template('main/lancamentos.html', lancamentos=_get_lancamentos())
 
 @main_bp.route('/lancamentos/<slug>')
 def lancamento_detail(slug):
-    item = next((l for l in LANCAMENTOS if l['slug'] == slug), None)
+    whatsapp = os.getenv('WHATSAPP_NUMBER', '')
+    # Tenta buscar no DB primeiro
+    try:
+        item = Lancamento.query.filter_by(slug=slug).first()
+        if item:
+            return render_template(
+                'main/lancamento_detail.html',
+                lancamento=item.to_dict(),
+                whatsapp_number=whatsapp
+            )
+    except Exception:
+        pass
+    # Fallback estático
+    item = next((l for l in _LANCAMENTOS_STATIC if l['slug'] == slug), None)
     if not item:
         abort(404)
-    return render_template('main/lancamento_detail.html', lancamento=item)
+    return render_template(
+        'main/lancamento_detail.html',
+        lancamento=item,
+        whatsapp_number=whatsapp
+    )
+
+
+# ══ Chatbot Lead ══════════════════════════════════════════════════════════════
+@main_bp.route('/chatbot/lead', methods=['POST'])
+def chatbot_lead():
+    """Salva lead capturado pelo chatbot."""
+    data = request.get_json(silent=True) or {}
+    name    = str(data.get('name',    '')).strip()[:120]
+    phone   = str(data.get('phone',   '')).strip()[:30]
+    message = str(data.get('message', '')).strip()[:1000]
+    page    = str(data.get('page',    '')).strip()[:300]
+
+    if not name and not phone:
+        return jsonify({'ok': False, 'error': 'Dados insuficientes'}), 400
+
+    lead = ChatLead(name=name, phone=phone, message=message, page=page)
+    db.session.add(lead)
+    db.session.commit()
+    return jsonify({'ok': True, 'id': lead.id})

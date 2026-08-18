@@ -1,4 +1,4 @@
-/* ==========================================================================
+﻿/* ==========================================================================
    7X Patrimonial - Home Page (main/index.html)
    ========================================================================== */
 
@@ -6,11 +6,14 @@
 .hero-section {
     position: relative;
     width: 100%;
-    min-height: 66.444vh;
+    min-height: 65vh;
     display: flex;
-    align-items: flex-end;
-    overflow: visible; /* Permite a barra de busca vazar para baixo */
+    flex-direction: column;
+    align-items: stretch;
+    overflow: visible; /* permite a barra vazar para baixo */
     z-index: 10;
+    /* espaço para a barra flutuante (~metade da altura da barra) */
+    padding-bottom: 48px;
 }
 
 /* ── Video Background Carousel ───────────────────────────────────────────── */
@@ -31,9 +34,11 @@
     object-fit: cover;
     object-position: center 30%;
     opacity: 0;
-    transition: opacity 0.8s ease-in-out;
+    transition: opacity 1.1s ease-in-out;
     pointer-events: none;
     z-index: 0;
+    transform: scale(1.04);
+    animation: heroVideoZoom 20s ease-out forwards;
 }
 
 .hero-video.active {
@@ -41,9 +46,35 @@
     z-index: 1;
 }
 
-/* Overlay desativado — vídeo 100% visível e limpo */
+@keyframes heroVideoZoom {
+    to { transform: scale(1); }
+}
+
+/* ── Overlay multicamada ─────────────────────────────────────────────────── */
 .hero-overlay {
-    display: none;
+    display: block;
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    background:
+        linear-gradient(
+            170deg,
+            rgba(11, 15, 25, 0.25)  0%,
+            rgba(11, 15, 25, 0.05)  35%,
+            rgba(11, 15, 25, 0.55)  70%,
+            rgba(11, 15, 25, 0.92) 100%
+        ),
+        linear-gradient(
+            to right,
+            rgba(11, 15, 25, 0.45) 0%,
+            transparent 45%
+        ),
+        radial-gradient(
+            ellipse 90% 35% at 50% 100%,
+            rgba(201, 172, 119, 0.10),
+            transparent
+        );
+    pointer-events: none;
 }
 
 /* ── Hero Content ────────────────────────────────────────────────────────── */
@@ -51,105 +82,93 @@
     position: relative;
     z-index: 3;
     width: 100%;
-    padding-top: 6rem;
-    padding-bottom: 0; /* Ancorado na base */
+    flex: 1;
+    display: flex;
+    align-items: center;       /* verticalmente centrado */
+    justify-content: center;
+    padding-top: 0;
+    padding-bottom: 0;
 }
 
-/* ── Hero Typography (Elegante, Centralizada e Animada) ─────────────────── */
-@keyframes titleGlowReveal {
-    0% {
-        opacity: 0;
-        transform: translateY(22px) scale(0.96);
-        letter-spacing: 0.22em;
-    }
-    100% {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-        letter-spacing: 0.12em;
-    }
-}
-
-@keyframes goldShimmerSweep {
-    0% {
-        background-position: -200% center;
-    }
-    100% {
-        background-position: 200% center;
-    }
-}
-
-.hero-simple-title {
-    font-family: 'Cormorant Garamond', 'Cinzel', Georgia, serif;
-    font-size: clamp(1.3rem, 2.3vw, 1.85rem);
-    font-style: italic;
-    font-weight: 600;
-    letter-spacing: 0.08em;
+/* ── Hero Headline — só o título ─────────────────────────────────────────── */
+.hero-headline {
     text-align: center;
-    width: 100%;
-    margin: 0 auto 0.95rem auto;
-    line-height: 1.2;
-    
-    /* Gradiente animado em ouro champanhe e branco puro */
-    background: linear-gradient(115deg,
-            #ffffff 20%,
-            #fdf7e7 40%,
-            var(--primary, #c9ac77) 55%,
-            #fdf7e7 70%,
-            #ffffff 90%);
-    background-size: 240% auto;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    
-    /* Sombra refinada e nítida */
-    filter: drop-shadow(0 3px 14px rgba(0, 0, 0, 0.92)) drop-shadow(0 0 8px rgba(201, 172, 119, 0.35));
-    
-    animation: titleGlowReveal 0.9s cubic-bezier(0.22, 1, 0.36, 1) both,
-               goldShimmerSweep 6s ease-in-out infinite 1s;
+    padding: 0 1rem;
 }
 
-/* ── Hero Search Bar (Fundo Branco Fosco com Efeito) ────────────────────── */
-@keyframes searchBarEnter {
-    from {
-        opacity: 0;
-        transform: translateY(28px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+/* Main title */
+@keyframes heroFadeUp {
+    from { opacity: 0; transform: translateY(28px); }
+    to   { opacity: 1; transform: translateY(0); }
 }
 
-.hero-search-wrapper {
-    width: 100%;
-    position: relative;
-    z-index: 25;
+.hero-main-title {
+    font-family: var(--font-heading, 'Cormorant Garamond', Georgia, serif);
+    font-size: clamp(2.8rem, 7vw, 6rem);
+    font-weight: 300;
+    font-style: italic;
+    line-height: 1.05;
+    letter-spacing: -0.01em;
+    color: #ffffff;
+    margin: 0 auto;
+    animation: heroFadeUp 1s 0.3s cubic-bezier(0.22, 1, 0.36, 1) both;
+    text-shadow: 0 4px 32px rgba(0,0,0,0.5);
+}
+
+/* ── Barra de busca flutuante ────────────────────────────────────────────── */
+.hero-search-float {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 30;
+    transform: translateY(50%);
+    padding: 0 1.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: .55rem;
+}
+
+/* Label elegante acima da barra */
+.hero-search-label {
+    font-family: var(--font-heading, 'Cormorant Garamond', Georgia, serif);
+    font-size: clamp(1.1rem, 2vw, 1.5rem);
+    font-weight: 300;
+    font-style: italic;
+    color: rgba(255, 255, 255, 0.90);
+    letter-spacing: 0.06em;
+    margin: 0;
+    text-align: center;
+    text-shadow: 0 2px 18px rgba(0,0,0,0.65);
+    animation: heroFadeUp 0.8s 0.3s cubic-bezier(0.22, 1, 0.36, 1) both;
+    pointer-events: none;
+    user-select: none;
 }
 
 .hero-search-bar {
-    max-width: 900px;
+    max-width: 960px;
     width: 100%;
-    margin: 2.5rem auto -32px auto; /* Centralizada horizontalmente e vazando para baixo */
+    margin: 0 auto;
     position: relative;
-    z-index: 25;
-    animation: searchBarEnter 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.45s both;
+    z-index: 30;
+    animation: searchBarEnter 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.6s both;
+}
+
+@keyframes searchBarEnter {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
 }
 
 /* ── Estado Fixo / Anexado ao Header ao Rolar a Página ─────────────────── */
 @keyframes searchDockIn {
-    0% {
-        opacity: 0.7;
-        transform: translate(-50%, -8px);
-    }
-    100% {
-        opacity: 1;
-        transform: translate(-50%, 0);
-    }
+    0%   { opacity: 0.7; transform: translate(-50%, -8px); }
+    100% { opacity: 1;   transform: translate(-50%, 0); }
 }
 
 .hero-search-bar.is-docked {
     position: fixed !important;
-    top: 58px; /* Ajustado dinamicamente via JS */
+    top: 58px;
     left: 50% !important;
     transform: translateX(-50%) !important;
     width: calc(100% - 2.5rem);
@@ -159,9 +178,8 @@
     animation: searchDockIn 0.25s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
-.hero-search-bar.is-docked .hero-simple-title {
-    display: none;
-}
+.hero-search-bar.is-docked .hero-simple-title { display: none; }
+.hero-search-float:has(.is-docked) .hero-search-label { display: none; }
 
 .hero-search-bar.is-docked .hero-fields {
     min-height: 52px;
@@ -171,31 +189,44 @@
                 inset 0 1px 0 rgba(255, 255, 255, 1);
 }
 
-.hero-search-bar.is-docked .hero-purpose-toggle {
-    padding: 0.4rem 0.8rem;
-}
-
-.hero-search-bar.is-docked .purpose-btn {
-    padding: 0.35rem 0.8rem;
-    font-size: 0.72rem;
-}
-
-.hero-search-bar.is-docked .hero-field {
-    padding: 0.4rem 0.95rem;
-}
-
-.hero-search-bar.is-docked .hero-field label {
-    display: none;
-}
-
+.hero-search-bar.is-docked .hero-purpose-toggle { padding: 0.4rem 0.8rem; }
+.hero-search-bar.is-docked .purpose-btn { padding: 0.35rem 0.8rem; font-size: 0.72rem; }
+.hero-search-bar.is-docked .hero-field { padding: 0.4rem 0.95rem; }
+.hero-search-bar.is-docked .hero-field label { display: none; }
 .hero-search-bar.is-docked .hero-field input,
-.hero-search-bar.is-docked .hero-field select {
-    font-size: 0.88rem;
+.hero-search-bar.is-docked .hero-field select { font-size: 0.88rem; }
+.hero-search-bar.is-docked .hero-search-btn { padding: 0 1.5rem; font-size: 0.78rem; }
+
 }
 
-.hero-search-bar.is-docked .hero-search-btn {
-    padding: 0 1.5rem;
-    font-size: 0.78rem;
+.hero-headline-sep::before,
+.hero-headline-sep::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(to right, transparent, rgba(201,172,119,0.5));
+}
+
+.hero-headline-sep::after {
+    background: linear-gradient(to left, transparent, rgba(201,172,119,0.5));
+}
+
+.hero-headline-sep-diamond {
+    width: 6px;
+    height: 6px;
+    background: var(--primary);
+    transform: rotate(45deg);
+    flex-shrink: 0;
+}
+
+/* ── Hero Search Title pequeno (dentro da barra) ────────────────────────── */
+.hero-simple-title {
+    display: none; /* A headline principal fica fora da barra agora */
+}
+
+/* Primeira seção do catálogo — espaço para a barra de busca flutuante do hero */
+.section--first {
+    padding-top: 480px !important;
 }
 
 /* ── Segmented Control Integrado: Comprar / Alugar ──────────────────────── */
@@ -409,8 +440,8 @@
 .hero-video-controls {
     position: absolute;
     right: 2.5rem;
-    bottom: 2.2rem;
-    z-index: 15;
+    bottom: 4.5rem;
+    z-index: 20;
     display: flex;
     align-items: center;
     gap: 1.25rem;

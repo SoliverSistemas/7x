@@ -1,4 +1,4 @@
-from app.models.db_models import Property
+from app.models.db_models import Property, PropertyCategory
 from app import db
 import math
 
@@ -14,14 +14,35 @@ class PropertyRepository:
         return [p.to_dict() for p in properties]
 
     @classmethod
-    def calculate_category(cls, prop):
-        if prop.get('is_exclusive'):
-            return "Exclusivo"
-        if prop.get('price', 0) > 2000000:
-            return "Alto Padrão"
-        if prop.get('featured'):
-            return "Destaque"
-        return "Geral"
+    def calculate_category(cls, prop: dict) -> str:
+        """
+        Classifica o imóvel lendo as categorias configuradas no banco,
+        ordenadas por prioridade (menor número = verificada primeiro).
+        Fallback para 'Geral' se nenhuma bater ou tabela vazia.
+        """
+        try:
+            categories = PropertyCategory.query.order_by(
+                PropertyCategory.priority.asc()
+            ).all()
+        except Exception:
+            # Tabela ainda não existe (ex: primeiro boot) — usa lógica legada
+            categories = []
+
+        if not categories:
+            # Lógica legada como segurança
+            if prop.get('is_exclusive'):
+                return 'Exclusivo'
+            if prop.get('price', 0) > 2_000_000:
+                return 'Alto Padrão'
+            if prop.get('featured'):
+                return 'Destaque'
+            return 'Geral'
+
+        for cat in categories:
+            if cat.matches(prop):
+                return cat.name
+
+        return 'Geral'
 
     @classmethod
     def toggle_exclusive(cls, property_id):
