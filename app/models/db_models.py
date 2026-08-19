@@ -395,3 +395,22 @@ class ChatLead(db.Model):
 
     def __repr__(self):
         return f'<ChatLead {self.name} {self.phone}>'
+
+
+class AgentProfile(db.Model):
+    """
+    Overrides para o perfil do corretor (nome, avatar, instagram, descrição).
+    O campo 'name' atua como chave, combinando com o nome retornado pela Tecimob.
+    """
+    __tablename__ = 'agent_profiles'
+
+    id          = db.Column(db.Integer, primary_key=True)
+    name        = db.Column(db.String(150), unique=True, nullable=False, index=True)
+    avatar_url  = db.Column(db.String(500))
+    instagram   = db.Column(db.String(150))
+    description = db.Column(db.Text)
+    created_at  = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at  = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    def __repr__(self):
+        return f'<AgentProfile {self.name}>'

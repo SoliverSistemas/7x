@@ -51,20 +51,13 @@
             <nav class="nav-menu" id="nav-menu">
                 <a href="{{ url_for('main.index') }}" class="nav-link {% if request.endpoint == 'main.index' %}active{% endif %}">Início</a>
                 <a href="{{ url_for('properties.list_properties') }}" class="nav-link {% if 'properties' in (request.endpoint or '') %}active{% endif %}">Imóveis</a>
+                <a href="{{ url_for('agents.list_agents') }}" class="nav-link {% if 'agents' in (request.endpoint or '') %}active{% endif %}">Corretores</a>
                 <a href="{{ url_for('main.about') }}" class="nav-link {% if request.endpoint == 'main.about' %}active{% endif %}">Sobre Nós</a>
                 <a href="{{ url_for('main.contact') }}" class="nav-link {% if request.endpoint == 'main.contact' %}active{% endif %}">Contato</a>
                 <a href="{{ url_for('main.publique') }}" class="nav-link {% if request.endpoint == 'main.publique' %}active{% endif %}">Publique seu Imóvel</a>
             </nav>
 
             <div class="header-actions">
-                <!-- Favorites Button -->
-                <button id="header-favorites-btn" class="header-fav-btn" title="Meus Favoritos" aria-label="Ver imóveis favoritos">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
-                    </svg>
-                    <span class="favorites-count-badge" style="display:none;">0</span>
-                </button>
-
                 <a href="{{ url_for('properties.list_properties') }}" class="btn btn-primary btn-sm header-cta">
                     Buscar Imóveis
                 </a>
@@ -81,12 +74,47 @@
                         <line x1="17.66" y1="6.34" x2="19.78" y2="4.22"/>
                     </svg>
                 </button>
-
                 <button class="mobile-nav-toggle" aria-label="Abrir Menu" aria-expanded="false" aria-controls="nav-menu">☰</button>
             </div>
 
         </div>
+
+        <!-- Botão de Pesquisa e Favoritos no Header (Extrema Direita) -->
+        <div class="header-icon-group-absolute">
+            <button id="header-search-btn" class="header-icon-btn" title="Buscar Imóveis" aria-label="Buscar imóveis">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            </button>
+
+            <button id="header-favorites-btn" class="header-fav-btn header-icon-btn" title="Meus Favoritos" aria-label="Ver imóveis favoritos">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                </svg>
+                <span class="favorites-count-badge" style="display:none;">0</span>
+            </button>
+        </div>
     </header>
+
+    <!-- Search Overlay -->
+    <div class="search-overlay" id="searchOverlay">
+        <button class="search-close-btn" id="searchCloseBtn" aria-label="Fechar busca">&times;</button>
+        <div class="search-overlay-content">
+            <h2 class="search-overlay-title">Encontre seu imóvel ideal</h2>
+            <form action="{{ url_for('properties.list_properties') }}" method="GET" class="search-overlay-form">
+                <div class="search-input-wrapper">
+                    <svg class="search-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                    <input type="text" name="q" placeholder="Digite cidade, bairro, condomínio ou código..." id="searchOverlayInput" autocomplete="off">
+                    <button type="submit" class="btn btn-primary search-submit-btn">Buscar</button>
+                </div>
+                <div class="search-suggestions">
+                    <span>Sugestões:</span>
+                    <a href="{{ url_for('properties.list_properties', purpose='Venda') }}">Comprar</a>
+                    <a href="{{ url_for('properties.list_properties', purpose='Alugar') }}">Alugar</a>
+                    <a href="{{ url_for('properties.list_properties', type='Casa') }}">Casas</a>
+                    <a href="{{ url_for('properties.list_properties', type='Apartamento') }}">Apartamentos</a>
+                </div>
+            </form>
+        </div>
+    </div>
 
     <!-- Favorites Side Drawer -->
     <div class="fav-drawer-overlay" id="favDrawerOverlay"></div>

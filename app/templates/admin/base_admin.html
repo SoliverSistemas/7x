@@ -60,6 +60,17 @@
                 Lançamentos
             </a>
 
+            <a href="{{ url_for('admin.list_agents') }}"
+               class="admin-nav-item {% if 'corretor' in (request.endpoint or '') %}active{% endif %}">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="9" cy="7" r="4"></circle>
+                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                </svg>
+                Corretores
+            </a>
+
             <a href="{{ url_for('admin.categorias_list') }}"
                class="admin-nav-item {% if 'categor' in (request.endpoint or '') %}active{% endif %}">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">

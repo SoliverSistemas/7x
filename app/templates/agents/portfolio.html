@@ -1,0 +1,336 @@
+{% extends 'base.html' %}
+
+{% block title %}Portfólio de {{ agent.name }} - {{ site_name }}{% endblock %}
+
+{% block content %}
+<section class="agent-hero">
+    <div class="agent-hero-bg"></div>
+    <div class="container">
+        <div class="agent-profile-glass fade-in">
+            <div class="agent-profile-left">
+                <div class="agent-avatar-large">
+                    {% if agent.avatar_url %}
+                        <img src="{{ agent.avatar_url }}" alt="{{ agent.name }}">
+                    {% else %}
+                        <div class="avatar-placeholder">
+                        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="agent-profile-right">
+                <h1 class="agent-name">{{ agent.name }}</h1>
+                
+                <div class="agent-meta">
+                    {% if agent.creci %}
+                        <span class="agent-badge"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2" ry="2"></rect><line x1="8" y1="10" x2="16" y2="10"></line><line x1="8" y1="14" x2="12" y2="14"></line></svg> CRECI: {{ agent.creci }}</span>
+                    {% endif %}
+                    <span class="agent-badge"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg> {{ properties|length }} imóveis</span>
+                </div>
+                
+                {% if agent.description %}
+                    <div class="agent-bio">
+                        <p>{{ agent.description }}</p>
+                    </div>
+                {% endif %}
+                
+                <div class="agent-contacts">
+                    {% if agent.phone %}
+                        {% set phone_number = agent.phone | replace('+', '') | replace(' ', '') | replace('-', '') | replace('(', '') | replace(')', '') %}
+                        <a href="https://wa.me/{{ phone_number }}?text=Olá, vi seu portfólio de imóveis no site da 7X e gostaria de mais informações." target="_blank" class="btn btn-whatsapp">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg> WhatsApp
+                        </a>
+                    {% endif %}
+                    {% if agent.email %}
+                        <a href="mailto:{{ agent.email }}" class="btn btn-outline-light">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg> E-mail
+                        </a>
+                    {% endif %}
+                    {% if agent.instagram %}
+                        <a href="https://instagram.com/{{ agent.instagram.replace('@', '') }}" target="_blank" class="btn btn-instagram" title="Instagram">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="agent-properties">
+    <div class="container">
+        <div class="section-header fade-in text-center mb-5">
+            <h2>Imóveis de {{ agent.name }}</h2>
+            <p>Confira a seleção exclusiva disponível para você.</p>
+        </div>
+
+        {% if properties %}
+            <div class="properties-grid stagger-container">
+                {% for p in properties %}
+                    {% include 'partials/_property_card.html' %}
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="empty-state text-center py-5">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="opacity: 0.5; margin-bottom: 20px;"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                <h3>Nenhum imóvel encontrado</h3>
+                <p class="text-muted">Este corretor não possui imóveis ativos no momento.</p>
+            </div>
+        {% endif %}
+    </div>
+</section>
+
+<style>
+/* ── Premium Agent Portfolio Styles ─────────────────────────────────────── */
+.agent-hero {
+    position: relative;
+    padding: 120px 0 80px;
+    background: var(--bg-main);
+    overflow: hidden;
+}
+
+.agent-hero-bg {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: radial-gradient(ellipse at center, rgba(201, 172, 119, 0.15) 0%, transparent 60%);
+    pointer-events: none;
+}
+
+.agent-profile-glass {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 50px;
+    background: linear-gradient(145deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255,255,255,0.08);
+    padding: 50px;
+    border-radius: 24px;
+    box-shadow: 0 30px 60px rgba(0,0,0,0.3);
+    position: relative;
+    z-index: 1;
+}
+
+@media (max-width: 991px) {
+    .agent-profile-glass {
+        flex-direction: column;
+        text-align: center;
+        padding: 40px 30px;
+        gap: 30px;
+    }
+    .agent-contacts {
+        justify-content: center;
+    }
+}
+
+.agent-avatar-large {
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    padding: 6px;
+    background: linear-gradient(135deg, var(--color-gold), rgba(255,255,255,0.1));
+    box-shadow: 0 15px 35px rgba(0,0,0,0.4);
+    flex-shrink: 0;
+}
+
+.agent-avatar-large img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid var(--bg-surface);
+}
+
+.agent-avatar-large .avatar-placeholder {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: var(--bg-surface);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 5rem;
+    color: var(--text-muted);
+    border: 4px solid var(--bg-surface);
+}
+
+.agent-profile-right {
+    flex: 1;
+}
+
+.agent-name {
+    font-family: var(--font-heading);
+    font-size: 2.8rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 15px;
+    line-height: 1.1;
+    letter-spacing: -0.5px;
+}
+
+.agent-meta {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+    margin-bottom: 25px;
+}
+
+@media (max-width: 991px) {
+    .agent-meta {
+        justify-content: center;
+    }
+}
+
+.agent-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 16px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 30px;
+    font-size: 0.9rem;
+    color: var(--color-gold);
+    font-weight: 500;
+    letter-spacing: 0.5px;
+}
+
+.agent-bio {
+    font-size: 1.1rem;
+    line-height: 1.7;
+    color: var(--text-secondary);
+    margin-bottom: 35px;
+    position: relative;
+}
+
+.agent-bio::before {
+    content: '"';
+    position: absolute;
+    top: -20px;
+    left: -20px;
+    font-size: 4rem;
+    color: rgba(201, 172, 119, 0.15);
+    font-family: Georgia, serif;
+    line-height: 1;
+}
+
+@media (max-width: 991px) {
+    .agent-bio::before {
+        left: 50%;
+        transform: translateX(-50%);
+    }
+}
+
+.agent-contacts {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.agent-contacts .btn {
+    padding: 12px 24px;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.btn-whatsapp {
+    background: #25d366;
+    color: #fff;
+    border: none;
+    box-shadow: 0 4px 15px rgba(37, 211, 102, 0.3);
+}
+
+.btn-whatsapp:hover {
+    background: #20bd5a;
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(37, 211, 102, 0.4);
+    color: #fff;
+}
+
+.agent-contacts .btn-outline-light {
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.2);
+    color: var(--text-primary);
+}
+
+.agent-contacts .btn-outline-light:hover {
+    background: rgba(255,255,255,0.1);
+    transform: translateY(-3px);
+    border-color: rgba(255,255,255,0.4);
+}
+
+.btn-instagram {
+    background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+    color: #fff;
+    width: 48px;
+    height: 48px;
+    padding: 0 !important;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    border: none;
+    box-shadow: 0 4px 15px rgba(220, 39, 67, 0.3);
+    font-size: 1.3rem;
+}
+
+.btn-instagram:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(220, 39, 67, 0.4);
+    color: #fff;
+}
+
+.agent-properties {
+    padding: 80px 0;
+    background: var(--bg-body);
+}
+
+.properties-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 30px;
+}
+</style>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    gsap.fromTo('.fade-in', 
+        { opacity: 0, y: 30 },
+        {
+            opacity: 1, 
+            y: 0, 
+            duration: 0.8,
+            stagger: 0.2,
+            scrollTrigger: {
+                trigger: '.agent-hero',
+                start: "top 85%"
+            }
+        }
+    );
+
+    gsap.utils.toArray('.property-card').forEach((card, i) => {
+        gsap.fromTo(card, 
+            { opacity: 0, y: 50 },
+            {
+                opacity: 1, 
+                y: 0, 
+                duration: 0.6,
+                delay: i * 0.1,
+                scrollTrigger: {
+                    trigger: '.stagger-container',
+                    start: "top 80%"
+                }
+            }
+        );
+    });
+});
+</script>
+{% endblock %}

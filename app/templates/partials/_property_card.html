@@ -1,0 +1,83 @@
+<div class="property-card" data-href="{{ url_for('properties.detail', property_id=p.id) }}">
+    <div class="card-img-wrapper">
+        {% if p.calculated_category and p.calculated_category != 'Geral' %}
+        <div class="card-ribbon card-ribbon--{{ p.calculated_category|lower|replace(' ', '-')|replace('ã', 'a') }}">{{ p.calculated_category }}</div>
+        {% endif %}
+        <div class="card-badges">
+            <span class="badge badge-gold">{{ p.purpose }}</span>
+            {% if p.badge %}
+                <span class="badge badge-blue">{{ p.badge }}</span>
+            {% endif %}
+        </div>
+        <button class="card-favorite-btn" data-id="{{ p.id }}"
+                title="Salvar Favorito" aria-label="Salvar nos favoritos">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+            </svg>
+        </button>
+        {% set img_src = p.image if p.image and p.image.startswith('http') else (url_for('static', filename='img/' + p.image) if p.image else url_for('static', filename='img/placeholder.jpg')) %}
+        <img src="{{ img_src }}"
+             alt="{{ p.title }}" loading="lazy">
+        <div class="card-price-overlay">
+            <span class="card-price-label">{{ p.purpose == 'Aluguel' and 'Aluguel / mês' or 'Valor' }}</span>
+            <span class="card-price-val">{{ p.price|currency }}</span>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="card-location">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                <circle cx="12" cy="10" r="3"/>
+            </svg>
+            {{ p.neighborhood }}, {{ p.city }}
+        </div>
+        <h3 class="card-title">
+            <a href="{{ url_for('properties.detail', property_id=p.id) }}">{{ p.title }}</a>
+        </h3>
+        <div class="card-specs">
+            {% if p.area %}
+            <div class="card-spec-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg>
+                <span>{{ p.area|area_format }}</span>
+            </div>
+            {% endif %}
+            {% if p.bedrooms %}
+            <div class="card-spec-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 14h18v6H3z"/><path d="M3 14V8a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v6"/><path d="M7 10h10"/></svg>
+                <span>{{ p.bedrooms }} dorms</span>
+            </div>
+            {% endif %}
+            {% if p.suites %}
+            <div class="card-spec-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 12H3l9-9 9 9h-2"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg>
+                <span>{{ p.suites }} suítes</span>
+            </div>
+            {% endif %}
+            {% if p.garage %}
+            <div class="card-spec-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2 12h20M12 2v20M5 5l14 14M19 5L5 19"/></svg>
+                <span>{{ p.garage }} vagas</span>
+            </div>
+            {% endif %}
+        </div>
+        <div class="card-info-chips">
+            {% if p.is_financeable %}<span class="card-chip">Financiável</span>{% endif %}
+            {% if p.accepts_exchange %}<span class="card-chip">Aceita Troca</span>{% endif %}
+            {% if p.furnished and p.furnished != 'Não mobiliado' %}<span class="card-chip">Mobiliado</span>{% endif %}
+        </div>
+        <div class="card-footer">
+            {% if p.condo_fee %}
+            <div class="card-condo">
+                <span class="card-condo-label">Condomínio</span>
+                <span class="card-condo-val">{{ p.condo_fee|currency }}</span>
+            </div>
+            {% else %}
+            <div></div>
+            {% endif %}
+            <a href="{{ url_for('properties.detail', property_id=p.id) }}" class="card-cta-btn">
+                Ver detalhes
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+            </a>
+        </div>
+    </div>
+</div>

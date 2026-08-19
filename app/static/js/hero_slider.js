@@ -206,6 +206,17 @@ function initStickySearchBar() {
     let isDocked = false;
 
     function handleScroll() {
+        // No mobile, a barra fica sempre estática dentro do hero
+        if (window.innerWidth <= 768) {
+            if (isDocked) {
+                isDocked = false;
+                searchBar.classList.remove('is-docked');
+                searchBar.style.top = '';
+                searchWrapper.style.minHeight = '';
+            }
+            return;
+        }
+
         const headerBottom = header ? header.getBoundingClientRect().bottom : 58;
         const wrapperRect = searchWrapper.getBoundingClientRect();
 

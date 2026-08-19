@@ -486,7 +486,7 @@ p {
     background: none;
     border: none;
     color: var(--text-primary);
-    font-size: 1.4rem;
+    font-size: 1.5rem; /* Botão proporcional ao header mais baixo */
     cursor: pointer;
     padding: 0.25rem;
     line-height: 1;
@@ -804,8 +804,11 @@ a.whatsapp-float {
     bottom: 2rem;
     right: 2rem;
     z-index: 900;
-    width: 56px;
+    width: auto;
+    min-width: 56px;
+    max-width: 56px;
     height: 56px;
+    padding: 0;
     background: #25D366;
     color: #fff;
     display: flex;
@@ -814,7 +817,7 @@ a.whatsapp-float {
     gap: 0;
     text-decoration: none;
     box-shadow: 0 4px 20px rgba(37,211,102,0.3);
-    transition: width 0.35s cubic-bezier(0.34,1.56,0.64,1),
+    transition: max-width 0.35s cubic-bezier(0.34,1.56,0.64,1),
                 padding 0.35s ease,
                 gap 0.3s ease,
                 box-shadow 0.25s ease;
@@ -854,7 +857,7 @@ a.whatsapp-float::before {
 
 /* Hover: expande */
 a.whatsapp-float:hover {
-    width: auto;
+    max-width: 200px;
     height: 56px;
     padding: 0 1.2rem;
     gap: 0.5rem;
@@ -896,23 +899,83 @@ a.whatsapp-float:hover::before {
     }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 992px) {
+    .site-header {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+    }
+
+    .header-inner {
+        height: 10px !important;
+        gap: 0.5rem;
+    }
+
+    .site-header.scrolled .header-inner {
+        height: 5px !important;
+    }
+
+    .site-header.scrolled .nav-menu {
+        top: 30px;
+    }
+    
+    .brand-mark {
+        font-size: 1.9rem;
+    }
+    
+    .brand-name {
+        font-size: 1.3rem;
+        letter-spacing: 0.05em;
+    }
+
+    /* Ocultar elementos desnecessários no mobile para deixar apenas Logo + Hamburger */
+    .header-icon-group-absolute,
+    .theme-toggle-btn,
+    .header-cta {
+        display: none !important;
+    }
+
+    /* Ajustar o container de ações (apenas o hamburger vai ficar) */
+    .header-actions {
+        margin-right: 0;
+        gap: 0;
+    }
+
     .nav-menu {
-        display: none;
+        display: flex;
         position: absolute;
-        top: 72px;
+        top: 45px;
         left: 0;
         right: 0;
         background: var(--bg-surface);
         flex-direction: column;
-        padding: 1rem 1.5rem 1.5rem 1.5rem;
+        padding: 2.5rem 1rem 1rem 1rem; /* Margem maior no topo para os itens ficarem mais abaixo */
         border-bottom: 1px solid var(--border-color);
         box-shadow: var(--shadow-lg);
         gap: 0.25rem;
+        z-index: -1; 
+        opacity: 0;
+        pointer-events: none;
+        
+        /* Efeito girando 90 graus para 0 (mais lento) */
+        transform-origin: top right;
+        transform: perspective(1000px) rotateZ(90deg) scale(0.6);
+        transition: transform 0.9s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.8s ease;
+    }
+
+    .nav-link {
+        width: 100%;
+        padding: 1rem 1.2rem;
+        border-radius: 6px;
+        font-size: 1.25rem;
+        font-weight: 500;
     }
 
     .nav-menu.active {
-        display: flex;
+        opacity: 1;
+        pointer-events: auto;
+        transform: perspective(1000px) rotateZ(0deg) scale(1);
     }
 
     .mobile-nav-toggle {
@@ -944,12 +1007,12 @@ a.whatsapp-float:hover::before {
         padding: 3.5rem 0;
     }
 
-    .whatsapp-float {
+    a.whatsapp-float {
         bottom: 1.5rem;
         right: 1.5rem;
-        width: 52px;
-        height: 52px;
-        font-size: 1.5rem;
+        width: 46px;
+        height: 46px;
+        font-size: 1.3rem;
     }
 }
 
@@ -1037,39 +1100,61 @@ a.whatsapp-float:hover::before {
 
 .top-bar-close:hover { color: rgba(255, 255, 255, 0.8); }
 
-@media (max-width: 768px) {
-    .top-bar { padding: 0.5rem 1rem; }
+@media (max-width: 992px) {
+    .top-bar { display: none !important; } /* Removido a faixa de mensagem */
     .top-bar-msg { font-size: 0.72rem; }
     .top-bar-link { display: none; }
 }
 
-/* ══ Favorites Header Button ═════════════════════════════════════════════ */
-.header-fav-btn {
-    position: relative;
+/* ══ Header Icon Group (Search & Favorites on Extreme Right) ═════════════════════════════════════════════ */
+.header-icon-group-absolute {
+    position: absolute;
+    right: 20px; /* Padding lateral para afastar da borda da tela */
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    align-items: center;
+    background: var(--bg-surface);
+    border: 1px solid var(--border-color);
+    border-radius: 8px; /* canto redondo de todos os lados */
+    z-index: 50; /* ficar acima dos itens do header */
+    overflow: hidden; /* para respeitar o border-radius */
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+}
+
+.header-icon-btn {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 38px;
-    height: 38px;
+    width: 46px;
+    height: 46px;
     background: transparent;
-    border: 1px solid var(--border-color);
+    border: none;
+    border-right: 1px solid var(--border-color);
     color: var(--text-secondary);
     cursor: pointer;
     transition: all 0.25s cubic-bezier(0.22, 1, 0.36, 1);
     padding: 0;
-    flex-shrink: 0;
+    text-decoration: none;
+    position: relative;
+}
+
+.header-icon-btn:last-child {
+    border-right: none;
+}
+
+.header-icon-btn:hover {
+    color: var(--primary);
+    background: rgba(201, 172, 119, 0.08);
 }
 
 .header-fav-btn:hover {
-    border-color: #ef4444;
     color: #ef4444;
-    background: rgba(239, 68, 68, 0.06);
-    transform: translateY(-1px);
+    background: rgba(239, 68, 68, 0.08);
 }
 
 .header-fav-btn.has-favorites {
     color: #ef4444;
-    border-color: rgba(239, 68, 68, 0.4);
     background: rgba(239, 68, 68, 0.04);
 }
 
@@ -1081,8 +1166,8 @@ a.whatsapp-float:hover::before {
 /* Count badge on the button */
 .favorites-count-badge {
     position: absolute;
-    top: -6px;
-    right: -6px;
+    top: 4px;
+    right: 4px; /* Movido para dentro do botão para não ser cortado pelo overflow:hidden do grupo */
     min-width: 18px;
     height: 18px;
     padding: 0 4px;
@@ -1134,17 +1219,18 @@ a.whatsapp-float:hover::before {
     height: 100dvh;
     background: var(--bg-surface);
     border-left: 1px solid var(--border-color);
-    box-shadow: -24px 0 60px rgba(0, 0, 0, 0.35);
+    box-shadow: none;
     z-index: 1101;
     display: flex;
     flex-direction: column;
     transform: translateX(100%);
-    transition: transform 0.38s cubic-bezier(0.22, 1, 0.36, 1);
+    transition: transform 0.38s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.4s ease;
     overflow: hidden;
 }
 
 .fav-drawer.open {
     transform: translateX(0);
+    box-shadow: -24px 0 60px rgba(0, 0, 0, 0.35);
 }
 
 .fav-drawer-header {
@@ -1357,7 +1443,7 @@ a.whatsapp-float:hover::before {
 
 /* --- INÍCIO DO CSS RESPONSIVO GLOBAL --- */
 /* Injetado via solicitação: não alterar HTML/CSS existente */
-@media (max-width: 768px) {
+@media (max-width: 992px) {
     /* 1. Prevenir rolagem horizontal indesejada */
     html, body {
         overflow-x: hidden !important;
@@ -1420,4 +1506,136 @@ a.whatsapp-float:hover::before {
 }
 /* --- FIM DO CSS RESPONSIVO GLOBAL --- */
 
+/* ══ Search Overlay ══════════════════════════════════════════════════════ */
+.search-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(11, 15, 25, 0.95);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.4s ease, visibility 0.4s ease;
+}
 
+.search-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.search-close-btn {
+    position: absolute;
+    top: 2rem;
+    right: 3rem;
+    background: transparent;
+    border: none;
+    color: #fff;
+    font-size: 3rem;
+    font-weight: 300;
+    cursor: pointer;
+    transition: color 0.3s ease;
+    z-index: 2;
+}
+
+.search-close-btn:hover {
+    color: var(--primary);
+}
+
+.search-overlay-content {
+    width: 100%;
+    max-width: 800px;
+    padding: 0 2rem;
+    text-align: center;
+    transform: translateY(20px);
+    transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+    position: relative;
+    z-index: 1;
+}
+
+.search-overlay.active .search-overlay-content {
+    transform: translateY(0);
+}
+
+.search-overlay-title {
+    font-family: var(--font-heading);
+    font-size: 2.5rem;
+    color: #fff;
+    margin-bottom: 2rem;
+    font-weight: 300;
+}
+
+.search-input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 0.5rem;
+    transition: border-color 0.3s ease, background 0.3s ease;
+}
+
+.search-input-wrapper:focus-within {
+    border-color: var(--primary);
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.search-icon {
+    margin: 0 1rem;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.search-input-wrapper input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: #fff;
+    font-size: 1.25rem;
+    padding: 1rem 0;
+    outline: none;
+    min-width: 0;
+}
+
+.search-input-wrapper input::placeholder {
+    color: rgba(255, 255, 255, 0.3);
+}
+
+.search-submit-btn {
+    padding: 1rem 2rem !important;
+    font-size: 1.1rem;
+    border-radius: 8px;
+    width: auto !important;
+    margin-bottom: 0 !important;
+}
+
+.search-suggestions {
+    margin-top: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.95rem;
+}
+
+.search-suggestions a {
+    color: #fff;
+    text-decoration: none;
+    padding: 0.4rem 1rem;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 20px;
+    transition: background 0.3s ease, color 0.3s ease;
+}
+
+.search-suggestions a:hover {
+    background: var(--primary);
+    color: #111;
+}

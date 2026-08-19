@@ -7,7 +7,7 @@ from flask import (
     redirect, url_for, session, flash, current_app, jsonify
 )
 from app.models.property_model import PropertyRepository
-from app.models.db_models import ExclusiveCollection, Property, Lancamento, PropertyCategory
+from app.models.db_models import ExclusiveCollection, Property, Lancamento, PropertyCategory, AgentProfile
 from app import db
 from app.services.sync_service import SyncService
 from app.services.storage_service import StorageService
@@ -594,3 +594,45 @@ def categorias_criar_padroes():
     db.session.commit()
     flash('Categorias padrão criadas com sucesso!', 'success')
     return redirect(url_for('admin.categorias_list'))
+
+
+# ── Corretores ──────────────────────────────────────────────────────────────
+@admin_bp.route('/corretores', methods=['GET'])
+@login_required
+def list_agents():
+    agents = PropertyRepository.get_all_agents()
+    return render_template('admin/agents.html', agents=agents)
+
+@admin_bp.route('/corretores/<agent_name>', methods=['POST'])
+@login_required
+def update_agent(agent_name):
+    from werkzeug.utils import secure_filename
+
+    prof = AgentProfile.query.filter_by(name=agent_name).first()
+    if not prof:
+        prof = AgentProfile(name=agent_name)
+        db.session.add(prof)
+        
+    avatar_file = request.files.get('avatar')
+    if avatar_file and avatar_file.filename:
+        # Upload new avatar
+        if prof.avatar_url:
+            StorageService.delete_agent_avatar(prof.avatar_url)
+            
+        ext = os.path.splitext(avatar_file.filename)[1]
+        filename = f"{uuid.uuid4()}{ext}"
+        file_bytes = avatar_file.read()
+        
+        try:
+            url = StorageService.upload_agent_avatar(file_bytes, filename, avatar_file.content_type)
+            prof.avatar_url = url
+        except Exception as e:
+            flash(f'Erro ao fazer upload da imagem: {e}', 'error')
+            return redirect(url_for('admin.list_agents'))
+
+    prof.instagram = request.form.get('instagram')
+    prof.description = request.form.get('description')
+    
+    db.session.commit()
+    flash(f'Perfil de {agent_name} atualizado com sucesso!', 'success')
+    return redirect(url_for('admin.list_agents'))

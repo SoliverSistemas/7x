@@ -24,6 +24,11 @@ function initCardTilt() {
 
         const MAX_TILT = 10; // graus máximos
 
+        card.addEventListener('mouseenter', () => {
+            // Remove transition para que o mousemove não conflite e fique "gaguejando"
+            card.style.transition = 'none';
+        });
+
         card.addEventListener('mousemove', e => {
             const rect = card.getBoundingClientRect();
             const x = e.clientX - rect.left;
@@ -37,25 +42,26 @@ function initCardTilt() {
             const rotY =  nx * MAX_TILT;   // eixo Y: inclina esq/dir
 
             card.style.transform =
-                `perspective(900px) rotateX(${rotX}deg) rotateY(${rotY}deg) translateZ(6px)`;
+                `perspective(1000px) rotateX(${rotX}deg) rotateY(${rotY}deg) scale3d(1.02, 1.02, 1.02)`;
 
             /* Reflexo segue o cursor */
             sheen.style.background =
                 `radial-gradient(circle at ${x}px ${y}px,
-                    rgba(201,172,119,0.18) 0%,
-                    rgba(201,172,119,0.06) 40%,
+                    rgba(201,172,119,0.15) 0%,
+                    rgba(201,172,119,0.05) 40%,
                     transparent 70%)`;
             sheen.style.opacity = '1';
         });
 
         card.addEventListener('mouseleave', () => {
-            /* Retorna suavemente — transition no CSS */
+            /* Restaura a transição para voltar suavemente ao normal */
+            card.style.transition = 'transform 0.5s ease-out, box-shadow 0.5s ease';
             card.style.transform = '';
             sheen.style.opacity  = '0';
         });
 
         card.addEventListener('mousedown',  () => {
-            card.style.transform = card.style.transform.replace('translateZ(6px)', 'translateZ(2px)');
+            card.style.transform = card.style.transform.replace('scale3d(1.02, 1.02, 1.02)', 'scale3d(0.98, 0.98, 0.98)');
         });
         card.addEventListener('mouseup',    () => {
             /* restore via mousemove ao continuar */

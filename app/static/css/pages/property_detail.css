@@ -1002,7 +1002,7 @@
 
 .lightbox-close-btn:hover {
     color: var(--primary);
-    transform: rotate(90deg);
+    transform: scale(1.15);
 }
 
 .lightbox-stage {

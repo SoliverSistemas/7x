@@ -1,4 +1,4 @@
-﻿/* ==========================================================================
+/* ==========================================================================
    7X Patrimonial - Home Page (main/index.html)
    ========================================================================== */
 
@@ -56,24 +56,7 @@
     position: absolute;
     inset: 0;
     z-index: 2;
-    background:
-        linear-gradient(
-            170deg,
-            rgba(11, 15, 25, 0.25)  0%,
-            rgba(11, 15, 25, 0.05)  35%,
-            rgba(11, 15, 25, 0.55)  70%,
-            rgba(11, 15, 25, 0.92) 100%
-        ),
-        linear-gradient(
-            to right,
-            rgba(11, 15, 25, 0.45) 0%,
-            transparent 45%
-        ),
-        radial-gradient(
-            ellipse 90% 35% at 50% 100%,
-            rgba(201, 172, 119, 0.10),
-            transparent
-        );
+    background: none;
     pointer-events: none;
 }
 
@@ -436,47 +419,44 @@
     transform: rotate(-10deg) scale(1.1);
 }
 
-/* ── Video Carousel Controls (Painel de Controle de Luxo) ───────────────── */
+
+
+/* ── Video Carousel Controls (Minimal Vertical Layout) ───────────────── */
 .hero-video-controls {
     position: absolute;
     right: 2.5rem;
-    bottom: 4.5rem;
+    bottom: 50%;
+    transform: translateY(50%) translateX(20px);
     z-index: 20;
     display: flex;
-    align-items: center;
-    gap: 1.25rem;
-    background: rgba(11, 15, 25, 0.4);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    padding: 0.5rem 0.95rem;
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    border-left: 2.5px solid rgba(201, 172, 119, 0.3);
-    box-shadow: none;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 1.5rem;
+    background: transparent;
+    padding: 0;
+    border: none;
     opacity: 0;
-    transform: translateY(6px);
-    transition: opacity 0.55s cubic-bezier(0.22, 1, 0.36, 1),
-                transform 0.55s cubic-bezier(0.22, 1, 0.36, 1),
-                background 0.4s ease,
-                border-color 0.4s ease,
-                box-shadow 0.4s ease;
+    visibility: hidden;
+    transition: opacity 0.5s ease, transform 0.5s ease, visibility 0.5s;
 }
 
 .hero-section:hover .hero-video-controls,
 .hero-video-controls:hover,
 .hero-video-controls:focus-within {
     opacity: 1;
-    transform: translateY(0);
-    background: rgba(11, 15, 25, 0.82);
-    border-color: rgba(255, 255, 255, 0.12);
-    border-left-color: var(--primary);
-    box-shadow: 0 14px 40px rgba(0, 0, 0, 0.45), 0 0 18px rgba(201, 172, 119, 0.12);
+    visibility: visible;
+    transform: translateY(50%) translateX(0);
+    background: transparent;
+    border: none;
+    box-shadow: none;
 }
 
 /* Indicators (01, 02, 03) */
 .hero-indicators {
     display: flex;
-    align-items: center;
-    gap: 0.85rem;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 1rem;
 }
 
 .indicator-btn {
@@ -484,35 +464,41 @@
     border: none;
     cursor: pointer;
     display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.3rem;
-    padding: 0.25rem 0.2rem;
-    transition: all 0.2s ease;
+    flex-direction: row-reverse;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0;
+    transition: all 0.3s ease;
+    opacity: 0.6;
+}
+
+.indicator-btn:hover {
+    opacity: 1;
 }
 
 .indicator-number {
     font-family: var(--font-heading);
-    font-size: 0.72rem;
-    font-weight: 700;
-    letter-spacing: 0.08em;
-    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    color: #ffffff;
     transition: color 0.3s ease;
     line-height: 1;
 }
 
 .indicator-bar {
-    width: 36px;
-    height: 3px;
-    background: rgba(255, 255, 255, 0.18);
+    width: 24px;
+    height: 1px;
+    background: rgba(255, 255, 255, 0.3);
     position: relative;
     overflow: hidden;
     display: block;
+    transition: width 0.3s ease;
 }
 
 .indicator-progress {
     position: absolute;
-    left: 0;
+    right: 0;
     top: 0;
     height: 100%;
     width: 0%;
@@ -521,26 +507,32 @@
     transition: width 0.1s linear;
 }
 
+.indicator-btn.active {
+    opacity: 1;
+}
+
 .indicator-btn.active .indicator-number {
-    color: #ffffff;
-    font-weight: 900;
+    font-weight: 800;
+    color: var(--primary, #c9ac77);
 }
 
 .indicator-btn.active .indicator-bar {
-    background: rgba(255, 255, 255, 0.35);
+    width: 40px;
+    background: rgba(255, 255, 255, 0.2);
 }
 
 .indicator-btn.active .indicator-progress {
-    box-shadow: 0 0 10px rgba(201, 172, 119, 0.7);
+    box-shadow: 0 0 10px rgba(201, 172, 119, 0.4);
 }
 
 /* Navigation Actions (Prev / Play-Pause / Next) */
 .hero-nav-actions {
     display: flex;
+    flex-direction: column;
     align-items: center;
-    gap: 0.4rem;
-    border-left: 1px solid rgba(255, 255, 255, 0.14);
-    padding-left: 0.85rem;
+    gap: 0.5rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.15);
+    padding-top: 1rem;
 }
 
 .hero-ctrl-btn {
@@ -2022,60 +2014,246 @@
 }
 
 /* ══ Responsive ══════════════════════════════════════════════════════════ */
-@media (max-width: 768px) {
+@media (max-width: 992px) {
+    /* ── Hero Container Mobile ── */
     .hero-section {
-        min-height: 36.111vh;
-        align-items: center;
+        margin-top: 35px !important;  /* ← ajustado para a nova altura do header */
+        margin-left: -16px !important; /* ← quebra o padding do container principal */
+        margin-right: -16px !important;
+        width: calc(100% + 32px) !important;
+        min-height: auto !important;
+        height: auto !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: center !important; /* ← centraliza o conteúdo verticalmente */
+        align-items: center !important;     /* ← centraliza horizontalmente */
+        padding: 0 16px !important;
+        overflow: hidden !important;
+    }
+
+    /* ── Espaçador — define a altura visível do hero ── */
+    .hero-section::before {
+        content: '' !important;
+        display: block !important;
+        min-height: 60vh !important;  /* ← hero ainda mais baixo */
+        flex-shrink: 0 !important;
+    }
+
+    /* ── Vídeo: sem margens laterais, cobre tudo ── */
+    .hero-video-wrapper {
+        position: absolute !important;
+        inset: 0 !important;
+        width: 100% !important;
+        height: 100% !important;
+        z-index: 0 !important;
+        overflow: hidden !important;
+    }
+
+    .hero-video {
+        position: absolute !important;
+        inset: 0 !important;          /* cola em todas as bordas */
+        width: 100% !important;
+        height: 100% !important;
+        object-fit: cover !important;
+        object-position: center 20% !important;
+        transform: none !important;   /* sem deslocamento lateral */
+    }
+
+    .hero-overlay {
+        position: absolute !important;
+        inset: 0 !important;
+        z-index: 2 !important;
+        background: none !important;
     }
 
     .hero-content {
-        padding: 5rem 0 0 0;
+        position: relative !important;
+        z-index: 5 !important;
+        padding: 2rem 1.25rem 0.5rem !important;
+        text-align: center !important;
+        flex: 0 0 auto !important;
+    }
+
+    .hero-main-title {
+        font-size: clamp(2rem, 7.5vw, 2.5rem) !important;
+        line-height: 1.15 !important;
+    }
+
+    /* ── Barra de Pesquisa Compacta — fica no centro do hero ── */
+    .hero-search-float {
+        position: absolute !important;
+        top: 50% !important;
+        bottom: auto !important;
+        left: 50% !important;
+        right: auto !important;
+        transform: translate(-50%, -50%) !important;
+        z-index: 10 !important;
+        width: 90% !important;
+        max-width: 400px !important; /* ← Larga mas contida */
+        padding: 0 !important;
+        margin: 0 !important;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        gap: 0.3rem !important;
+    }
+
+    .hero-search-label {
+        font-size: 1rem !important;
+        margin-bottom: 0.25rem !important;
+        display: block !important;
     }
 
     .hero-search-bar {
-        margin: 1.5rem auto -20px auto;
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        position: relative !important;
+        transform: none !important;
+        top: auto !important;
+        left: auto !important;
     }
 
+    .hero-form {
+        width: 100% !important;
+    }
+
+    /* Card compacto da barra: quadrada, menos destaque */
     .hero-fields {
-        flex-direction: column;
-        min-height: auto;
+        display: flex !important;
+        flex-direction: row !important;
+        align-items: center !important;
+        width: 100% !important;
+        background: #ffffff !important; /* ← branco sólido elegante */
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+        border-radius: 0 !important; /* ← quadrada */
+        padding: 0 !important; /* ← sem padding no container */
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08) !important; /* ← sombra bem suave */
+        border: 1px solid var(--primary, #c9ac77) !important; /* ← borda dourada elegante */
     }
 
-    .hero-purpose-toggle {
-        width: 100%;
-        justify-content: center;
-        border-bottom: 1px solid rgba(0, 0, 0, 0.08);
-        padding: 0.6rem;
+    /* Oculta os campos adicionais no mobile para deixar apenas a busca textual */
+    .hero-purpose-toggle,
+    .hero-fields .hero-field:nth-child(5),
+    .hero-fields .hero-field:nth-child(7) {
+        display: none !important;
     }
 
-    .purpose-btn {
-        flex: 1;
-        text-align: center;
+    /* O campo principal (Localização) ocupa todo o espaço restante */
+    .hero-fields .hero-field:nth-child(3) {
+        flex: 1 !important;
+        padding: 0.1rem 0.8rem !important; /* ← altura extrema fina */
+        background: transparent !important;
+        border: none !important;
+        margin: 0 !important;
+        min-width: 0 !important;
+    }
+
+    /* Esconde o label para ficar limpo */
+    .hero-fields .hero-field:nth-child(3) label {
+        display: none !important;
+    }
+
+    .hero-fields .hero-field:nth-child(3) input {
+        font-size: 1rem !important;
+        font-weight: 400 !important; /* ← mais destaque */
+        color: #222222 !important;
+        padding: 0 !important;
+        width: 100% !important;
+        background: transparent !important;
+        border: none !important;
+        height: auto !important;
+        line-height: 1.2 !important; /* ← previne altura extra do texto */
+    }
+
+    .hero-fields .hero-field:nth-child(3) input::placeholder {
+        color: #555555 !important; /* ← placeholder mais escuro */
+        font-weight: 400 !important;
+        opacity: 1 !important;
     }
 
     .hero-field {
-        padding: 0.75rem 1rem;
-        border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+        padding: 0.1rem 0.8rem !important; /* ← espaço interno extremo fino */
+        background: transparent !important;
+        border-radius: 0 !important;
+        border: none !important;
+        width: 100% !important;
+        margin: 0 !important;
+        min-width: 0 !important;
     }
 
-    .hero-divider { display: none; }
+    .hero-field label {
+        font-size: 0.58rem !important;
+        font-weight: 800 !important;
+        letter-spacing: 0.07em !important;
+        margin-bottom: 1px !important;
+        display: block !important;
+        color: #8a7042 !important;
+    }
 
+    .hero-field input,
+    .hero-field select {
+        font-size: 0.83rem !important;
+        font-weight: 600 !important;
+        color: #0b0f19 !important;
+        padding: 0 !important;
+        width: 100% !important;
+        background: transparent !important;
+        border: none !important;
+        height: auto !important;
+    }
+
+    .hero-divider {
+        display: none !important;
+    }
+
+    /* Botão ocupa linha inteira */
     .hero-search-btn {
-        width: 100%;
-        justify-content: center;
-        padding: 1rem;
+        width: auto !important;
+        height: auto !important; 
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        border-radius: 0 !important;
+        background: transparent !important; /* ← sem fundo escuro */
+        color: #111111 !important; /* ← lupa escura */
+        margin: 0 !important;
+        padding: 0 0.8rem !important; /* ← bordas justas */
+        border: none !important;
+        cursor: pointer !important;
+        flex-shrink: 0 !important;
     }
 
+    .hero-search-btn span {
+        display: none !important; /* ← remove o texto 'Buscar' */
+    }
+
+    .hero-search-btn svg {
+        stroke-width: 1.2 !important; /* ← ícone mais fino */
+        width: 20px !important;
+        height: 20px !important;
+    }
+
+    /* Controles de Vídeo discretos no canto superior */
     .hero-video-controls {
-        right: 1rem;
-        bottom: 1rem;
-        padding: 0.4rem 0.6rem;
-        gap: 0.8rem;
-        opacity: 0.7;
+        display: none !important;
     }
 
-    .indicator-bar { width: 20px; }
-    .hero-scroll-hint { display: none; }
+    .indicator-bar {
+        width: 16px !important;
+    }
+
+    .hero-scroll-hint {
+        display: none !important;
+    }
+
+    /* Reduz espaço antes da próxima seção de imóveis no mobile */
+    .hero-section + .section,
+    .section:first-of-type {
+        padding-top: 2.5rem !important;
+    }
 
     .section-header-flex {
         flex-direction: column;

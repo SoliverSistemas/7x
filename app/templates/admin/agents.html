@@ -1,0 +1,208 @@
+{% extends 'admin/base_admin.html' %}
+
+{% block title %}Corretores{% endblock %}
+{% block page_title %}Gerenciar Corretores{% endblock %}
+
+{% block extra_css %}
+<style>
+/* ── Estilos de Modal e Utilitários para Corretores ─────────────────────── */
+.agt-header {
+    display: flex; flex-direction: column; gap: 0.5rem;
+    margin-bottom: 2rem;
+}
+.agt-title { font-size: 1.4rem; font-weight: 700; color: var(--adm-text); }
+.agt-subtitle { font-size: 0.85rem; color: var(--adm-text-2); }
+
+.agt-avatar-wrap {
+    width: 48px; height: 48px; border-radius: 50%;
+    overflow: hidden; background: var(--adm-surface-3);
+    border: 2px solid var(--adm-border-2);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--adm-text-3);
+}
+
+.modal-backdrop {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(4px); z-index: 1000;
+    display: none; align-items: center; justify-content: center;
+    padding: 1rem;
+}
+.modal-backdrop.open { display: flex; }
+.modal-window {
+    background: var(--adm-surface); border: 1px solid var(--adm-border-2);
+    border-radius: 16px; width: 100%; max-width: 500px;
+    box-shadow: var(--adm-shadow-lg); overflow: hidden;
+}
+.modal-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--adm-border-2);
+}
+.modal-title { font-weight: 600; font-size: 1.1rem; }
+.modal-close {
+    background: transparent; border: none; color: var(--adm-text-2);
+    cursor: pointer; font-size: 1.2rem; display: flex; align-items: center;
+    padding: 0.2rem; border-radius: 4px;
+}
+.modal-close:hover { color: var(--adm-text); background: var(--adm-surface-3); }
+.modal-body { padding: 1.5rem; }
+.modal-footer {
+    padding: 1.25rem 1.5rem; border-top: 1px solid var(--adm-border-2);
+    background: var(--adm-surface-2); display: flex; justify-content: flex-end; gap: 1rem;
+}
+.form-group { margin-bottom: 1.25rem; }
+.form-label { display: block; font-size: 0.85rem; font-weight: 500; margin-bottom: 0.5rem; color: var(--adm-text-2); }
+.form-control {
+    width: 100%; background: var(--adm-surface-2); border: 1px solid var(--adm-border-2);
+    border-radius: 8px; color: var(--adm-text); padding: 0.6rem 0.8rem;
+    font-size: 0.9rem; transition: 0.2s;
+}
+.form-control:focus { border-color: var(--adm-gold); outline: none; box-shadow: 0 0 0 2px var(--adm-gold-dim); }
+.btn {
+    padding: 0.6rem 1.2rem; border-radius: 8px; font-weight: 600; font-size: 0.85rem;
+    cursor: pointer; transition: 0.2s; border: none;
+}
+.btn-primary { background: var(--adm-gold); color: #000; }
+.btn-primary:hover { background: var(--adm-gold-hover); }
+.btn-outline { background: transparent; border: 1px solid var(--adm-border-2); color: var(--adm-text); }
+.btn-outline:hover { background: var(--adm-surface-3); }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="agt-header">
+    <h1 class="agt-title">Corretores e Equipe</h1>
+    <p class="agt-subtitle">Configure as fotos de perfil (avatares) e descrições dos seus corretores. As informações abaixo vão sobrescrever o padrão do Tecimob no site.</p>
+</div>
+
+<!-- Table -->
+<div class="dash-card" style="padding:0; overflow:hidden;">
+    <div class="admin-table-wrap">
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>Corretor</th>
+                    <th>Imóveis Ativos</th>
+                    <th>Instagram</th>
+                    <th style="text-align: right;">Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for agent in agents %}
+                <tr>
+                    <td>
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <div class="agt-avatar-wrap">
+                                {% if agent.avatar_url %}
+                                    <img src="{{ agent.avatar_url }}" style="width: 100%; height: 100%; object-fit: cover;">
+                                {% else %}
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                                {% endif %}
+                            </div>
+                            <div>
+                                <div style="font-weight: 600; color: var(--adm-text);">{{ agent.name }}</div>
+                                <div style="font-size: 0.8rem; color: var(--adm-text-2);">{{ agent.email }}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <span style="display: inline-block; padding: 4px 10px; border-radius: 99px; font-size: 0.8rem; font-weight: 600; background: var(--adm-blue-dim); color: var(--adm-blue);">
+                            {{ agent.property_count }} imóveis
+                        </span>
+                    </td>
+                    <td>
+                        {% if agent.instagram %}
+                            <a href="https://instagram.com/{{ agent.instagram.replace('@', '') }}" target="_blank" style="color: var(--adm-gold);">{{ agent.instagram }}</a>
+                        {% else %}
+                            <span style="color: var(--adm-text-3);">Não configurado</span>
+                        {% endif %}
+                    </td>
+                    <td style="text-align: right;">
+                        <button type="button" class="btn btn-outline" style="padding: 0.4rem 0.8rem;" 
+                                onclick="openAgentModal('{{ agent.name }}', '{{ agent.avatar_url }}', '{{ agent.instagram or '' }}', `{{ agent.description or '' }}`)">
+                            Editar Perfil
+                        </button>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="4" style="text-align: center; padding: 3rem; color: var(--adm-text-2);">Nenhum corretor com imóveis ativos no momento.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Modal Edit Agent -->
+<div class="modal-backdrop" id="agentModal">
+    <div class="modal-window">
+        <div class="modal-header">
+            <h3 class="modal-title">Editar Perfil do Corretor</h3>
+            <button type="button" class="modal-close" onclick="closeAgentModal()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            </button>
+        </div>
+        <form id="agentForm" action="" method="POST" enctype="multipart/form-data">
+            <div class="modal-body">
+                <input type="hidden" name="agent_name" id="modalAgentName">
+                
+                <div class="form-group" style="text-align: center;">
+                    <div id="modalAvatarPreview" style="width: 80px; height: 80px; border-radius: 50%; overflow: hidden; margin: 0 auto 12px; background: var(--adm-surface-3); border: 2px solid var(--adm-border-2); display: flex; align-items: center; justify-content: center; color: var(--adm-text-3);">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                    </div>
+                    <label class="form-label">Foto de Perfil (Avatar)</label>
+                    <input type="file" name="avatar" class="form-control" accept="image/*" onchange="previewImage(this)">
+                    <div style="font-size: 0.75rem; color: var(--adm-text-2); margin-top: 6px;">Proporção sugerida: 1:1 (quadrada). Deixe em branco para manter a foto atual.</div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Instagram</label>
+                    <input type="text" name="instagram" id="modalInstagram" class="form-control" placeholder="@usuario">
+                </div>
+
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label class="form-label">Descrição / Biografia</label>
+                    <textarea name="description" id="modalDescription" class="form-control" rows="4" placeholder="Breve currículo ou apresentação..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline" onclick="closeAgentModal()">Cancelar</button>
+                <button type="submit" class="btn btn-primary">Salvar Alterações</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+function openAgentModal(name, avatar, instagram, description) {
+    document.getElementById('modalAgentName').value = name;
+    document.getElementById('agentForm').action = "/admin/corretores/" + encodeURIComponent(name);
+    
+    document.getElementById('modalInstagram').value = instagram;
+    document.getElementById('modalDescription').value = description;
+    
+    const preview = document.getElementById('modalAvatarPreview');
+    if (avatar) {
+        preview.innerHTML = `<img src="${avatar}" style="width: 100%; height: 100%; object-fit: cover;">`;
+    } else {
+        preview.innerHTML = `<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>`;
+    }
+    
+    document.getElementById('agentModal').classList.add('open');
+}
+
+function closeAgentModal() {
+    document.getElementById('agentModal').classList.remove('open');
+}
+
+function previewImage(input) {
+    if (input.files && input.files[0]) {
+        var reader = new FileReader();
+        reader.onload = function(e) {
+            document.getElementById('modalAvatarPreview').innerHTML = `<img src="${e.target.result}" style="width: 100%; height: 100%; object-fit: cover;">`;
+        }
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+</script>
+{% endblock %}

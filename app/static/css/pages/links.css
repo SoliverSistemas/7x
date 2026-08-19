@@ -58,7 +58,7 @@
 }
 
 .links-logo-img {
-    max-width: 130px;
+    max-width: 170px;
     height: auto;
     object-fit: contain;
     filter: drop-shadow(0 4px 16px rgba(0, 0, 0, 0.5));
@@ -67,18 +67,6 @@
 
 .links-logo-img:hover {
     transform: scale(1.04);
-}
-
-.links-brand-title {
-    font-size: 1.6rem;
-    font-weight: 800;
-    letter-spacing: -0.5px;
-    color: var(--text-primary, #ffffff);
-    margin-bottom: 0.35rem;
-}
-
-.links-brand-title span {
-    color: var(--primary, #c9ac77);
 }
 
 .links-verified-badge {
@@ -94,10 +82,11 @@
     border: 1px solid rgba(201, 172, 119, 0.25);
     padding: 0.25rem 0.65rem;
     margin-bottom: 0.75rem;
+    border-radius: 20px;
 }
 
 .links-bio-text {
-    font-size: 0.88rem;
+    font-size: 0.95rem;
     line-height: 1.6;
     color: var(--text-secondary, rgba(255, 255, 255, 0.7));
     max-width: 420px;
@@ -109,7 +98,7 @@
     width: 100%;
     display: flex;
     flex-direction: column;
-    gap: 0.85rem;
+    gap: 1rem;
     margin-bottom: 2.5rem;
 }
 
@@ -118,11 +107,12 @@
     align-items: center;
     justify-content: space-between;
     width: 100%;
-    padding: 1.1rem 1.4rem;
+    padding: 1.25rem 1.5rem;
     background: rgba(18, 22, 34, 0.75);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 24px;
     color: var(--text-primary, #ffffff);
     text-decoration: none;
     position: relative;

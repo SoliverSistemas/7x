@@ -19,8 +19,11 @@
     bottom: 6rem;          /* fica acima do botão de WhatsApp */
     right: 2rem;
     z-index: 1200;
-    width: 56px;
+    width: auto;
+    min-width: 56px;
+    max-width: 56px;
     height: 56px;
+    padding: 0;
     background: linear-gradient(135deg, #c9ac77 0%, #b0935e 100%);
     border: none;
     cursor: pointer;
@@ -31,7 +34,7 @@
     overflow: hidden;
     white-space: nowrap;
     box-shadow: 0 4px 20px rgba(201, 172, 119, 0.4);
-    transition: width .35s cubic-bezier(.34,1.56,.64,1),
+    transition: max-width .35s cubic-bezier(.34,1.56,.64,1),
                 padding .35s ease,
                 gap .3s ease,
                 box-shadow .25s ease;
@@ -54,7 +57,7 @@
 }
 
 #chatbotToggle:hover {
-    width: auto;
+    max-width: 180px;
     height: 56px;
     padding: 0 1.2rem;
     gap: .5rem;
@@ -417,13 +420,21 @@
 }
 
 /* ══ MOBILE ══════════════════════════════════════════════════ */
-@media (max-width: 420px) {
+@media (max-width: 768px) {
     #chatbotWindow {
-        width: calc(100vw - 24px);
-        right: 12px;
-        bottom: 140px;
+        width: calc(100vw - 32px);
+        right: 16px;
+        bottom: 150px;
         max-height: 70vh;
         border-radius: 16px;
     }
-    #chatbotToggle { bottom: 80px; right: 16px; }
+    #chatbotToggle, #chatbotToggle:hover { 
+        bottom: 86px !important; 
+        right: 1.5rem !important; 
+        max-width: 46px !important; 
+        width: 46px !important; 
+        height: 46px !important; 
+        padding: 0 !important;
+    }
+    #chatbotToggle .chat-btn-label { display: none !important; }
 }

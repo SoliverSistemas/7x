@@ -27,7 +27,7 @@ def list_properties():
 
     filter_results = PropertyRepository.filter(
         page=page,
-        per_page=12,
+        per_page=15,
         search_query=query,
         prop_type=prop_type,
         purpose=purpose,
@@ -51,6 +51,10 @@ def list_properties():
     cities        = PropertyRepository.get_cities()
     types         = PropertyRepository.get_types()
     neighborhoods = PropertyRepository.get_neighborhoods()
+    
+    from app.models.property_model import PropertyCategory
+    categories_obj = PropertyCategory.query.order_by(PropertyCategory.priority.asc()).all()
+    categories_list = [c.name for c in categories_obj]
 
     return render_template(
         'properties/index.html',
@@ -59,6 +63,7 @@ def list_properties():
         cities=cities,
         types=types,
         neighborhoods=neighborhoods,
+        categories_list=categories_list,
         current_filters={
             'query':        query,
             'type':         prop_type,

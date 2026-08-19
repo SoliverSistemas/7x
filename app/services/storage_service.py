@@ -15,6 +15,7 @@ class StorageService:
 
     BUCKET_EXCLUSIVE   = 'exclusive-covers'
     BUCKET_LANCAMENTOS = 'lancamentos'
+    BUCKET_AGENTS      = 'agents'
 
     # Caminho base dentro de app/static para fallback local
     LOCAL_BASE = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'static', 'uploads')
@@ -128,4 +129,14 @@ class StorageService:
         """Remove qualquer arquivo do bucket lancamentos."""
         cls.delete_file(url, cls.BUCKET_LANCAMENTOS)
 
+    # ── Corretores (Agentes) ──────────────────────────────────────────────
 
+    @classmethod
+    def upload_agent_avatar(cls, file_bytes: bytes, filename: str, content_type: str = 'image/jpeg') -> str:
+        """Upload de foto de perfil (avatar) do corretor."""
+        return cls._upload(cls.BUCKET_AGENTS, f"avatars/{filename}", file_bytes, content_type)
+
+    @classmethod
+    def delete_agent_avatar(cls, url: str):
+        """Remove avatar do corretor do bucket agents."""
+        cls.delete_file(url, cls.BUCKET_AGENTS)

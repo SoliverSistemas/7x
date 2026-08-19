@@ -65,8 +65,8 @@ def index():
     exclusive_slots = ExclusiveCollection.query.order_by(ExclusiveCollection.display_order).limit(3).all()
     exclusive_properties = [slot.to_dict() for slot in exclusive_slots]
 
-    high_end_properties = PropertyRepository.filter(category="Alto Padrão")['properties']
-    featured_properties = PropertyRepository.get_featured()
+    high_end_properties = PropertyRepository.filter(category="Alto Padrão", per_page=10)['properties']
+    featured_properties = PropertyRepository.get_featured(limit=10)
 
     all_properties = PropertyRepository.get_all()
     cities = PropertyRepository.get_cities()

@@ -1,4 +1,4 @@
-from app.models.db_models import Property, PropertyCategory
+from app.models.db_models import Property, PropertyCategory, AgentProfile
 from app import db
 import math
 
@@ -11,7 +11,70 @@ class PropertyRepository:
     def get_all(cls):
         # Retorna todos os imóveis ativos
         properties = Property.query.filter_by(status='Disponível').all()
-        return [p.to_dict() for p in properties]
+        
+        # Load agent profiles to override avatar, description, instagram, etc.
+        try:
+            profiles = AgentProfile.query.all()
+            profile_map = {p.name: p for p in profiles}
+        except Exception:
+            profile_map = {}
+
+        result = []
+        for prop in properties:
+            p_dict = prop.to_dict()
+            agent = p_dict.get('agent', {})
+            agent_name = agent.get('name')
+            if agent_name and agent_name in profile_map:
+                prof = profile_map[agent_name]
+                if prof.avatar_url:
+                    agent['avatar_url'] = prof.avatar_url
+                if prof.instagram:
+                    agent['instagram'] = prof.instagram
+                if prof.description:
+                    agent['description'] = prof.description
+            result.append(p_dict)
+
+        return result
+
+    @classmethod
+    def get_all_agents(cls):
+        """Retorna uma lista única de agentes com a contagem de imóveis para cada."""
+        properties = cls.get_all()
+        agents_map = {}
+        for p in properties:
+            agent = p.get('agent', {})
+            name = agent.get('name')
+            if name:
+                if name not in agents_map:
+                    agents_map[name] = {
+                        'name': name,
+                        'email': agent.get('email', ''),
+                        'phone': agent.get('phone', ''),
+                        'creci': agent.get('creci', ''),
+                        'avatar_url': agent.get('avatar_url', ''),
+                        'instagram': agent.get('instagram', ''),
+                        'description': agent.get('description', ''),
+                        'property_count': 0
+                    }
+                agents_map[name]['property_count'] += 1
+        
+        # Sort by property count descending
+        sorted_agents = sorted(agents_map.values(), key=lambda x: x['property_count'], reverse=True)
+        return sorted_agents
+
+    @classmethod
+    def get_properties_by_agent(cls, agent_name):
+        """Retorna os imóveis sob responsabilidade de um corretor específico."""
+        properties = cls.get_all()
+        # Normaliza o nome para busca insensível a maiúsculas/minúsculas
+        search_name = agent_name.lower().strip()
+        filtered = []
+        for p in properties:
+            agent = p.get('agent', {})
+            name = agent.get('name', '')
+            if name.lower().strip() == search_name:
+                filtered.append(p)
+        return filtered
 
     @classmethod
     def calculate_category(cls, prop: dict) -> str:
@@ -55,10 +118,10 @@ class PropertyRepository:
         return None
 
     @classmethod
-    def get_featured(cls):
-        properties = Property.query.filter_by(featured=True, status='Disponível').limit(3).all()
+    def get_featured(cls, limit=3):
+        properties = Property.query.filter_by(featured=True, status='Disponível').limit(limit).all()
         if not properties:
-            properties = Property.query.filter_by(status='Disponível').limit(3).all()
+            properties = Property.query.filter_by(status='Disponível').limit(limit).all()
         return [p.to_dict() for p in properties]
 
     @classmethod
@@ -181,7 +244,11 @@ class PropertyRepository:
         elif sort_key == "area_desc":
             query = query.order_by(Property.area.desc())
         else:  # 'recent'
-            query = query.order_by(Property.created_at.desc(), Property.id.desc())
+            from sqlalchemy import func, cast, Integer
+            query = query.order_by(
+                cast(func.nullif(func.regexp_replace(Property.reference, r'\D', '', 'g'), ''), Integer).desc().nullslast(),
+                Property.created_at.desc()
+            )
 
         # Pagination
         try:

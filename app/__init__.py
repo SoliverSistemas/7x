@@ -63,11 +63,13 @@ def create_app(config_name='dev'):
     from app.routes.properties import properties_bp
     from app.routes.api import api_bp
     from app.routes.admin import admin_bp
+    from app.routes.agents import agents_bp
 
     app.register_blueprint(main_bp)
     app.register_blueprint(properties_bp, url_prefix='/imoveis')
     app.register_blueprint(api_bp, url_prefix='/api')
     app.register_blueprint(admin_bp, url_prefix='/admin')
+    app.register_blueprint(agents_bp)
 
     # Register Error Handlers
     @app.errorhandler(404)
@@ -80,6 +82,6 @@ def create_app(config_name='dev'):
 
     # Import models so Flask-Migrate can detect them
     with app.app_context():
-        from app.models.db_models import Property, ExclusiveCollection, Lancamento  # noqa: F401
+        from app.models.db_models import Property, ExclusiveCollection, Lancamento, AgentProfile  # noqa: F401
 
     return app

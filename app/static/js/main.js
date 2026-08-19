@@ -6,9 +6,11 @@ document.addEventListener('DOMContentLoaded', () => {
     initMobileNav();
     initFavorites();
     initFavoritesDrawer();
+    initSearchOverlay();
     initModalEvents();
     autoHideAlerts();
     initClickableCards();
+    initPropertySliders();
 });
 
 // Mobile Navigation Toggle
@@ -184,25 +186,179 @@ function autoHideAlerts() {
 
 // Clickable Property Cards (Torna todo o card clicável)
 function initClickableCards() {
-    document.addEventListener('click', (e) => {
-        const card = e.target.closest('.property-card');
-        if (!card) return;
+    const cards = document.querySelectorAll('.property-card');
+    cards.forEach(card => {
+        // Altera o cursor para mostrar que é clicável
+        card.style.cursor = 'pointer';
 
-        // Se clicou no botão de favoritar, não redireciona
-        if (e.target.closest('.card-favorite-btn')) {
-            return;
-        }
-
-        // Obtém o link de detalhes do imóvel
-        const detailLink = card.querySelector('.card-title a, .card-footer a, a[href*="/imoveis/"]');
-        if (detailLink && detailLink.href) {
-            // Suporte para Ctrl/Cmd/Botão do meio para abrir em nova aba
-            if (e.ctrlKey || e.metaKey || e.button === 1) {
-                window.open(detailLink.href, '_blank');
-            } else {
-                window.location.href = detailLink.href;
+        card.addEventListener('click', function(e) {
+            // Ignora se clicou no botão de favorito, nos links ou na galeria
+            if (e.target.closest('.card-favorite-btn') || e.target.closest('a') || e.target.closest('.gallery-pagination')) {
+                return;
             }
+            
+            const href = this.dataset.href;
+            if (href) {
+                if (e.ctrlKey || e.metaKey || e.button === 1) {
+                    window.open(href, '_blank');
+                } else {
+                    window.location.href = href;
+                }
+            }
+        });
+        
+        // Suporte para teclado
+        card.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                const link = this.querySelector('a.stretched-link');
+                if (link) window.location.href = link.href;
+            }
+        });
+    });
+}
+
+function initSearchOverlay() {
+    const searchBtn = document.getElementById('header-search-btn');
+    const searchOverlay = document.getElementById('searchOverlay');
+    const searchCloseBtn = document.getElementById('searchCloseBtn');
+    const searchInput = document.getElementById('searchOverlayInput');
+
+    if (!searchBtn || !searchOverlay || !searchCloseBtn) return;
+
+    searchBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        searchOverlay.classList.add('active');
+        document.body.style.overflow = 'hidden'; // impede scroll
+        setTimeout(() => {
+            if (searchInput) searchInput.focus();
+        }, 100);
+    });
+
+    function closeSearch() {
+        searchOverlay.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+
+    searchCloseBtn.addEventListener('click', closeSearch);
+
+    // Fechar ao clicar fora do conteúdo (no fundo escuro)
+    searchOverlay.addEventListener('click', (e) => {
+        if (e.target === searchOverlay) {
+            closeSearch();
         }
+    });
+
+    // Fechar com a tecla ESC
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && searchOverlay.classList.contains('active')) {
+            closeSearch();
+        }
+    });
+}
+
+// ── Slider de imóveis — rolagem suave com easing + drag ─────────────────
+function initPropertySliders() {
+    // Easing: suavização tipo quadrática
+    function easeInOutCubic(t) {
+        return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+    }
+
+    function smoothScroll(el, targetX, duration) {
+        const startX = el.scrollLeft;
+        const delta  = targetX - startX;
+        if (Math.abs(delta) < 1) return;
+        let startTime = null;
+
+        function step(timestamp) {
+            if (!startTime) startTime = timestamp;
+            const elapsed  = timestamp - startTime;
+            const progress = Math.min(elapsed / duration, 1);
+            el.scrollLeft  = startX + delta * easeInOutCubic(progress);
+            if (progress < 1) requestAnimationFrame(step);
+        }
+        requestAnimationFrame(step);
+    }
+
+    function updateButtons(slider, prevBtn, nextBtn) {
+        if (prevBtn) prevBtn.disabled = slider.scrollLeft <= 2;
+        if (nextBtn) nextBtn.disabled = slider.scrollLeft + slider.clientWidth >= slider.scrollWidth - 2;
+    }
+
+    document.querySelectorAll('.properties-slider-wrapper').forEach(wrapper => {
+        const slider  = wrapper.querySelector('.properties-slider');
+        const prevBtn = wrapper.querySelector('.slider-nav-btn.prev');
+        const nextBtn = wrapper.querySelector('.slider-nav-btn.next');
+        if (!slider) return;
+
+        // Atualiza estado inicial dos botões
+        updateButtons(slider, prevBtn, nextBtn);
+        slider.addEventListener('scroll', () => updateButtons(slider, prevBtn, nextBtn), { passive: true });
+
+        // Calcula quanto rolar: exatamente 1 largura de card + gap
+        function getScrollStep() {
+            const card = slider.querySelector('.property-card');
+            if (!card) return slider.clientWidth * 0.75;
+            const style = getComputedStyle(slider);
+            const gap   = parseFloat(style.gap) || 24;
+            return card.offsetWidth + gap;
+        }
+
+        if (prevBtn) {
+            prevBtn.addEventListener('click', () => {
+                smoothScroll(slider, slider.scrollLeft - getScrollStep() * 3, 550);
+            });
+        }
+        if (nextBtn) {
+            nextBtn.addEventListener('click', () => {
+                smoothScroll(slider, slider.scrollLeft + getScrollStep() * 3, 550);
+            });
+        }
+
+        // ── Drag-to-scroll (arrastar com o mouse) ──────────────────────────
+        let isDragging = false;
+        let startX, startScrollLeft, velX = 0, lastX, rafId;
+
+        slider.addEventListener('mousedown', e => {
+            if (e.button !== 0) return;
+            isDragging    = true;
+            startX        = e.pageX;
+            startScrollLeft = slider.scrollLeft;
+            lastX         = e.pageX;
+            velX          = 0;
+            slider.classList.add('is-dragging');
+            cancelAnimationFrame(rafId);
+        });
+
+        document.addEventListener('mousemove', e => {
+            if (!isDragging) return;
+            const dx      = e.pageX - startX;
+            velX          = e.pageX - lastX;
+            lastX         = e.pageX;
+            slider.scrollLeft = startScrollLeft - dx;
+        });
+
+        document.addEventListener('mouseup', () => {
+            if (!isDragging) return;
+            isDragging = false;
+            slider.classList.remove('is-dragging');
+            // Inércia suave ao soltar
+            let velocity = -velX * 1.8;
+            function inertia() {
+                if (Math.abs(velocity) < 0.5) return;
+                slider.scrollLeft += velocity;
+                velocity *= 0.9;
+                rafId = requestAnimationFrame(inertia);
+            }
+            rafId = requestAnimationFrame(inertia);
+        });
+
+        // Previne que links/cards sejam ativados durante o drag
+        slider.addEventListener('click', e => {
+            if (Math.abs(slider.scrollLeft - startScrollLeft) > 5) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+        }, true);
     });
 }
 

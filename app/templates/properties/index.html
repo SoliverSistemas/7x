@@ -8,25 +8,8 @@
 
 {% block content %}
 
-<!-- ══ Page Hero compacto ════════════════════════════════════════════════ -->
-<section class="prop-hero">
-    <div class="prop-hero-bg"></div>
-    <div class="container">
-        <div class="prop-hero-inner">
-            <div class="section-eyebrow">
-                <span class="eyebrow-line"></span>
-                <span>CURADORIA EXCLUSIVA</span>
-            </div>
-            <h1 class="prop-hero-title">
-                Catálogo <em>7X</em>
-            </h1>
-            <p class="prop-hero-sub">
-                <span class="prop-count">{{ properties|length }}</span>
-                imóveis selecionados para você
-            </p>
-        </div>
-    </div>
-</section>
+<!-- Espaço em branco no lugar do Hero -->
+<div class="prop-hero-spacer" style="height: 120px; background: transparent;"></div>
 
 <!-- ══ Catalog Layout ════════════════════════════════════════════════════ -->
 <section class="prop-catalog-section">
@@ -327,6 +310,23 @@
                         imóvel{{ 's' if pagination.total != 1 else '' }} encontrado{{ 's' if pagination.total != 1 else '' }}
                     </p>
                     <div class="toolbar-right">
+                        <!-- Categoria (Minimalist Dropdown) -->
+                        <div class="sort-control" style="margin-right: 0.5rem;">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                <rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect>
+                            </svg>
+                            {% set current_cat = current_filters.category %}
+                            <select id="filter-category-select" onchange="updateFilter('category', this.value)">
+                                <option value="" {% if not current_cat or current_cat == 'Todas' %}selected{% endif %}>Todas as Coleções</option>
+                                {% for cat_name in categories_list %}
+                                <option value="{{ cat_name }}" {% if current_cat == cat_name %}selected{% endif %}>{{ cat_name }}</option>
+                                {% endfor %}
+                                {% if 'Geral' not in categories_list %}
+                                <option value="Geral" {% if current_cat == 'Geral' %}selected{% endif %}>Geral</option>
+                                {% endif %}
+                            </select>
+                        </div>
+                        
                         <!-- Ordenação -->
                         <div class="sort-control">
                             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
@@ -381,103 +381,34 @@
                 }
                 </script>
 
-                <!-- Category Navigation -->
-                <div class="category-nav">
-                    {% set current_cat = current_filters.category %}
-                    <button type="button" class="category-btn {{ 'active' if not current_cat or current_cat == 'Todas' else '' }}" onclick="updateFilter('category', '')">Todas</button>
-                    <button type="button" class="category-btn {{ 'active' if current_cat == 'Exclusivo' else '' }}" onclick="updateFilter('category', 'Exclusivo')">Exclusivos</button>
-                    <button type="button" class="category-btn {{ 'active' if current_cat == 'Alto Padrão' else '' }}" onclick="updateFilter('category', 'Alto Padrão')">Alto Padrão</button>
-                    <button type="button" class="category-btn {{ 'active' if current_cat == 'Destaque' else '' }}" onclick="updateFilter('category', 'Destaque')">Destaques</button>
-                    <button type="button" class="category-btn {{ 'active' if current_cat == 'Geral' else '' }}" onclick="updateFilter('category', 'Geral')">Geral</button>
+
+
+                <!-- Pagination Top -->
+                {% if pagination and pagination.last_page > 1 %}
+                <div class="pagination pagination-top">
+                    {% if pagination.has_prev %}
+                    <a href="{{ url_for('properties.list_properties', page=pagination.current_page - 1, **current_filters) }}" class="btn-page btn-page-prev">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+                        Anterior
+                    </a>
+                    {% endif %}
+                    
+                    <span class="page-info">Página {{ pagination.current_page }} de {{ pagination.last_page }}</span>
+                    
+                    {% if pagination.has_next %}
+                    <a href="{{ url_for('properties.list_properties', page=pagination.current_page + 1, **current_filters) }}" class="btn-page btn-page-next">
+                        Próxima
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+                    </a>
+                    {% endif %}
                 </div>
+                {% endif %}
 
                 <!-- Properties grid -->
                 <div class="properties-grid" id="properties-container">
                     {% if properties %}
                         {% for p in properties %}
-                        <div class="property-card" data-href="{{ url_for('properties.detail', property_id=p.id) }}">
-                            <div class="card-img-wrapper">
-                                {% if p.calculated_category and p.calculated_category != 'Geral' %}
-                                <div class="card-ribbon card-ribbon--{{ p.calculated_category|lower|replace(' ', '-')|replace('ã', 'a') }}">{{ p.calculated_category }}</div>
-                                {% endif %}
-                                <div class="card-badges">
-                                    <span class="badge badge-gold">{{ p.purpose }}</span>
-                                    {% if p.badge %}
-                                        <span class="badge badge-blue">{{ p.badge }}</span>
-                                    {% endif %}
-                                </div>
-                                <button class="card-favorite-btn" data-id="{{ p.id }}"
-                                        title="Salvar Favorito" aria-label="Salvar nos favoritos">
-                                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
-                                    </svg>
-                                </button>
-                                {% set img_src = p.image if p.image and p.image.startswith('http') else (url_for('static', filename='img/' + p.image) if p.image else url_for('static', filename='img/placeholder.jpg')) %}
-                                <img src="{{ img_src }}"
-                                     alt="{{ p.title }}" loading="lazy">
-                                <div class="card-price-overlay">
-                                    <span class="card-price-label">{{ p.purpose == 'Aluguel' and 'Aluguel / mês' or 'Valor' }}</span>
-                                    <span class="card-price-val">{{ p.price|currency }}</span>
-                                </div>
-                            </div>
-                            <div class="card-body">
-                                <div class="card-location">
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
-                                        <circle cx="12" cy="10" r="3"/>
-                                    </svg>
-                                    {{ p.neighborhood }}, {{ p.city }}
-                                </div>
-                                <h3 class="card-title">
-                                    <a href="{{ url_for('properties.detail', property_id=p.id) }}">{{ p.title }}</a>
-                                </h3>
-                                <div class="card-specs">
-                                    {% if p.area %}
-                                    <div class="card-spec-item">
-                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg>
-                                        <span>{{ p.area|area_format }}</span>
-                                    </div>
-                                    {% endif %}
-                                    {% if p.bedrooms %}
-                                    <div class="card-spec-item">
-                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 14h18v6H3z"/><path d="M3 14V8a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v6"/><path d="M7 10h10"/></svg>
-                                        <span>{{ p.bedrooms }} dorms</span>
-                                    </div>
-                                    {% endif %}
-                                    {% if p.suites %}
-                                    <div class="card-spec-item">
-                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 12H3l9-9 9 9h-2"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg>
-                                        <span>{{ p.suites }} suítes</span>
-                                    </div>
-                                    {% endif %}
-                                    {% if p.garage %}
-                                    <div class="card-spec-item">
-                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="7" width="20" height="14"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
-                                        <span>{{ p.garage }} vagas</span>
-                                    </div>
-                                    {% endif %}
-                                </div>
-                                <div class="card-info-chips">
-                                    {% if p.is_financeable %}<span class="card-chip">Financiável</span>{% endif %}
-                                    {% if p.accepts_exchange %}<span class="card-chip">Aceita Troca</span>{% endif %}
-                                    {% if p.furnished and p.furnished != 'Não mobiliado' %}<span class="card-chip">Mobiliado</span>{% endif %}
-                                </div>
-                                <div class="card-footer">
-                                    {% if p.condo_fee %}
-                                    <div class="card-condo">
-                                        <span class="card-condo-label">Condomínio</span>
-                                        <span class="card-condo-val">{{ p.condo_fee|currency }}</span>
-                                    </div>
-                                    {% else %}
-                                    <div></div>
-                                    {% endif %}
-                                    <a href="{{ url_for('properties.detail', property_id=p.id) }}" class="card-cta-btn">
-                                        Ver detalhes
-                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
+                            {% include 'partials/_property_card.html' %}
                         {% endfor %}
                     {% else %}
                         <div class="empty-state">
@@ -495,36 +426,37 @@
                     {% endif %}
                 </div>
 
-            </div><!-- /.catalog-main -->
+                <!-- Pagination -->
+                {% if pagination and pagination.last_page > 1 %}
+                <div class="pagination">
+                    
+                    {% if pagination.has_prev %}
+                    <a href="{{ url_for('properties.list_properties', page=pagination.current_page - 1, **current_filters) }}" class="btn-page btn-page-prev">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+                        Anterior
+                    </a>
+                    {% endif %}
+                    
+                    <span class="page-info">Página {{ pagination.current_page }} de {{ pagination.last_page }}</span>
+                    
+                    {% if pagination.has_next %}
+                    <a href="{{ url_for('properties.list_properties', page=pagination.current_page + 1, **current_filters) }}" class="btn-page btn-page-next">
+                        Próxima
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+                    </a>
+                    {% endif %}
+                </div>
+                <style>
+                    .pagination { display: flex; align-items: center; justify-content: center; gap: 1rem; margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--border-light); grid-column: 1 / -1; }
+                    .pagination-top { margin-top: 1rem; margin-bottom: 2rem; padding-top: 0; padding-bottom: 2rem; border-top: none; border-bottom: 1px solid var(--border-light); }
+                    .btn-page { display: flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1.25rem; background: var(--bg-card); border: 1px solid var(--border-light); border-radius: 8px; color: var(--text-main); font-weight: 500; transition: all 0.2s ease; text-decoration: none; }
+                    .btn-page:hover { background: var(--accent-light); border-color: var(--accent-gold); color: var(--accent-gold); }
+                    .btn-page svg { width: 16px; height: 16px; }
+                    .page-info { font-size: 0.95rem; color: var(--text-muted); font-weight: 500; }
+                </style>
+                {% endif %}
 
-            <!-- Pagination -->
-            {% if pagination and pagination.last_page > 1 %}
-            <div class="pagination">
-                
-                {% if pagination.has_prev %}
-                <a href="{{ url_for('properties.list_properties', page=pagination.current_page - 1, **current_filters) }}" class="btn-page btn-page-prev">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
-                    Anterior
-                </a>
-                {% endif %}
-                
-                <span class="page-info">Página {{ pagination.current_page }} de {{ pagination.last_page }}</span>
-                
-                {% if pagination.has_next %}
-                <a href="{{ url_for('properties.list_properties', page=pagination.current_page + 1, **current_filters) }}" class="btn-page btn-page-next">
-                    Próxima
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
-                </a>
-                {% endif %}
-            </div>
-            <style>
-                .pagination { display: flex; align-items: center; justify-content: center; gap: 1rem; margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--border-light); }
-                .btn-page { display: flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1.25rem; background: var(--bg-card); border: 1px solid var(--border-light); border-radius: 8px; color: var(--text-main); font-weight: 500; transition: all 0.2s ease; text-decoration: none; }
-                .btn-page:hover { background: var(--accent-light); border-color: var(--accent-gold); color: var(--accent-gold); }
-                .btn-page svg { width: 16px; height: 16px; }
-                .page-info { font-size: 0.95rem; color: var(--text-muted); font-weight: 500; }
-            </style>
-            {% endif %}
+            </div><!-- /.catalog-main -->
 
         </div><!-- /.catalog-layout -->
     </div>
