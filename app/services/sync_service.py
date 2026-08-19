@@ -127,9 +127,18 @@ class SyncService:
 
                 # ── Busca os detalhes de todos os imóveis da página EM PARALELO ──
                 enriched_properties = []
+                
+                # O ThreadPoolExecutor não herda automaticamente o app_context do Flask
+                from flask import current_app
+                app_obj = current_app._get_current_object()
+                
+                def _worker(p_data, app):
+                    with app.app_context():
+                        return cls._fetch_detail_and_merge(p_data)
+                
                 with ThreadPoolExecutor(max_workers=_DETAIL_WORKERS) as executor:
                     futures = {
-                        executor.submit(cls._fetch_detail_and_merge, p_data): p_data
+                        executor.submit(_worker, p_data, app_obj): p_data
                         for p_data in properties_on_page
                     }
                     for future in as_completed(futures):
