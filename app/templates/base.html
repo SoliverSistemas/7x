@@ -50,7 +50,7 @@
 
             <nav class="nav-menu" id="nav-menu">
                 <a href="{{ url_for('main.index') }}" class="nav-link {% if request.endpoint == 'main.index' %}active{% endif %}">Início</a>
-                <a href="{{ url_for('properties.list_properties') }}" class="nav-link {% if 'properties' in request.endpoint %}active{% endif %}">Imóveis</a>
+                <a href="{{ url_for('properties.list_properties') }}" class="nav-link {% if 'properties' in (request.endpoint or '') %}active{% endif %}">Imóveis</a>
                 <a href="{{ url_for('main.about') }}" class="nav-link {% if request.endpoint == 'main.about' %}active{% endif %}">Sobre Nós</a>
                 <a href="{{ url_for('main.contact') }}" class="nav-link {% if request.endpoint == 'main.contact' %}active{% endif %}">Contato</a>
                 <a href="{{ url_for('main.publique') }}" class="nav-link {% if request.endpoint == 'main.publique' %}active{% endif %}">Publique seu Imóvel</a>
