@@ -20,6 +20,7 @@ class Config:
     SITE_NAME = os.environ.get('SITE_NAME') or '7X Imóveis'
     SITE_SLOGAN = os.environ.get('SITE_SLOGAN') or 'Seu imóvel ideal com inteligência e exclusividade'
     CONTACT_PHONE = os.environ.get('CONTACT_PHONE') or '(11) 99999-7777'
+    CONTACT_PHONE_2 = os.environ.get('CONTACT_PHONE_2') or ''
     CONTACT_EMAIL = os.environ.get('CONTACT_EMAIL') or 'contato@7ximoveis.com.br'
     CONTACT_ADDRESS = os.environ.get('CONTACT_ADDRESS') or 'Av. Paulista, 1000 - Bela Vista, São Paulo - SP'
 
@@ -28,6 +29,7 @@ class Config:
     LINK_INSTAGRAM_URL = os.environ.get('LINK_INSTAGRAM_URL') or 'https://instagram.com/7xpatrimonial'
     LINK_TIKTOK_URL = os.environ.get('LINK_TIKTOK_URL') or 'https://tiktok.com/@7xpatrimonial'
     LINK_WHATSAPP_URL = os.environ.get('LINK_WHATSAPP_URL') or 'https://wa.me/5511999997777'
+    LINK_WHATSAPP_URL_2 = os.environ.get('LINK_WHATSAPP_URL_2') or ''
 
     # Tecimob API Integration (https://swagger.tecimob.com.br)
     TECIMOB_API_TOKEN = os.environ.get('TECIMOB_API_TOKEN') or ''
@@ -51,8 +53,10 @@ class ProductionConfig(Config):
 
 config_by_name = {
     'dev': DevelopmentConfig,
+    'development': DevelopmentConfig,
     'test': TestingConfig,
     'prod': ProductionConfig,
+    'production': ProductionConfig,
     'default': DevelopmentConfig
 }
 

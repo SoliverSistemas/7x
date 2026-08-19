@@ -50,9 +50,11 @@ def create_app(config_name='dev'):
             'site_name': app.config.get('SITE_NAME', '7X Imóveis'),
             'site_slogan': app.config.get('SITE_SLOGAN', ''),
             'contact_phone': app.config.get('CONTACT_PHONE', ''),
+            'contact_phone_2': app.config.get('CONTACT_PHONE_2', ''),
             'contact_email': app.config.get('CONTACT_EMAIL', ''),
             'contact_address': app.config.get('CONTACT_ADDRESS', ''),
             'whatsapp_url': wa_url,
+            'whatsapp_url_2': app.config.get('LINK_WHATSAPP_URL_2', ''),
             'whatsapp_number': wa_number,
         }
 
