@@ -11,8 +11,8 @@
 {# ── Helpers ─────────────────────────────────────────────────────────────── #}
 {% set prop_img = property.image if property.image and property.image.startswith('http') else (url_for('static', filename='img/' + property.image) if property.image else url_for('static', filename='img/placeholder.jpg')) %}
 {% set gallery_imgs = property.gallery if property.gallery else [] %}
-{% set all_imgs = ([property.image] + gallery_imgs) | unique | list if property.image and property.image not in gallery_imgs else gallery_imgs %}
-{% if not all_imgs %}{% set all_imgs = [property.image] %}{% endif %}
+{% set all_imgs = ([property.image] + gallery_imgs) | reject('none') | unique | list %}
+{% if not all_imgs %}{% set all_imgs = ['placeholder.jpg'] %}{% endif %}
 
 {# Monta amenities: separado ou fallback para campo único #}
 {% set amen_unit = property.amenities_property if property.amenities_property else property.amenities %}
@@ -111,7 +111,7 @@
     {# Hidden: fontes para o lightbox #}
     <div class="gallery-lightbox-sources" hidden>
       {% for img in all_imgs %}
-        {% set src = img if img.startswith('http') else url_for('static', filename='img/' + img) %}
+        {% set src = img if img and img.startswith('http') else url_for('static', filename='img/' + img) %}
         <span data-lightbox-src="{{ src }}" data-lightbox-index="{{ loop.index0 }}"></span>
       {% endfor %}
     </div>

@@ -308,17 +308,25 @@ class TecimobService:
         images_list = item.get('images') or []
         gallery_urls = []
         if images_list:
-            # Ordenar por 'order' e pegar file_url
-            sorted_imgs = sorted(images_list, key=lambda x: x.get('order', 999))
-            gallery_urls = [img['file_url'] for img in sorted_imgs if img.get('file_url')]
-        else:
+            try:
+                # Caso a API retorne dicts com 'order' e 'file_url'
+                if isinstance(images_list[0], dict):
+                    sorted_imgs = sorted(images_list, key=lambda x: x.get('order', 999))
+                    gallery_urls = [img['file_url'] for img in sorted_imgs if img.get('file_url')]
+                # Caso a API retorne apenas strings (URLs diretas)
+                elif isinstance(images_list[0], str):
+                    gallery_urls = [img for img in images_list if img.startswith('http')]
+            except Exception:
+                pass
+        
+        if not gallery_urls:
             # Fallback: busca em informations (campo legado)
             informations = item.get('informations') or []
             for info in informations:
                 if 'imagem' in (info.get('name') or '').lower() or info.get('name') == 'images':
                     v = info.get('value')
                     if isinstance(v, list):
-                        gallery_urls.extend(v)
+                        gallery_urls.extend([str(i) for i in v if isinstance(i, str)])
                     elif isinstance(v, str) and v.startswith('http'):
                         gallery_urls.append(v)
 
