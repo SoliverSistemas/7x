@@ -1007,12 +1007,30 @@ a.whatsapp-float:hover::before {
         padding: 3.5rem 0;
     }
 
-    a.whatsapp-float {
-        bottom: 1.5rem;
-        right: 1.5rem;
-        width: 46px;
-        height: 46px;
-        font-size: 1.3rem;
+    a.whatsapp-float,
+    a.whatsapp-float:hover {
+        bottom: 1.25rem !important;
+        right: 1.25rem !important;
+        width: 48px !important;
+        min-width: 48px !important;
+        max-width: 48px !important;
+        height: 48px !important;
+        padding: 0 !important;
+        border-radius: 50% !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        box-shadow: 0 4px 16px rgba(37, 211, 102, 0.45) !important;
+        z-index: 1000 !important;
+    }
+
+    a.whatsapp-float .wa-label {
+        display: none !important;
+    }
+
+    a.whatsapp-float .wa-icon {
+        width: 22px !important;
+        height: 22px !important;
     }
 }
 
@@ -1451,7 +1469,7 @@ a.whatsapp-float:hover::before {
     }
     
     /* 2. Forçar containers a usarem a tela toda com margem segura */
-    .container, .container-fluid, .wrapper, .main-container, main {
+    .container, .container-fluid, .wrapper, .main-container {
         width: 100% !important;
         max-width: 100% !important;
         padding-left: 16px !important;

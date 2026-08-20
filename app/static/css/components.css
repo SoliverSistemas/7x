@@ -123,10 +123,15 @@
     display: flex;
     gap: 1.5rem;
     overflow-x: auto;
-    scroll-behavior: auto; /* JS vai controlar o easing */
+    scroll-behavior: auto;
     padding-bottom: 1rem;
     -webkit-overflow-scrolling: touch;
     cursor: grab;
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+}
+.properties-slider::-webkit-scrollbar {
+    display: none;
 }
 
 .properties-slider.is-dragging {
@@ -183,7 +188,7 @@
 .slider-nav-btn.prev { left: 0; }
 .slider-nav-btn.next { right: 0; }
 
-.slider-nav-btn:hover {
+.slider-nav-btn:not(:disabled):hover {
     background: var(--primary);
     color: #000;
     border-color: var(--primary);
@@ -192,14 +197,32 @@
 
 /* Disabled state */
 .slider-nav-btn:disabled {
-    opacity: 0.25;
+    opacity: 0.5;
     cursor: default;
     transform: translateY(-50%);
-    pointer-events: none;
 }
 
 @media(max-width: 900px) {
-    .slider-nav-btn { display: none; }
+    .slider-nav-btn { 
+        width: 36px !important; 
+        height: 36px !important; 
+        min-width: 36px !important;
+        min-height: 36px !important;
+        max-width: 36px !important;
+        max-height: 36px !important;
+        border-radius: 50% !important;
+        top: calc(50% - 0.5rem);
+        bottom: auto;
+        transform: translateY(-50%);
+        z-index: 20;
+    }
+    .slider-nav-btn.prev {
+        left: 0.5rem;
+    }
+    .slider-nav-btn.next {
+        right: 0.5rem;
+        left: auto;
+    }
 }
 
 
@@ -352,9 +375,14 @@
 .card-favorite-btn {
     position: absolute;
     top: 0.85rem;
-    right: 0.85rem;
-    width: 36px;
-    height: 36px;
+    left: 0.85rem;
+    width: 36px !important;
+    height: 36px !important;
+    min-width: 36px !important;
+    min-height: 36px !important;
+    max-width: 36px !important;
+    max-height: 36px !important;
+    aspect-ratio: 1 / 1;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -937,6 +965,22 @@ textarea.form-control {
     }
     .properties-grid {
         grid-template-columns: 1fr;
+    }
+    .card-img-wrapper {
+        height: 140px;
+    }
+    .card-body {
+        padding: 0.85rem;
+    }
+    .card-title {
+        font-size: 0.95rem;
+        margin-bottom: 0.4rem;
+    }
+    .card-info-chips {
+        display: none;
+    }
+    .card-price-overlay .card-price-val {
+        font-size: 1.2rem;
     }
     .cta-buttons {
         flex-direction: column;

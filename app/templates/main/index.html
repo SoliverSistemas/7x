@@ -173,45 +173,55 @@
             </a>
         </div>
 
-        <div class="lancamentos-grid">
-            {% for item in lancamentos %}
-            <a href="{{ url_for('main.lancamento_detail', slug=item.slug) }}"
-               class="lancamento-card"
-               data-delay="{{ loop.index0 * 120 }}">
+        <div class="lancamentos-slider-wrapper properties-slider-wrapper">
+            <button class="slider-nav-btn prev" aria-label="Anterior">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"></polyline></svg>
+            </button>
+            
+            <div class="lancamentos-grid properties-slider">
+                {% for item in lancamentos %}
+                <a href="{{ url_for('main.lancamento_detail', slug=item.slug) }}"
+                   class="lancamento-card property-card"
+                   data-delay="{{ loop.index0 * 120 }}">
 
-                <div class="lancamento-cover">
-                    {% if item.cover_url and (item.cover_url.startswith('http') or item.cover_url.startswith('/static')) %}
-                    <img src="{{ item.cover_url }}" alt="{{ item.name }}" loading="lazy">
-                    {% elif item.cover %}
-                    <img src="{{ url_for('static', filename=item.cover) }}" alt="{{ item.name }}" loading="lazy">
-                    {% else %}
-                    <img src="{{ url_for('static', filename='img/placeholder.jpg') }}" alt="{{ item.name }}" loading="lazy">
-                    {% endif %}
-                    <div class="lancamento-cover-overlay"></div>
+                    <div class="lancamento-cover">
+                        {% if item.cover_url and (item.cover_url.startswith('http') or item.cover_url.startswith('/static')) %}
+                        <img src="{{ item.cover_url }}" alt="{{ item.name }}" loading="lazy">
+                        {% elif item.cover %}
+                        <img src="{{ url_for('static', filename=item.cover) }}" alt="{{ item.name }}" loading="lazy">
+                        {% else %}
+                        <img src="{{ url_for('static', filename='img/placeholder.jpg') }}" alt="{{ item.name }}" loading="lazy">
+                        {% endif %}
+                        <div class="lancamento-cover-overlay"></div>
 
-                    <!-- Tudo posicionado DENTRO da cover (overflow:hidden correto) -->
-                    <div class="lancamento-status-pill">{{ item.status }}</div>
+                        <!-- Tudo posicionado DENTRO da cover (overflow:hidden correto) -->
+                        <div class="lancamento-status-pill">{{ item.status }}</div>
 
-                    <div class="lancamento-info">
-                        <div class="lancamento-location">
-                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-                            {{ item.location }}
+                        <div class="lancamento-info">
+                            <div class="lancamento-location">
+                                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                                {{ item.location }}
+                            </div>
+                            <h3 class="lancamento-name">{{ item.name }}</h3>
+                            <p class="lancamento-tagline">{{ item.tagline }}</p>
+                            <div class="lancamento-footer">
+                                <span class="lancamento-type">{{ item.type }}</span>
+                                <span class="lancamento-units">{{ item.units }}</span>
+                            </div>
                         </div>
-                        <h3 class="lancamento-name">{{ item.name }}</h3>
-                        <p class="lancamento-tagline">{{ item.tagline }}</p>
-                        <div class="lancamento-footer">
-                            <span class="lancamento-type">{{ item.type }}</span>
-                            <span class="lancamento-units">{{ item.units }}</span>
+
+                        <div class="lancamento-arrow">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
                         </div>
                     </div>
 
-                    <div class="lancamento-arrow">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-                    </div>
-                </div>
+                </a>
+                {% endfor %}
+            </div>
 
-            </a>
-            {% endfor %}
+            <button class="slider-nav-btn next" aria-label="Próximo">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
+            </button>
         </div>
     </div>
 </section>

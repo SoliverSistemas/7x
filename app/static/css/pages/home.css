@@ -105,18 +105,18 @@
     left: 0;
     right: 0;
     z-index: 30;
-    transform: translateY(50%);
+    transform: translateY(42%); /* ← mais baixo (mais para baixo do hero) */
     padding: 0 1.5rem;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: .55rem;
+    gap: .45rem;
 }
 
 /* Label elegante acima da barra */
 .hero-search-label {
     font-family: var(--font-heading, 'Cormorant Garamond', Georgia, serif);
-    font-size: clamp(1.1rem, 2vw, 1.5rem);
+    font-size: clamp(1rem, 1.8vw, 1.35rem);
     font-weight: 300;
     font-style: italic;
     color: rgba(255, 255, 255, 0.90);
@@ -130,7 +130,7 @@
 }
 
 .hero-search-bar {
-    max-width: 960px;
+    max-width: 820px; /* ← menos largo (antes 960px) */
     width: 100%;
     margin: 0 auto;
     position: relative;
@@ -155,7 +155,7 @@
     left: 50% !important;
     transform: translateX(-50%) !important;
     width: calc(100% - 2.5rem);
-    max-width: 960px;
+    max-width: 820px;
     margin: 0 !important;
     z-index: 990;
     animation: searchDockIn 0.25s cubic-bezier(0.22, 1, 0.36, 1) both;
@@ -165,20 +165,20 @@
 .hero-search-float:has(.is-docked) .hero-search-label { display: none; }
 
 .hero-search-bar.is-docked .hero-fields {
-    min-height: 52px;
+    min-height: 46px;
     border-color: rgba(201, 172, 119, 0.4);
     box-shadow: 0 16px 45px rgba(0, 0, 0, 0.45),
                 0 0 20px rgba(201, 172, 119, 0.15),
                 inset 0 1px 0 rgba(255, 255, 255, 1);
 }
 
-.hero-search-bar.is-docked .hero-purpose-toggle { padding: 0.4rem 0.8rem; }
-.hero-search-bar.is-docked .purpose-btn { padding: 0.35rem 0.8rem; font-size: 0.72rem; }
-.hero-search-bar.is-docked .hero-field { padding: 0.4rem 0.95rem; }
+.hero-search-bar.is-docked .hero-purpose-toggle { padding: 0.3rem 0.6rem; }
+.hero-search-bar.is-docked .purpose-btn { padding: 0.25rem 0.65rem; font-size: 0.68rem; }
+.hero-search-bar.is-docked .hero-field { padding: 0.3rem 0.75rem; }
 .hero-search-bar.is-docked .hero-field label { display: none; }
 .hero-search-bar.is-docked .hero-field input,
-.hero-search-bar.is-docked .hero-field select { font-size: 0.88rem; }
-.hero-search-bar.is-docked .hero-search-btn { padding: 0 1.5rem; font-size: 0.78rem; }
+.hero-search-bar.is-docked .hero-field select { font-size: 0.84rem; }
+.hero-search-bar.is-docked .hero-search-btn { padding: 0 1.25rem; font-size: 0.74rem; }
 
 }
 
@@ -216,8 +216,8 @@
 .hero-purpose-toggle {
     display: flex;
     align-items: center;
-    gap: 4px;
-    padding: 0.65rem 0.95rem;
+    gap: 3px;
+    padding: 0.45rem 0.75rem;
     background: rgba(15, 23, 42, 0.04);
     flex-shrink: 0;
 }
@@ -226,11 +226,11 @@
     background: transparent;
     border: 1px solid transparent;
     color: #64748b;
-    font-size: 0.76rem;
+    font-size: 0.72rem;
     font-weight: 700;
-    letter-spacing: 0.06em;
+    letter-spacing: 0.05em;
     text-transform: uppercase;
-    padding: 0.5rem 1rem;
+    padding: 0.38rem 0.75rem;
     cursor: pointer;
     transition: all 0.2s cubic-bezier(0.22, 1, 0.36, 1);
     white-space: nowrap;
@@ -256,9 +256,9 @@
     backdrop-filter: blur(30px) saturate(190%);
     -webkit-backdrop-filter: blur(30px) saturate(190%);
     border: 1px solid rgba(255, 255, 255, 0.95);
-    min-height: 64px;
-    box-shadow: 0 24px 54px rgba(0, 0, 0, 0.35),
-                0 6px 18px rgba(0, 0, 0, 0.12),
+    min-height: 52px; /* ← menos altura (antes 64px) */
+    box-shadow: 0 20px 45px rgba(0, 0, 0, 0.28),
+                0 4px 14px rgba(0, 0, 0, 0.08),
                 inset 0 1px 0 rgba(255, 255, 255, 1);
     transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
 }
@@ -2079,28 +2079,28 @@
         line-height: 1.15 !important;
     }
 
-    /* ── Barra de Pesquisa Compacta — fica no centro do hero ── */
+    /* ── Barra de Pesquisa Compacta — posicionada mais abaixo e menos larga ── */
     .hero-search-float {
         position: absolute !important;
-        top: 50% !important;
+        top: 60% !important; /* ← mais baixo (antes 50%) */
         bottom: auto !important;
         left: 50% !important;
         right: auto !important;
         transform: translate(-50%, -50%) !important;
         z-index: 10 !important;
-        width: 90% !important;
-        max-width: 400px !important; /* ← Larga mas contida */
+        width: 84% !important;
+        max-width: 320px !important; /* ← menos largo (antes 400px) */
         padding: 0 !important;
         margin: 0 !important;
         display: flex !important;
         flex-direction: column !important;
         align-items: center !important;
-        gap: 0.3rem !important;
+        gap: 0.25rem !important;
     }
 
     .hero-search-label {
-        font-size: 1rem !important;
-        margin-bottom: 0.25rem !important;
+        font-size: 0.92rem !important;
+        margin-bottom: 0.15rem !important;
         display: block !important;
     }
 
@@ -2119,19 +2119,21 @@
         width: 100% !important;
     }
 
-    /* Card compacto da barra: quadrada, menos destaque */
+    /* Card compacto da barra: quadrada, mais fina */
     .hero-fields {
         display: flex !important;
         flex-direction: row !important;
         align-items: center !important;
         width: 100% !important;
-        background: #ffffff !important; /* ← branco sólido elegante */
+        min-height: 42px !important;
+        height: 42px !important;
+        background: #ffffff !important;
         backdrop-filter: none !important;
         -webkit-backdrop-filter: none !important;
-        border-radius: 0 !important; /* ← quadrada */
-        padding: 0 !important; /* ← sem padding no container */
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08) !important; /* ← sombra bem suave */
-        border: 1px solid var(--primary, #c9ac77) !important; /* ← borda dourada elegante */
+        border-radius: 0 !important;
+        padding: 0 !important;
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1) !important;
+        border: 1px solid var(--primary, #c9ac77) !important;
     }
 
     /* Oculta os campos adicionais no mobile para deixar apenas a busca textual */
@@ -2141,10 +2143,14 @@
         display: none !important;
     }
 
-    /* O campo principal (Localização) ocupa todo o espaço restante */
+    /* O campo principal (Localização) ocupa todo o espaço restante e centraliza */
     .hero-fields .hero-field:nth-child(3) {
         flex: 1 !important;
-        padding: 0.1rem 0.8rem !important; /* ← altura extrema fina */
+        height: 100% !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: center !important;
+        padding: 0 0.85rem !important;
         background: transparent !important;
         border: none !important;
         margin: 0 !important;
@@ -2157,52 +2163,39 @@
     }
 
     .hero-fields .hero-field:nth-child(3) input {
-        font-size: 1rem !important;
-        font-weight: 400 !important; /* ← mais destaque */
+        font-size: 0.95rem !important;
+        font-weight: 400 !important;
         color: #222222 !important;
         padding: 0 !important;
+        margin: 0 !important;
         width: 100% !important;
         background: transparent !important;
         border: none !important;
-        height: auto !important;
-        line-height: 1.2 !important; /* ← previne altura extra do texto */
+        height: 100% !important;
+        line-height: normal !important;
+        display: flex !important;
+        align-items: center !important;
     }
 
     .hero-fields .hero-field:nth-child(3) input::placeholder {
-        color: #555555 !important; /* ← placeholder mais escuro */
+        color: #555555 !important;
         font-weight: 400 !important;
         opacity: 1 !important;
+        line-height: normal !important;
     }
 
     .hero-field {
-        padding: 0.1rem 0.8rem !important; /* ← espaço interno extremo fino */
+        height: 100% !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        padding: 0 0.85rem !important;
         background: transparent !important;
         border-radius: 0 !important;
         border: none !important;
         width: 100% !important;
         margin: 0 !important;
         min-width: 0 !important;
-    }
-
-    .hero-field label {
-        font-size: 0.58rem !important;
-        font-weight: 800 !important;
-        letter-spacing: 0.07em !important;
-        margin-bottom: 1px !important;
-        display: block !important;
-        color: #8a7042 !important;
-    }
-
-    .hero-field input,
-    .hero-field select {
-        font-size: 0.83rem !important;
-        font-weight: 600 !important;
-        color: #0b0f19 !important;
-        padding: 0 !important;
-        width: 100% !important;
-        background: transparent !important;
-        border: none !important;
-        height: auto !important;
     }
 
     .hero-divider {
@@ -2212,15 +2205,15 @@
     /* Botão ocupa linha inteira */
     .hero-search-btn {
         width: auto !important;
-        height: auto !important; 
+        height: 100% !important; 
         display: flex !important;
         align-items: center !important;
         justify-content: center !important;
         border-radius: 0 !important;
-        background: transparent !important; /* ← sem fundo escuro */
-        color: #111111 !important; /* ← lupa escura */
+        background: transparent !important;
+        color: #111111 !important;
         margin: 0 !important;
-        padding: 0 0.8rem !important; /* ← bordas justas */
+        padding: 0 0.85rem !important;
         border: none !important;
         cursor: pointer !important;
         flex-shrink: 0 !important;
@@ -2730,6 +2723,11 @@
     font-size: 9px;
     fill: var(--text-muted);
     font-family: var(--font-body);
+}
+
+/* ── Lançamentos: hide slider buttons on desktop since it's a grid ────────────────── */
+.lancamentos-slider-wrapper .slider-nav-btn {
+    display: none;
 }
 
 .inv-gauge-center {
@@ -3874,7 +3872,7 @@
         font-size: 0.65rem;
     }
     .cine-arrow {
-        display: none; /* Em mobile, swipe basta */
+        display: flex !important;
     }
     .cine-portfolio-link {
         display: none;
@@ -3883,393 +3881,348 @@
 
 
 
-/* A seção principal precisa ter uma altura enorme para forçar o scroll vertical. 
-   Isso será calculado pelo JS baseado na quantidade de imagens. Mas colocamos um fallback. */
-.cinematic-section {
-    position: relative;
-    background: #05070a;
-    width: 100%;
-}
 
-/* Grain texture cinematográfico (SVG inline base64) */
-.cine-grain {
-    position: fixed;
-    inset: 0;
-    z-index: 100;
-    pointer-events: none;
-    opacity: 0;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
-    background-repeat: repeat;
-    background-size: 180px;
-    mix-blend-mode: overlay;
-    transition: opacity 0.5s ease;
-}
 
-/* Ativa o grain quando está dentro da seção cinemática */
-.in-cinematic .cine-grain {
-    opacity: 0.04;
-}
 
-/* O wrapper que gruda (sticky) na tela quando o usuário chega nele */
-.sticky-wrapper {
-    position: sticky;
-    top: 0;
-    width: 100%;
-    height: 100vh;
-    overflow: hidden;
-    display: flex;
-    align-items: center;
-}
 
-/* Header flutuante em cima das imagens */
-.cinematic-header {
-    position: absolute;
-    top: 10%;
-    left: 5%;
-    z-index: 20;
-    max-width: 600px;
-    pointer-events: none; /* Para não bloquear cliques nas imagens */
-}
+/* ══════════════════════════════════════════════════════════════════════════
+   RESPONSIVIDADE MOBILE — SEÇÕES DO INDEX (exceto Hero e Header)
+   ══════════════════════════════════════════════════════════════════════════ */
 
-.cinematic-title {
-    font-size: clamp(2.5rem, 5vw, 4.5rem);
-    font-weight: 800;
-    line-height: 1.1;
-    color: #fff;
-    margin-top: 0.5rem;
-    letter-spacing: -0.03em;
-    text-shadow: 0 10px 30px rgba(0,0,0,0.5);
-}
+@media (max-width: 768px) {
 
-/* ── Contador de Slides ─────────────────────────────────────────────────── */
-.cine-counter {
-    position: absolute;
-    top: 2rem;
-    right: 3rem;
-    z-index: 20;
-    display: flex;
-    align-items: baseline;
-    gap: 0.4rem;
-    mix-blend-mode: normal;
-}
-
-.cine-counter-current {
-    font-size: 2.5rem;
-    font-weight: 800;
-    color: #fff;
-    line-height: 1;
-    letter-spacing: -0.05em;
-}
-
-.cine-counter-sep {
-    font-size: 1rem;
-    color: rgba(255,255,255,0.3);
-    padding: 0 0.2rem;
-}
-
-.cine-counter-total {
-    font-size: 1rem;
-    color: rgba(255,255,255,0.4);
-    font-weight: 500;
-}
-
-/* ── Barra de Progresso ─────────────────────────────────────────────────── */
-.cine-progress-bar {
-    position: absolute;
-    bottom: 2.5rem;
-    left: 5%;
-    right: 5%;
-    height: 1px;
-    background: rgba(255,255,255,0.12);
-    z-index: 20;
-    border-radius: 2px;
-    overflow: hidden;
-}
-
-.cine-progress-fill {
-    height: 100%;
-    background: linear-gradient(90deg, var(--primary), #f0d98a);
-    width: 0%;
-    border-radius: 2px;
-    transition: width 0.1s linear;
-    box-shadow: 0 0 8px rgba(201,172,119,0.6);
-}
-
-/* ── Scroll Hint ────────────────────────────────────────────────────────── */
-.cine-scroll-hint {
-    position: absolute;
-    bottom: 4.5rem;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 20;
-    display: flex;
-    align-items: center;
-    gap: 0.6rem;
-    color: rgba(255,255,255,0.6);
-    font-size: 0.8rem;
-    font-weight: 600;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    pointer-events: none;
-    transition: opacity 0.5s ease;
-}
-
-.cine-scroll-hint.hidden {
-    opacity: 0;
-}
-
-.cine-hint-icon {
-    width: 28px;
-    height: 28px;
-    border: 1px solid rgba(255,255,255,0.2);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    animation: hintBounce 1.5s infinite ease-in-out;
-}
-
-@keyframes hintBounce {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(4px); }
-}
-
-.cinematic-title-gold {
-    background: linear-gradient(105deg, var(--primary-hover) 0%, #f0d98a 40%, var(--primary) 70%);
-    background-size: 200% auto;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-}
-
-.cinematic-subtitle {
-    font-size: 1.1rem;
-    color: rgba(255,255,255,0.8);
-    margin-top: 1.5rem;
-    line-height: 1.7;
-    text-shadow: 0 4px 10px rgba(0,0,0,0.5);
-}
-
-/* ── Container Horizontal ───────────────────────────────────────────────── */
-/* Este é o elemento que o JS vai empurrar para a esquerda (translateX) */
-.horizontal-container {
-    display: flex;
-    height: 100vh;
-    width: fit-content;
-    /* will-change garante performance em 60fps na transição */
-    will-change: transform;
-}
-
-/* Cada "Slide" da galeria */
-.cinematic-panel {
-    position: relative;
-    width: 100vw; /* Ocupa 100% da largura da tela */
-    height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: flex-end; /* Conteúdo na direita */
-    padding: 0 10vw;
-    overflow: hidden;
-}
-
-/* A Imagem de Fundo (Monstruosa) */
-.cinematic-img {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    z-index: 1;
-    transition: transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
-}
-
-/* Efeito de Parallax hover opcional */
-.cinematic-panel:hover .cinematic-img {
-    transform: scale(1.05);
-}
-
-/* Overlay dramático para o texto ler bem */
-.cinematic-overlay {
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(90deg, rgba(5,7,10,0.15) 0%, transparent 30%, transparent 60%, rgba(5,7,10,0.85) 100%),
-                linear-gradient(0deg, rgba(5,7,10,0.7) 0%, transparent 60%);
-    z-index: 2;
-    pointer-events: none;
-}
-
-/* ── Conteúdo do Slide (Glassmorphism Cards) ────────────────────────────── */
-.cinematic-content {
-    position: relative;
-    z-index: 5;
-    background: rgba(11, 15, 25, 0.5);
-    backdrop-filter: blur(24px);
-    -webkit-backdrop-filter: blur(24px);
-    border: 1px solid rgba(255,255,255,0.05);
-    padding: 3rem;
-    border-radius: 20px;
-    max-width: 500px;
-    transform: translateY(30px);
-    opacity: 0;
-    transition: all 1s cubic-bezier(0.2, 0.8, 0.2, 1);
-}
-
-/* JS vai adicionar a classe .in-view quando o painel chegar no centro da tela */
-.cinematic-panel.in-view .cinematic-content {
-    transform: translateY(0);
-    opacity: 1;
-}
-
-.cine-badge {
-    display: inline-block;
-    padding: 0.4rem 1rem;
-    background: rgba(201,172,119,0.1);
-    border: 1px solid var(--primary);
-    color: var(--primary);
-    font-size: 0.75rem;
-    font-weight: 700;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    border-radius: 100px;
-    margin-bottom: 1.5rem;
-}
-
-.cine-prop-title {
-    font-size: 2.5rem;
-    font-weight: 800;
-    color: #fff;
-    margin-bottom: 1.2rem;
-    line-height: 1.1;
-    letter-spacing: -0.02em;
-}
-
-/* Meta tags (metragem, suítes, etc.) */
-.cine-prop-meta {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    margin-bottom: 1.2rem;
-    font-size: 0.85rem;
-    color: rgba(255,255,255,0.6);
-    font-weight: 500;
-    letter-spacing: 0.02em;
-}
-
-.cine-meta-sep {
-    color: var(--primary);
-    opacity: 0.6;
-}
-
-.cine-prop-desc {
-    font-size: 1rem;
-    color: rgba(255,255,255,0.7);
-    line-height: 1.7;
-    margin-bottom: 2rem;
-}
-
-.cine-btn {
-    width: 100%;
-    text-align: center;
-}
-
-/* ── Painel Final (CTA) ─────────────────────────────────────────────────── */
-.cine-end-panel {
-    width: 60vw;
-    background: #05070a;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0;
-    border-left: 1px solid rgba(255,255,255,0.04);
-}
-
-.cine-end-content {
-    text-align: center;
-    padding: 4rem;
-    max-width: 480px;
-}
-
-.cine-end-logo {
-    font-size: 4rem;
-    font-weight: 900;
-    background: linear-gradient(135deg, var(--primary-hover), var(--primary));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    letter-spacing: -0.05em;
-    margin-bottom: 2rem;
-    line-height: 1;
-}
-
-.cine-end-title {
-    font-size: 2.5rem;
-    font-weight: 800;
-    color: #fff;
-    margin-bottom: 1rem;
-    line-height: 1.15;
-    letter-spacing: -0.02em;
-}
-
-.cine-end-desc {
-    font-size: 1rem;
-    color: var(--text-secondary);
-    margin-bottom: 2.5rem;
-    line-height: 1.7;
-}
-
-/* ── Responsive ─────────────────────────────────────────────────────────── */
-@media (max-width: 900px) {
-    .cinematic-header {
-        top: 15%;
+    /* ── Seções gerais ───────────────────────────────────────────────── */
+    .section {
+        padding: 3rem 0 !important;
     }
-    .cinematic-title {
-        font-size: 2.5rem;
-    }
-    .cinematic-content {
-        padding: 2rem;
-    }
-    .cine-prop-title {
-        font-size: 1.8rem;
-    }
-}
 
-@media (max-width: 600px) {
-    /* Em mobile extremo, o scrolljacking atrapalha. Desabilitamos o sticky e deixamos normal */
+    /* ── Cabeçalho das seções de catálogo ───────────────────────────── */
+    .section-header-flex {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 1rem !important;
+    }
+
+    .section-header-flex .btn {
+        width: 100% !important;
+        text-align: center !important;
+        justify-content: center !important;
+        margin-left: 0 !important;
+    }
+
+    .section-header-flex h2 {
+        font-size: clamp(1.6rem, 6vw, 2.2rem) !important;
+    }
+
+    /* ── Lançamentos: show slider buttons on mobile ── */
+    .lancamentos-slider-wrapper {
+        /* No full width hack, keep inside container */
+    }
+    .lancamentos-slider-wrapper .slider-nav-btn {
+        display: flex !important;
+    }
+
+    /* ── Catálogo: Slider de imóveis ────────────────────────────────── */
+    .properties-slider-wrapper {
+        padding: 0 !important;
+    }
+
+    .properties-slider {
+        gap: 1rem !important;
+        scroll-snap-type: x mandatory !important;
+        padding: 0 1rem 1rem !important;
+    }
+
+    .properties-slider .property-card {
+        flex: 0 0 70vw !important;
+        scroll-snap-align: center !important;
+    }
+
+    /* ── Lançamentos ─────────────────────────────────────────────────── */
+    .lancamentos-section {
+        padding: 3rem 0 !important;
+    }
+
+    .lancamentos-header {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 1rem !important;
+        margin-bottom: 2rem !important;
+    }
+
+    .lancamentos-title {
+        font-size: clamp(2rem, 7vw, 2.8rem) !important;
+    }
+
+    .lancamentos-subtitle {
+        font-size: 0.9rem !important;
+        max-width: 100% !important;
+    }
+
+    .lancamentos-grid {
+        grid-template-columns: 1fr !important;
+        gap: 1rem !important;
+    }
+
+    .lancamentos-grid .lancamento-card:first-child {
+        grid-column: span 1 !important;
+    }
+
+    .lancamentos-grid .lancamento-card:first-child .lancamento-cover {
+        aspect-ratio: 3 / 4 !important;
+    }
+
+    .lancamento-name {
+        font-size: 1.4rem !important;
+    }
+
+    .lancamentos-grid .lancamento-card:first-child .lancamento-name {
+        font-size: 1.6rem !important;
+    }
+
+    .lancamento-tagline {
+        opacity: 1 !important;
+        transform: translateY(0) !important;
+    }
+
+    .lancamento-arrow {
+        opacity: 1 !important;
+        transform: scale(1) rotate(0deg) !important;
+    }
+
+    .lancamento-info {
+        padding: 1.5rem 1.2rem 1.2rem !important;
+    }
+
+    /* ── Coleção Exclusiva (Cinematic Carousel) ──────────────────────── */
     .cinematic-section {
-        height: auto !important;
+        height: 85vh !important;
     }
-    .sticky-wrapper {
-        position: relative;
-        height: auto;
-        display: block;
+
+    .cine-slide {
+        padding: 1.5rem !important;
+        align-items: flex-end !important;
+        justify-content: center !important;
     }
+
+    .cine-slide-content {
+        max-width: 100% !important;
+    }
+
+    .cine-prop-title {
+        font-size: clamp(1.6rem, 6vw, 2rem) !important;
+        line-height: 1.2 !important;
+    }
+
+    .cine-prop-desc {
+        font-size: 0.85rem !important;
+        display: -webkit-box !important;
+        -webkit-line-clamp: 3 !important;
+        -webkit-box-orient: vertical !important;
+        overflow: hidden !important;
+    }
+
+    .cine-btn {
+        width: 100% !important;
+        justify-content: center !important;
+        padding: 0.85rem 1.5rem !important;
+    }
+
     .cinematic-header {
-        position: relative;
-        top: 0;
-        left: 0;
-        padding: 4rem 1.5rem 2rem;
-        text-align: center;
+        top: 6% !important;
+        left: 1.2rem !important;
     }
-    .horizontal-container {
-        display: block;
-        height: auto;
-        width: 100%;
-        transform: none !important; /* Desativa o js transform */
+
+    .cinematic-title {
+        font-size: clamp(1.5rem, 5vw, 2rem) !important;
     }
-    .cinematic-panel {
-        width: 100%;
-        height: 80vh;
-        padding: 1.5rem;
-        align-items: flex-end;
+
+    .cine-counter {
+        top: 1.2rem !important;
+        right: 1.2rem !important;
     }
-    .cine-end-panel {
-        width: 100%;
-        height: 60vh;
+
+    .cine-arrow {
+        width: 36px !important;
+        height: 36px !important;
+        border-radius: 50% !important;
     }
-    .cinematic-content {
-        transform: translateY(0);
-        opacity: 1; /* Sempre visível no mobile */
+    .cine-arrow-prev { left: 0.5rem !important; }
+    .cine-arrow-next { right: 0.5rem !important; }
+
+    .cine-portfolio-link {
+        display: none !important;
+    }
+
+    /* ── Parceiros (logo marquee) ────────────────────────────────────── */
+    .partners-logos-section {
+        padding: 2.5rem 0 !important;
+    }
+
+    .partners-logos-header {
+        margin-bottom: 1.5rem !important;
+    }
+
+    .partners-logos-title {
+        font-size: clamp(1.4rem, 5vw, 1.8rem) !important;
+    }
+
+    .plogo-card {
+        width: 140px !important;
+        height: 80px !important;
+    }
+
+    .partners-logo-group {
+        gap: 1rem !important;
+        padding-right: 1rem !important;
+    }
+
+    /* ── CTA Section ─────────────────────────────────────────────────── */
+    .cta-section {
+        padding: 3.5rem 0 !important;
+    }
+
+    .cta-inner h2 {
+        font-size: clamp(1.6rem, 6vw, 2.2rem) !important;
+        line-height: 1.2 !important;
+    }
+
+    .cta-inner p {
+        font-size: 0.95rem !important;
+        margin-bottom: 1.5rem !important;
+    }
+
+    .cta-buttons {
+        flex-direction: column !important;
+        align-items: stretch !important;
+        gap: 0.75rem !important;
+    }
+
+    .cta-buttons .btn {
+        width: 100% !important;
+        justify-content: center !important;
+        text-align: center !important;
+    }
+
+    .cta-trust-row {
+        flex-direction: column !important;
+        gap: 0.5rem !important;
+        align-items: center !important;
+    }
+
+    /* ── Calculadora ─────────────────────────────────────────────────── */
+    .inv-calculator-wrapper {
+        grid-template-columns: 1fr !important;
+        gap: 1.5rem !important;
+    }
+
+    .inv-inputs-panel {
+        position: static !important;
+        padding: 1.5rem !important;
+    }
+
+    .inv-intel-header {
+        margin-bottom: 2rem !important;
+    }
+
+    .inv-intel-title {
+        font-size: clamp(1.5rem, 5vw, 2rem) !important;
+    }
+
+    /* ── Stats ───────────────────────────────────────────────────────── */
+    .stats-bar {
+        grid-template-columns: 1fr 1fr !important;
+        padding: 1.5rem 0 !important;
+    }
+
+    .stat-divider {
+        display: none !important;
+    }
+
+    .stat-item {
+        padding: 1rem !important;
+        border-bottom: 1px solid var(--border-color) !important;
+    }
+
+    .stat-item:nth-child(odd) {
+        border-right: 1px solid var(--border-color) !important;
+    }
+
+    .stat-number {
+        font-size: clamp(2rem, 8vw, 2.8rem) !important;
+    }
+
+    /* ── Editorial ───────────────────────────────────────────────────── */
+    .editorial-inner {
+        grid-template-columns: 1fr !important;
+        gap: 2rem !important;
+    }
+
+    .editorial-frame::before,
+    .editorial-frame::after {
+        display: none !important;
+    }
+
+    .editorial-title-line {
+        font-size: clamp(1.5rem, 6vw, 2rem) !important;
+    }
+
+    .editorial-highlights {
+        flex-direction: column !important;
+        gap: 0.75rem !important;
+    }
+
+    /* ── Diferenciais ────────────────────────────────────────────────── */
+    .differentials-grid {
+        grid-template-columns: 1fr 1fr !important;
+    }
+
+    .differential-card {
+        border-bottom: 1px solid var(--border-color) !important;
+    }
+
+    .differential-card:nth-child(even) {
+        border-right: none !important;
+    }
+
+    /* ── Depoimentos ─────────────────────────────────────────────────── */
+    .testimonials-grid {
+        grid-template-columns: 1fr !important;
     }
 }
 
+@media (max-width: 480px) {
+
+    .plogo-card {
+        width: 110px !important;
+        height: 65px !important;
+    }
+
+    .differentials-grid {
+        grid-template-columns: 1fr !important;
+    }
+
+    .differential-card {
+        border-right: none !important;
+    }
+
+    .lancamento-name {
+        font-size: 1.2rem !important;
+    }
+
+    .lancamentos-grid .lancamento-card:first-child .lancamento-name {
+        font-size: 1.4rem !important;
+    }
+
+    .cta-section {
+        padding: 2.5rem 0 !important;
+    }
+
+    .section-header-flex h2 {
+        font-size: clamp(1.3rem, 6vw, 1.8rem) !important;
+    }
+
+    .properties-slider .property-card {
+        flex: 0 0 75vw !important;
+    }
+}

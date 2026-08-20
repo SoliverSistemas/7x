@@ -303,14 +303,47 @@ function initPropertySliders() {
             return card.offsetWidth + gap;
         }
 
+        // Animação customizada para evitar bugs do scroll-snap no iOS Safari
+        function smoothScroll(element, distance, duration = 400) {
+            if (element.isAnimating) return;
+            element.isAnimating = true;
+
+            const start = element.scrollLeft;
+            const startTime = performance.now();
+            
+            // Desativa temporariamente o snap (usando setProperty para ignorar !important do CSS)
+            element.style.setProperty('scroll-snap-type', 'none', 'important');
+
+            function step(currentTime) {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                
+                // Ease Out Quart (ainda mais suave)
+                const easeProgress = 1 - Math.pow(1 - progress, 4);
+                
+                element.scrollLeft = start + (distance * easeProgress);
+
+                if (progress < 1) {
+                    requestAnimationFrame(step);
+                } else {
+                    // Reativa o snap ao final
+                    element.style.removeProperty('scroll-snap-type');
+                    element.isAnimating = false;
+                }
+            }
+            requestAnimationFrame(step);
+        }
+
         if (prevBtn) {
             prevBtn.addEventListener('click', () => {
-                smoothScroll(slider, slider.scrollLeft - getScrollStep() * 3, 550);
+                const numCards = window.innerWidth <= 900 ? 1 : 3;
+                smoothScroll(slider, -(getScrollStep() * numCards));
             });
         }
         if (nextBtn) {
             nextBtn.addEventListener('click', () => {
-                smoothScroll(slider, slider.scrollLeft + getScrollStep() * 3, 550);
+                const numCards = window.innerWidth <= 900 ? 1 : 3;
+                smoothScroll(slider, getScrollStep() * numCards);
             });
         }
 

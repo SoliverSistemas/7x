@@ -12,10 +12,11 @@
         html.setAttribute('data-theme', theme);
         localStorage.setItem(STORAGE_KEY, theme);
 
-        var btn = document.getElementById('theme-toggle-btn');
-        if (!btn) return;
-        btn.title = theme === 'dark' ? 'Mudar para tema claro' : 'Mudar para tema escuro';
-        btn.setAttribute('aria-label', btn.title);
+        var buttons = document.querySelectorAll('#theme-toggle-btn, #theme-toggle-mobile, .theme-toggle-btn, .theme-toggle-mobile');
+        buttons.forEach(function (btn) {
+            btn.title = theme === 'dark' ? 'Mudar para tema claro' : 'Mudar para tema escuro';
+            btn.setAttribute('aria-label', btn.title);
+        });
     }
 
     // Aplica imediatamente (sem esperar DOMContentLoaded) para evitar flash
@@ -26,16 +27,19 @@
     document.addEventListener('DOMContentLoaded', function () {
         applyTheme(saved);
 
-        var btn = document.getElementById('theme-toggle-btn');
-        if (!btn) return;
+        var buttons = document.querySelectorAll('#theme-toggle-btn, #theme-toggle-mobile, .theme-toggle-btn, .theme-toggle-mobile');
+        buttons.forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                var current = html.getAttribute('data-theme') || 'dark';
+                var next = current === 'dark' ? 'light' : 'dark';
+                applyTheme(next);
 
-        btn.addEventListener('click', function () {
-            var current = html.getAttribute('data-theme') || 'dark';
-            applyTheme(current === 'dark' ? 'light' : 'dark');
-
-            // Micro-animação de rotação ao clicar
-            btn.classList.add('spinning');
-            setTimeout(function () { btn.classList.remove('spinning'); }, 500);
+                // Micro-animação de rotação ao clicar
+                buttons.forEach(function (b) {
+                    b.classList.add('spinning');
+                    setTimeout(function () { b.classList.remove('spinning'); }, 500);
+                });
+            });
         });
     });
 })();
