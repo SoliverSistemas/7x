@@ -9,32 +9,19 @@ class PropertyRepository:
 
     @classmethod
     def get_all(cls):
+        from sqlalchemy.orm import defer
         # Retorna todos os imóveis ativos
-        properties = Property.query.filter_by(status='Disponível').all()
+        properties = Property.query.filter_by(status='Disponível').options(
+            defer(Property.description),
+            defer(Property._amenities_property),
+            defer(Property._amenities_condo),
+            defer(Property._amenities),
+            defer(Property._gallery),
+            defer(Property._establishments),
+            defer(Property._agent)
+        ).all()
         
-        # Load agent profiles to override avatar, description, instagram, etc.
-        try:
-            profiles = AgentProfile.query.all()
-            profile_map = {p.name: p for p in profiles}
-        except Exception:
-            profile_map = {}
-
-        result = []
-        for prop in properties:
-            p_dict = prop.to_dict()
-            agent = p_dict.get('agent', {})
-            agent_name = agent.get('name')
-            if agent_name and agent_name in profile_map:
-                prof = profile_map[agent_name]
-                if prof.avatar_url:
-                    agent['avatar_url'] = prof.avatar_url
-                if prof.instagram:
-                    agent['instagram'] = prof.instagram
-                if prof.description:
-                    agent['description'] = prof.description
-            result.append(p_dict)
-
-        return result
+        return [prop.to_dict_summary() for prop in properties]
 
     @classmethod
     def get_all_agents(cls):
@@ -65,16 +52,10 @@ class PropertyRepository:
     @classmethod
     def get_properties_by_agent(cls, agent_name):
         """Retorna os imóveis sob responsabilidade de um corretor específico."""
-        properties = cls.get_all()
-        # Normaliza o nome para busca insensível a maiúsculas/minúsculas
-        search_name = agent_name.lower().strip()
-        filtered = []
-        for p in properties:
-            agent = p.get('agent', {})
-            name = agent.get('name', '')
-            if name.lower().strip() == search_name:
-                filtered.append(p)
-        return filtered
+        # Corretores não têm mais imóveis vinculados, então isso pode retornar vazio
+        # ou se precisar, pode buscar no campo JSON `_agent`.
+        # Mas no nosso novo fluxo, a página do corretor só exibe os contatos dele.
+        return []
 
     @classmethod
     def calculate_category(cls, prop: dict) -> str:
@@ -119,10 +100,20 @@ class PropertyRepository:
 
     @classmethod
     def get_featured(cls, limit=3):
-        properties = Property.query.filter_by(featured=True, status='Disponível').limit(limit).all()
+        from sqlalchemy.orm import defer
+        base_query = Property.query.options(
+            defer(Property.description),
+            defer(Property._amenities_property),
+            defer(Property._amenities_condo),
+            defer(Property._amenities),
+            defer(Property._gallery),
+            defer(Property._establishments),
+            defer(Property._agent)
+        )
+        properties = base_query.filter_by(featured=True, status='Disponível').limit(limit).all()
         if not properties:
-            properties = Property.query.filter_by(status='Disponível').limit(limit).all()
-        return [p.to_dict() for p in properties]
+            properties = base_query.filter_by(status='Disponível').limit(limit).all()
+        return [p.to_dict_summary() for p in properties]
 
     @classmethod
     def get_by_id(cls, property_id):
@@ -256,10 +247,22 @@ class PropertyRepository:
         except (ValueError, TypeError):
             page = 1
 
+        # Otimização massiva: Não carregar JSON strings pesadas
+        from sqlalchemy.orm import defer
+        query = query.options(
+            defer(Property.description),
+            defer(Property._amenities_property),
+            defer(Property._amenities_condo),
+            defer(Property._amenities),
+            defer(Property._gallery),
+            defer(Property._establishments),
+            defer(Property._agent)
+        )
+
         pagination = query.paginate(page=page, per_page=per_page, error_out=False)
         
         return {
-            'properties': [p.to_dict() for p in pagination.items],
+            'properties': [p.to_dict_summary() for p in pagination.items],
             'total': pagination.total,
             'current_page': pagination.page,
             'last_page': pagination.pages,

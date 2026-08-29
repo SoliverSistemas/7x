@@ -4,41 +4,99 @@
 
 document.addEventListener('DOMContentLoaded', () => {
     initHeroVideoSlider();
-    initStickySearchBar();
 });
 
+
+/* â”€â”€ Helper: debounce para evitar centenas de chamadas no resize â”€â”€â”€ */
+function debounce(fn, delay) {
+    var timer;
+    return function() {
+        var args = arguments;
+        clearTimeout(timer);
+        timer = setTimeout(function() { fn.apply(this, args); }, delay || 150);
+    };
+}
+
+/* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+   loadVideoSources(videoEl)
+   Popula as <source> de um vÃ­deo lazy (data-src-mp4) e dispara o download.
+   Idempotente: chamaÃ§Ãµes repetidas nÃ£o refazem o trabalho.
+   â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+function loadVideoSources(videoEl) {
+    if (videoEl.dataset.loaded) return; // jÃ¡ iniciou o download
+    videoEl.dataset.loaded = '1';
+
+    var mp4 = videoEl.dataset.srcMp4;
+    if (mp4) {
+        var source = document.createElement('source');
+        source.src  = mp4;
+        source.type = 'video/mp4';
+        videoEl.appendChild(source);
+    }
+
+    // preload="auto" faz o browser comeÃ§ar a baixar em background
+    videoEl.preload = 'auto';
+    videoEl.load();
+}
+
+
 function initHeroVideoSlider() {
-    const heroSection = document.getElementById('hero-slider');
+    var heroSection = document.getElementById('hero-slider');
     if (!heroSection) return;
 
-    const videos = Array.from(heroSection.querySelectorAll('.hero-video'));
-    const indicators = Array.from(heroSection.querySelectorAll('.indicator-btn'));
-    const prevBtn = document.getElementById('hero-prev-btn');
-    const nextBtn = document.getElementById('hero-next-btn');
-    const playPauseBtn = document.getElementById('hero-play-pause-btn');
+    var videos     = Array.from(heroSection.querySelectorAll('.hero-video'));
+    var indicators = Array.from(heroSection.querySelectorAll('.indicator-btn'));
+    var prevBtn       = document.getElementById('hero-prev-btn');
+    var nextBtn       = document.getElementById('hero-next-btn');
+    var playPauseBtn  = document.getElementById('hero-play-pause-btn');
 
     if (videos.length === 0) return;
 
-    let currentIndex = 0;
-    let isPlaying = true;
-    const SLIDE_DURATION = 8000; // 8 seconds per video
-    let slideTimer = null;
-    let progressStartTime = 0;
-    let progressAnimationFrame = null;
+    var currentIndex = 0;
+    var isPlaying    = true;
+    var SLIDE_DURATION        = 8000;
+    var slideTimer            = null;
+    var progressStartTime     = 0;
+    var progressAnimationFrame = null;
 
-    // Set initial video playback
-    videos.forEach((vid, idx) => {
-        vid.muted = true;
+    // ConfiguraÃ§Ã£o inicial dos vÃ­deos
+    videos.forEach(function(vid, idx) {
+        vid.muted       = true;
         vid.playsInline = true;
         if (idx === 0) {
             vid.classList.add('active');
-            vid.play().catch(() => {});
+            vid.play().catch(function() {});
         } else {
             vid.classList.remove('active');
-            vid.pause();
-            vid.currentTime = 0;
+            // VÃ­deos com data-src-mp4 ainda nÃ£o tÃªm source â€” aguardam o preload antecipado
+            // VÃ­deos jÃ¡ com <source> (sem data-src-mp4) ficam pausados normalmente
+            if (!vid.dataset.srcMp4) {
+                vid.pause();
+                vid.currentTime = 0;
+            }
         }
     });
+
+    /* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+       scheduleNextPreload(activeIndex)
+       Agenda o preload do prÃ³ximo vÃ­deo para iniciar a 60% do slide atual
+       (= 4.8s de 8s), dando ~3s de buffer antes da transiÃ§Ã£o.
+       â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+    var preloadTimer = null;
+    var PRELOAD_AT   = 0.60; // dispara o preload neste % da duraÃ§Ã£o do slide
+
+    function scheduleNextPreload(activeIndex) {
+        clearTimeout(preloadTimer);
+        var nextIndex = (activeIndex + 1) % videos.length;
+        var nextVideo = videos[nextIndex];
+        if (!nextVideo || !nextVideo.dataset.srcMp4) return; // jÃ¡ tem source ou nÃ£o Ã© lazy
+
+        var delay = Math.floor(SLIDE_DURATION * PRELOAD_AT); // ex: 4800ms
+        preloadTimer = setTimeout(function() {
+            loadVideoSources(nextVideo);
+        }, delay);
+    }
+
 
     function updateIndicators(index) {
         indicators.forEach((ind, i) => {
@@ -83,6 +141,9 @@ function initHeroVideoSlider() {
 
         progressStartTime = performance.now();
         progressAnimationFrame = requestAnimationFrame(animateProgressBar);
+
+        // Agenda preload do prÃ³ximo vÃ­deo com antecipaÃ§Ã£o
+        scheduleNextPreload(currentIndex);
     }
 
     function stopAutoSlide() {
@@ -93,16 +154,15 @@ function initHeroVideoSlider() {
     function goToSlide(targetIndex) {
         if (targetIndex === currentIndex && videos[currentIndex].classList.contains('active')) return;
 
-        const prevIndex = currentIndex;
-        currentIndex = targetIndex;
+        var prevIndex = currentIndex;
+        currentIndex  = targetIndex;
 
-        // Transition videos
-        const prevVideo = videos[prevIndex];
-        const nextVideo = videos[currentIndex];
+        var prevVideo = videos[prevIndex];
+        var nextVideo = videos[currentIndex];
 
         if (prevVideo) {
             prevVideo.classList.remove('active');
-            setTimeout(() => {
+            setTimeout(function() {
                 if (currentIndex !== prevIndex) {
                     prevVideo.pause();
                     prevVideo.currentTime = 0;
@@ -111,17 +171,20 @@ function initHeroVideoSlider() {
         }
 
         if (nextVideo) {
+            // Garante que o vÃ­deo tem suas sources (caso o preload antecipado
+            // ainda nÃ£o tivesse disparado, ex: clique manual antecipado)
+            loadVideoSources(nextVideo);
             nextVideo.classList.add('active');
             nextVideo.currentTime = 0;
             if (isPlaying) {
-                nextVideo.play().catch(() => {});
+                nextVideo.play().catch(function() {});
             }
         }
 
         updateIndicators(currentIndex);
 
         if (isPlaying) {
-            startAutoSlide();
+            startAutoSlide(); // jÃ¡ inclui scheduleNextPreload(currentIndex)
         }
     }
 
@@ -136,13 +199,13 @@ function initHeroVideoSlider() {
             if (currentVideo) currentVideo.play().catch(() => {});
             if (pauseIcon) pauseIcon.style.display = 'block';
             if (playIcon) playIcon.style.display = 'none';
-            if (playPauseBtn) playPauseBtn.setAttribute('title', 'Pausar vídeo');
+            if (playPauseBtn) playPauseBtn.setAttribute('title', 'Pausar vÃ­deo');
             startAutoSlide();
         } else {
             if (currentVideo) currentVideo.pause();
             if (pauseIcon) pauseIcon.style.display = 'none';
             if (playIcon) playIcon.style.display = 'block';
-            if (playPauseBtn) playPauseBtn.setAttribute('title', 'Reproduzir vídeo');
+            if (playPauseBtn) playPauseBtn.setAttribute('title', 'Reproduzir vÃ­deo');
             stopAutoSlide();
         }
     }
@@ -194,51 +257,4 @@ function initHeroVideoSlider() {
             }
         }
     });
-}
-
-/* ── 2. Sticky Hero Search Bar (Docks under Header on Scroll) ───────────── */
-function initStickySearchBar() {
-    const searchWrapper = document.getElementById('heroSearchWrapper');
-    const searchBar = document.getElementById('heroSearchBar');
-    const header = document.querySelector('.site-header');
-    if (!searchWrapper || !searchBar) return;
-
-    let isDocked = false;
-
-    function handleScroll() {
-        // No mobile, a barra fica sempre estática dentro do hero
-        if (window.innerWidth <= 768) {
-            if (isDocked) {
-                isDocked = false;
-                searchBar.classList.remove('is-docked');
-                searchBar.style.top = '';
-                searchWrapper.style.minHeight = '';
-            }
-            return;
-        }
-
-        const headerBottom = header ? header.getBoundingClientRect().bottom : 58;
-        const wrapperRect = searchWrapper.getBoundingClientRect();
-
-        // Check if search wrapper reached the header bottom
-        if (wrapperRect.top <= headerBottom) {
-            if (!isDocked) {
-                isDocked = true;
-                searchWrapper.style.minHeight = `${searchBar.offsetHeight}px`;
-                searchBar.classList.add('is-docked');
-            }
-            searchBar.style.top = `${Math.max(headerBottom, 0)}px`;
-        } else {
-            if (isDocked) {
-                isDocked = false;
-                searchBar.classList.remove('is-docked');
-                searchBar.style.top = '';
-                searchWrapper.style.minHeight = '';
-            }
-        }
-    }
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    window.addEventListener('resize', handleScroll, { passive: true });
-    handleScroll();
 }

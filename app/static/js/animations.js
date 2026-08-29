@@ -168,35 +168,7 @@ function initHoverEffects() {
     });
 }
 
-// ── 4. Animated Counter for Stats ──────────────────────────────────────
-function initStatCounters() {
-    if (typeof ScrollTrigger === 'undefined') return;
-
-    const statNumbers = document.querySelectorAll('.stat-number[data-count]');
-    if (!statNumbers.length) return;
-
-    statNumbers.forEach(el => {
-        const target = parseInt(el.dataset.count, 10);
-        if (isNaN(target)) return;
-
-        ScrollTrigger.create({
-            trigger: el,
-            start: 'top 90%',
-            once: true,
-            onEnter: () => {
-                const obj = { val: 0 };
-                gsap.to(obj, {
-                    val: target,
-                    duration: 2,
-                    ease: 'power2.out',
-                    onUpdate: () => {
-                        el.textContent = Math.round(obj.val).toLocaleString('pt-BR');
-                    }
-                });
-            }
-        });
-    });
-}
+// ── 4. Animated Counter for Stats — usa IntersectionObserver (sem dependência de GSAP) ──
 
 // ── 5. Header Scroll Effect ────────────────────────────────────────────
 function initHeaderScroll() {

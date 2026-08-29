@@ -5,204 +5,150 @@
 
 {% block extra_css %}
 <style>
-/* ── Estilos de Modal e Utilitários para Corretores ─────────────────────── */
-.agt-header {
-    display: flex; flex-direction: column; gap: 0.5rem;
-    margin-bottom: 2rem;
+.agt-toolbar {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 1.5rem; flex-wrap: wrap; gap: 0.75rem;
 }
-.agt-title { font-size: 1.4rem; font-weight: 700; color: var(--adm-text); }
 .agt-subtitle { font-size: 0.85rem; color: var(--adm-text-2); }
 
-.agt-avatar-wrap {
-    width: 48px; height: 48px; border-radius: 50%;
-    overflow: hidden; background: var(--adm-surface-3);
-    border: 2px solid var(--adm-border-2);
-    display: flex; align-items: center; justify-content: center;
-    color: var(--adm-text-3);
+.agents-table { width: 100%; border-collapse: collapse; }
+.agents-table th {
+    padding: 0.65rem 1rem; text-align: left;
+    font-size: 0.75rem; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.06em; color: var(--adm-text-3);
+    border-bottom: 1px solid var(--adm-border-2);
 }
+.agents-table td {
+    padding: 0.85rem 1rem;
+    border-bottom: 1px solid var(--adm-border);
+    vertical-align: middle;
+}
+.agents-table tr:hover td { background: var(--adm-surface-2); }
+.agents-table tr:last-child td { border-bottom: none; }
 
-.modal-backdrop {
-    position: fixed; inset: 0; background: rgba(0,0,0,0.7);
-    backdrop-filter: blur(4px); z-index: 1000;
-    display: none; align-items: center; justify-content: center;
-    padding: 1rem;
+.agent-row-avatar {
+    width: 44px; height: 44px; border-radius: 50%; overflow: hidden;
+    background: var(--adm-surface-3); border: 2px solid var(--adm-border-2);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--adm-text-3); flex-shrink: 0;
 }
-.modal-backdrop.open { display: flex; }
-.modal-window {
-    background: var(--adm-surface); border: 1px solid var(--adm-border-2);
-    border-radius: 16px; width: 100%; max-width: 500px;
-    box-shadow: var(--adm-shadow-lg); overflow: hidden;
+.agent-row-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.agent-cell-name { display: flex; align-items: center; gap: 0.75rem; }
+.agent-name-text { font-weight: 600; font-size: 0.93rem; }
+.agent-creci-text { font-size: 0.75rem; color: var(--adm-gold); margin-top: 2px; }
+
+.badge-active {
+    display: inline-block; padding: 2px 8px; border-radius: 20px;
+    font-size: 0.72rem; font-weight: 600;
+    background: rgba(16,185,129,0.12); color: #10b981;
+    border: 1px solid rgba(16,185,129,0.2);
 }
-.modal-header {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--adm-border-2);
+.badge-inactive {
+    display: inline-block; padding: 2px 8px; border-radius: 20px;
+    font-size: 0.72rem; font-weight: 600;
+    background: rgba(239,68,68,0.10); color: #ef4444;
+    border: 1px solid rgba(239,68,68,0.2);
 }
-.modal-title { font-weight: 600; font-size: 1.1rem; }
-.modal-close {
-    background: transparent; border: none; color: var(--adm-text-2);
-    cursor: pointer; font-size: 1.2rem; display: flex; align-items: center;
-    padding: 0.2rem; border-radius: 4px;
+.btn-table-action {
+    display: inline-flex; align-items: center; gap: 0.3rem;
+    padding: 0.3rem 0.7rem; border-radius: 6px; font-size: 0.78rem;
+    font-weight: 500; cursor: pointer; border: 1px solid transparent;
+    text-decoration: none; transition: 0.15s;
 }
-.modal-close:hover { color: var(--adm-text); background: var(--adm-surface-3); }
-.modal-body { padding: 1.5rem; }
-.modal-footer {
-    padding: 1.25rem 1.5rem; border-top: 1px solid var(--adm-border-2);
-    background: var(--adm-surface-2); display: flex; justify-content: flex-end; gap: 1rem;
-}
-.form-group { margin-bottom: 1.25rem; }
-.form-label { display: block; font-size: 0.85rem; font-weight: 500; margin-bottom: 0.5rem; color: var(--adm-text-2); }
-.form-control {
-    width: 100%; background: var(--adm-surface-2); border: 1px solid var(--adm-border-2);
-    border-radius: 8px; color: var(--adm-text); padding: 0.6rem 0.8rem;
-    font-size: 0.9rem; transition: 0.2s;
-}
-.form-control:focus { border-color: var(--adm-gold); outline: none; box-shadow: 0 0 0 2px var(--adm-gold-dim); }
-.btn {
-    padding: 0.6rem 1.2rem; border-radius: 8px; font-weight: 600; font-size: 0.85rem;
-    cursor: pointer; transition: 0.2s; border: none;
-}
-.btn-primary { background: var(--adm-gold); color: #000; }
-.btn-primary:hover { background: var(--adm-gold-hover); }
-.btn-outline { background: transparent; border: 1px solid var(--adm-border-2); color: var(--adm-text); }
-.btn-outline:hover { background: var(--adm-surface-3); }
+.btn-edit { background: var(--adm-surface-3); color: var(--adm-text-2); border-color: var(--adm-border-2); }
+.btn-edit:hover { color: var(--adm-gold); border-color: var(--adm-gold-dim); }
+.btn-delete { background: rgba(239,68,68,0.07); color: #ef4444; border-color: rgba(239,68,68,0.2); }
+.btn-delete:hover { background: rgba(239,68,68,0.15); }
+.btn-toggle { background: var(--adm-surface-3); color: var(--adm-text-3); border-color: var(--adm-border-2); }
+.btn-toggle:hover { color: var(--adm-text); }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="agt-header">
-    <h1 class="agt-title">Corretores e Equipe</h1>
-    <p class="agt-subtitle">Configure as fotos de perfil (avatares) e descrições dos seus corretores. As informações abaixo vão sobrescrever o padrão do Tecimob no site.</p>
+<div class="agt-toolbar">
+    <div>
+        <div class="adm-section-title">Corretores</div>
+        <p class="agt-subtitle">{{ agents | length }} corretor(es) cadastrado(s) • <a href="{{ url_for('agents.list_agents') }}" target="_blank" style="color:var(--adm-gold);">Ver página pública ↗</a></p>
+    </div>
+    <a href="{{ url_for('admin.create_agent') }}" class="adm-btn adm-btn-primary">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Novo Corretor
+    </a>
 </div>
 
-<!-- Table -->
-<div class="dash-card" style="padding:0; overflow:hidden;">
-    <div class="admin-table-wrap">
-        <table class="admin-table">
-            <thead>
-                <tr>
-                    <th>Corretor</th>
-                    <th>Imóveis Ativos</th>
-                    <th>Instagram</th>
-                    <th style="text-align: right;">Ações</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for agent in agents %}
-                <tr>
-                    <td>
-                        <div style="display: flex; align-items: center; gap: 12px;">
-                            <div class="agt-avatar-wrap">
-                                {% if agent.avatar_url %}
-                                    <img src="{{ agent.avatar_url }}" style="width: 100%; height: 100%; object-fit: cover;">
-                                {% else %}
-                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-                                {% endif %}
-                            </div>
-                            <div>
-                                <div style="font-weight: 600; color: var(--adm-text);">{{ agent.name }}</div>
-                                <div style="font-size: 0.8rem; color: var(--adm-text-2);">{{ agent.email }}</div>
-                            </div>
+<div class="adm-card">
+    {% if agents %}
+    <table class="agents-table">
+        <thead>
+            <tr>
+                <th>Corretor</th>
+                <th>Ordem</th>
+                <th>Status</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for a in agents %}
+            <tr>
+                <td>
+                    <div class="agent-cell-name">
+                        <div class="agent-row-avatar">
+                            {% if a.avatar_url %}
+                                <img src="{{ a.avatar_url }}" alt="{{ a.name }}">
+                            {% else %}
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                            {% endif %}
                         </div>
-                    </td>
-                    <td>
-                        <span style="display: inline-block; padding: 4px 10px; border-radius: 99px; font-size: 0.8rem; font-weight: 600; background: var(--adm-blue-dim); color: var(--adm-blue);">
-                            {{ agent.property_count }} imóveis
-                        </span>
-                    </td>
-                    <td>
-                        {% if agent.instagram %}
-                            <a href="https://instagram.com/{{ agent.instagram.replace('@', '') }}" target="_blank" style="color: var(--adm-gold);">{{ agent.instagram }}</a>
-                        {% else %}
-                            <span style="color: var(--adm-text-3);">Não configurado</span>
-                        {% endif %}
-                    </td>
-                    <td style="text-align: right;">
-                        <button type="button" class="btn btn-outline" style="padding: 0.4rem 0.8rem;" 
-                                onclick="openAgentModal('{{ agent.name }}', '{{ agent.avatar_url }}', '{{ agent.instagram or '' }}', `{{ agent.description or '' }}`)">
-                            Editar Perfil
-                        </button>
-                    </td>
-                </tr>
-                {% else %}
-                <tr>
-                    <td colspan="4" style="text-align: center; padding: 3rem; color: var(--adm-text-2);">Nenhum corretor com imóveis ativos no momento.</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-</div>
-
-<!-- Modal Edit Agent -->
-<div class="modal-backdrop" id="agentModal">
-    <div class="modal-window">
-        <div class="modal-header">
-            <h3 class="modal-title">Editar Perfil do Corretor</h3>
-            <button type="button" class="modal-close" onclick="closeAgentModal()">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-            </button>
-        </div>
-        <form id="agentForm" action="" method="POST" enctype="multipart/form-data">
-            <div class="modal-body">
-                <input type="hidden" name="agent_name" id="modalAgentName">
-                
-                <div class="form-group" style="text-align: center;">
-                    <div id="modalAvatarPreview" style="width: 80px; height: 80px; border-radius: 50%; overflow: hidden; margin: 0 auto 12px; background: var(--adm-surface-3); border: 2px solid var(--adm-border-2); display: flex; align-items: center; justify-content: center; color: var(--adm-text-3);">
-                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                        <div>
+                            <div class="agent-name-text">{{ a.name }}</div>
+                            {% if a.creci %}<div class="agent-creci-text">CRECI: {{ a.creci }}</div>{% endif %}
+                        </div>
                     </div>
-                    <label class="form-label">Foto de Perfil (Avatar)</label>
-                    <input type="file" name="avatar" class="form-control" accept="image/*" onchange="previewImage(this)">
-                    <div style="font-size: 0.75rem; color: var(--adm-text-2); margin-top: 6px;">Proporção sugerida: 1:1 (quadrada). Deixe em branco para manter a foto atual.</div>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">Instagram</label>
-                    <input type="text" name="instagram" id="modalInstagram" class="form-control" placeholder="@usuario">
-                </div>
-
-                <div class="form-group" style="margin-bottom: 0;">
-                    <label class="form-label">Descrição / Biografia</label>
-                    <textarea name="description" id="modalDescription" class="form-control" rows="4" placeholder="Breve currículo ou apresentação..."></textarea>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-outline" onclick="closeAgentModal()">Cancelar</button>
-                <button type="submit" class="btn btn-primary">Salvar Alterações</button>
-            </div>
-        </form>
+                </td>
+                <td style="text-align:center;">{{ a.display_order }}</td>
+                <td>
+                    {% if a.is_active %}
+                        <span class="badge-active">Ativo</span>
+                    {% else %}
+                        <span class="badge-inactive">Inativo</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <div style="display:flex;gap:0.4rem;flex-wrap:wrap;">
+                        <a href="{{ url_for('admin.edit_agent', agent_id=a.id) }}" class="btn-table-action btn-edit">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                            Editar
+                        </a>
+                        <form method="POST" action="{{ url_for('admin.toggle_agent_active', agent_id=a.id) }}" style="display:inline;">
+                            <button type="submit" class="btn-table-action btn-toggle" title="{{ 'Desativar' if a.is_active else 'Ativar' }}">
+                                {% if a.is_active %}
+                                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+                                    Desativar
+                                {% else %}
+                                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                                    Ativar
+                                {% endif %}
+                            </button>
+                        </form>
+                        <form method="POST" action="{{ url_for('admin.delete_agent', agent_id=a.id) }}" style="display:inline;"
+                              onsubmit="return confirm('Excluir o corretor {{ a.name }}? Esta ação não pode ser desfeita.');">
+                            <button type="submit" class="btn-table-action btn-delete">
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+                                Excluir
+                            </button>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <div style="padding:3rem;text-align:center;color:var(--adm-text-3);">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin-bottom:1rem;opacity:0.4;"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        <p>Nenhum corretor cadastrado ainda.</p>
+        <a href="{{ url_for('admin.create_agent') }}" class="adm-btn adm-btn-primary" style="margin-top:1rem;">Adicionar primeiro corretor</a>
     </div>
+    {% endif %}
 </div>
-
-<script>
-function openAgentModal(name, avatar, instagram, description) {
-    document.getElementById('modalAgentName').value = name;
-    document.getElementById('agentForm').action = "/admin/corretores/" + encodeURIComponent(name);
-    
-    document.getElementById('modalInstagram').value = instagram;
-    document.getElementById('modalDescription').value = description;
-    
-    const preview = document.getElementById('modalAvatarPreview');
-    if (avatar) {
-        preview.innerHTML = `<img src="${avatar}" style="width: 100%; height: 100%; object-fit: cover;">`;
-    } else {
-        preview.innerHTML = `<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>`;
-    }
-    
-    document.getElementById('agentModal').classList.add('open');
-}
-
-function closeAgentModal() {
-    document.getElementById('agentModal').classList.remove('open');
-}
-
-function previewImage(input) {
-    if (input.files && input.files[0]) {
-        var reader = new FileReader();
-        reader.onload = function(e) {
-            document.getElementById('modalAvatarPreview').innerHTML = `<img src="${e.target.result}" style="width: 100%; height: 100%; object-fit: cover;">`;
-        }
-        reader.readAsDataURL(input.files[0]);
-    }
-}
-</script>
 {% endblock %}

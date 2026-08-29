@@ -1,10 +1,10 @@
 {% extends 'base.html' %}
 
 {% block title %}{{ lancamento.name }} · Lançamento · 7X Patrimonial{% endblock %}
-{% block meta_description %}{{ lancamento.tagline }} — {{ lancamento.location }}. Lançamento exclusivo da 7X Patrimonial.{% endblock %}
+{% block meta_description %}<meta name="description" content="{{ lancamento.tagline }} — {{ lancamento.location }}. Lançamento exclusivo da 7X Patrimonial.">{% endblock %}
 
 {% block extra_css %}
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600;1,700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/pages/lancamento_detail.css') }}">
 <style>
 /* ── Reset e Animações Globais ─────────────────────────────── */
 .site-header,.top-bar,.site-footer,.fav-drawer,.fav-drawer-overlay,.modal-overlay,
@@ -34,7 +34,7 @@ main{margin:0!important;padding:0!important;background:transparent!important}
   --ink:      var(--bg-main);
   --ink2:     var(--bg-surface);
   --ink3:     var(--bg-card);
-  --serif:    'Playfair Display', Georgia, serif;
+  --serif:    'Inter', system-ui, sans-serif; /* Fonte suíça minimalista (estilo Apple) */
   --sans:     'Inter', system-ui, sans-serif;
   --ease:     cubic-bezier(.4,0,.2,1);
   --ease-out: cubic-bezier(.22,1,.36,1);
@@ -62,7 +62,7 @@ main{margin:0!important;padding:0!important;background:transparent!important}
 ═══════════════════════════════════════════════════════════ */
 .ld-hero{
   width:100%;height:100vh;min-height:640px;
-  position:relative;display:flex;align-items:flex-end;
+  position:relative;display:flex;align-items:center;
   background:#000; /* O hero deve sempre ser escuro para a foto */
   overflow:hidden;
 }
@@ -73,18 +73,10 @@ main{margin:0!important;padding:0!important;background:transparent!important}
   filter:saturate(.9);
   animation: ld-imgReveal 1.8s cubic-bezier(0.22,1,0.36,1) forwards;
 }
-/* Overlay multicamada — mais dramático (sempre escuro no hero) */
+/* Overlay sutil para garantir leitura sem apagar a foto */
 .ld-hero-overlay{
   position:absolute;inset:0;
-  background:
-    linear-gradient(to top,  rgba(0,0,0,1)    0%,
-                             rgba(0,0,0,.85)  25%,
-                             rgba(0,0,0,.35)  55%,
-                             rgba(0,0,0,.05)  85%,
-                             transparent      100%),
-    linear-gradient(100deg,  rgba(0,0,0,.75)  0%,
-                             rgba(0,0,0,.1)   55%,
-                             transparent      100%);
+  background:linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.1) 45%, transparent 100%);
   animation: ld-scaleIn 2s cubic-bezier(0.22,1,0.36,1) forwards;
 }
 /* Linha lateral dourada */
@@ -96,80 +88,101 @@ main{margin:0!important;padding:0!important;background:transparent!important}
 }
 
 .ld-hero-content{
-  position:relative;z-index:2;
-  width:100%;max-width:1300px;margin:0 auto;
-  padding:2rem 5rem 7rem;
+  position:absolute;z-index:2;
+  top:50%; transform:translateY(-50%);
+  width:100%;max-width:760px;
+  left:8rem;
+  padding:4rem;
+  
+  /* Glassmorphism Premium & Luminoso */
+  background:linear-gradient(145deg, rgba(15, 17, 22, 0.75) 0%, rgba(5, 6, 8, 0.9) 100%);
+  backdrop-filter:blur(30px) saturate(120%);
+  -webkit-backdrop-filter:blur(30px) saturate(120%);
+  
+  /* Bordas reflexivas arquitetônicas */
+  border:1px solid rgba(255,255,255,0.06);
+  border-top:1px solid rgba(255,255,255,0.15);
+  border-left:1px solid rgba(255,255,255,0.12);
+  border-radius:24px;
+  
+  /* Sombra com leve glow dourado */
+  box-shadow: 
+    0 40px 80px rgba(0,0,0,0.6), 
+    0 0 60px rgba(201,172,119,0.06),
+    inset 0 1px 0 rgba(255,255,255,0.05);
+}
+
+/* Detalhe arquitetônico (Linha dourada flutuante) */
+.ld-hero-content::after {
+  content:'';
+  position:absolute;
+  top:4rem; bottom:4rem; left:-1px;
+  width:2px;
+  background:linear-gradient(to bottom, var(--gold), transparent);
+  border-radius:2px;
+  opacity:0.8;
 }
 
 /* Eyebrow */
 .ld-hero-eyebrow{
-  display:flex;align-items:center;gap:1.25rem;margin-bottom:2.8rem;
+  display:flex;align-items:center;gap:1.25rem;margin-bottom:2.5rem;
   animation: ld-fadeUp 1s 0.3s both cubic-bezier(0.22,1,0.36,1);
 }
 .ld-hero-pill{
   font-family:var(--sans);
-  font-size:.58rem;font-weight:600;letter-spacing:.22em;text-transform:uppercase;
-  color:var(--gold);border:1px solid rgba(201,172,119,.3);
-  border-radius:100px;padding:.32rem 1.1rem;
-  background:rgba(0,0,0,.4);backdrop-filter:blur(4px);
+  font-size:.65rem;font-weight:700;letter-spacing:.22em;text-transform:uppercase;
+  color:var(--gold);border:1px solid rgba(201,172,119,.4);
+  border-radius:100px;padding:.4rem 1.3rem;
+  background:linear-gradient(90deg, rgba(201,172,119,0.1), transparent);
 }
-.ld-hero-sep{width:36px;height:1px;background:rgba(255,255,255,.2);}
+.ld-hero-sep{width:30px;height:1px;background:linear-gradient(90deg, rgba(255,255,255,0.3), transparent);}
 .ld-hero-location{
   font-family:var(--sans);
-  font-size:.6rem;font-weight:500;letter-spacing:.15em;text-transform:uppercase;
-  color:rgba(255,255,255,.6);
+  font-size:.75rem;font-weight:600;letter-spacing:.15em;text-transform:uppercase;
+  color:rgba(255,255,255,.8);
 }
 
-/* Título — Playfair grande */
+/* Título — Ultra Minimalista */
 .ld-hero-title{
-  font-family:var(--serif);
-  font-size:clamp(4.5rem,9vw,9.5rem);
-  font-weight:700;font-style:italic;
-  color:#fff;line-height:.9;
-  margin:0 0 2rem;
-  letter-spacing:-.03em;
-  text-shadow:0 8px 80px rgba(0,0,0,.8);
-  max-width:880px;
+  font-family:var(--sans);
+  font-size:clamp(4.2rem, 7.5vw, 6.5rem);
+  font-weight:300; /* Peso fino muito elegante */
+  color:#fff;line-height:1.02;
+  margin:0 0 1rem;
+  letter-spacing:-.035em;
+  max-width:100%;
   animation: ld-fadeUp 1s 0.5s both cubic-bezier(0.22,1,0.36,1);
 }
 
 /* Tagline */
 .ld-hero-tagline{
   font-family:var(--sans);
-  font-size:1rem;font-weight:300;
-  color:rgba(255,255,255,.8);
-  margin:0 0 3.5rem;max-width:500px;line-height:1.9;
-  letter-spacing:.01em;
-  border-left:1px solid rgba(201,172,119,.4);
-  padding-left:1.25rem;
+  font-size:1.25rem;font-weight:300;
+  color:rgba(255,255,255,.6);
+  margin:0 0 3.5rem;max-width:95%;line-height:1.6;
   animation: ld-fadeUp 1s 0.7s both cubic-bezier(0.22,1,0.36,1);
 }
 
-/* Metas — linha horizontal */
+/* Metas — Grid Minimalista Interno */
 .ld-hero-metas{
-  display:flex;align-items:stretch;
-  gap:0;max-width:620px;
-  border:1px solid rgba(255,255,255,.15);
-  border-radius:3px;overflow:hidden;
-  background:rgba(0,0,0,.6);
-  backdrop-filter:blur(12px);
+  display:grid;grid-template-columns:1fr 1fr;
+  gap:2rem;
+  padding-top:2.5rem;
+  border-top:1px solid rgba(255,255,255,.08);
   animation: ld-fadeUp 1s 0.9s both cubic-bezier(0.22,1,0.36,1);
 }
 .ld-meta{
-  flex:1;min-width:110px;
-  padding:1.1rem 1.6rem;
   display:flex;flex-direction:column;gap:.4rem;
-  border-right:1px solid rgba(255,255,255,.15);
 }
-.ld-meta:last-child{border-right:none;}
 .ld-meta-val{
-  font-family:var(--serif);
-  font-size:1.1rem;font-weight:600;
-  color:rgba(255,255,255,.95);line-height:1.2;
+  font-family:var(--sans); /* Fonte limpa */
+  font-size:1.9rem;font-weight:300;
+  color:var(--gold);line-height:1;
+  letter-spacing:-0.03em;
 }
 .ld-meta-key{
   font-family:var(--sans);
-  font-size:.5rem;font-weight:600;letter-spacing:.22em;text-transform:uppercase;
+  font-size:.85rem;font-weight:500;letter-spacing:.25em;text-transform:uppercase;
   color:rgba(255,255,255,.5);
 }
 
@@ -283,7 +296,7 @@ main{margin:0!important;padding:0!important;background:transparent!important}
 }
 .ld-block-title{
   font-family:var(--serif);
-  font-size:2.8rem;font-weight:600;font-style:italic;
+  font-size:3.8rem;font-weight:600;font-style:italic;
   color:var(--text-primary);line-height:1.1;
   margin:0 0 1.5rem;
   letter-spacing:-.02em;
@@ -501,40 +514,170 @@ main{margin:0!important;padding:0!important;background:transparent!important}
 .ld-lb-next{right:1.5rem;}
 .ld-lb-nav:hover{background:rgba(201,172,119,.2);color:var(--gold);border-color:var(--gold);}
 
+/* ── 1440px+ ───────────────────────────────────────────── */
+@media (min-width: 1440px) {
+  .ld-hero-content { margin-left: 8rem; }
+  .ld-sobre, .ld-gallery, .ld-cta { padding-left: 8rem; padding-right: 8rem; }
+}
 
-/* ═══════════════════════════════════════════════════════════
-   RESPONSIVE
-═══════════════════════════════════════════════════════════ */
-@media(max-width:1024px){
-  .ld-hero-content,.ld-sobre,.ld-gallery,.ld-cta{padding-left:3rem;padding-right:3rem;}
-  .ld-block-text{padding:4rem 3.5rem;}
-  .ld-sobre-inner{grid-template-columns:160px 1fr;gap:4rem;}
+/* ── 1024px ────────────────────────────────────────────── */
+@media (max-width: 1024px) {
+  .ld-hero-content { left: 3rem; max-width: 580px; padding: 3rem; }
+  .ld-hero-title { font-size: 3rem; }
+  .ld-sobre, .ld-gallery, .ld-cta { padding-left: 3rem; padding-right: 3rem; }
+  .ld-block-text   { padding: 4rem 3.5rem; }
+  .ld-sobre-inner  { grid-template-columns: 140px 1fr; gap: 4rem; }
+  .ld-back         { top: 1.25rem; left: 1.5rem; }
 }
-@media(max-width:768px){
-  .ld-hero-content{padding:1.5rem 1.5rem 5rem;}
-  .ld-hero-title{font-size:clamp(3rem,12vw,5rem);}
-  .ld-hero-metas{flex-direction:column;max-width:100%;}
-  .ld-meta{border-right:none;border-bottom:1px solid rgba(255,255,255,.06);}
-  .ld-meta:last-child{border-bottom:none;}
-  .ld-hero-scroll{right:1.5rem;}
-  .ld-sobre{padding:5rem 1.75rem;}
-  .ld-sobre-inner{grid-template-columns:1fr;gap:2rem;}
-  .ld-sobre-label{position:static;}
-  .ld-sobre-text{font-size:1.35rem;}
-  .ld-block,.ld-block.rev{grid-template-columns:1fr;}
-  .ld-block.rev .ld-block-text{order:0;}
-  .ld-block-img{order:-1;}
-  .ld-block-img img{min-height:300px;}
-  .ld-block-text{padding:3rem 1.75rem;border-left:1px solid rgba(201,172,119,.1)!important;border-right:none!important;}
-  .ld-block-num{font-size:5rem;top:1.5rem;left:1.75rem;}
-  .ld-block-title{font-size:2rem;}
-  .ld-gallery{padding:4rem 1.25rem;}
-  .ld-gallery-grid{grid-template-columns:repeat(2,1fr);}
-  .ld-gallery-item:first-child{grid-column:span 2;}
-  .ld-cta{padding:7rem 1.75rem;}
-  .ld-back{left:1.25rem;}
+@media (max-width: 768px) {
+  /* Hero */
+  .ld-hero { height: 100vh; min-height: 640px; padding: 0; }
+  .ld-hero-content { 
+    width: calc(100% - 3rem); 
+    left: 50%; transform: translate(-50%, -50%);
+    padding: 3rem 2rem; 
+    border-radius: 20px; 
+    backdrop-filter: blur(20px);
+  }
+  
+  .ld-hero-eyebrow { flex-wrap: wrap; margin-bottom: 1.5rem; gap: 0.8rem; }
+  .ld-hero-title { 
+    font-size: 4.5rem; 
+    line-height: 1.1; 
+    margin-bottom: 1rem; 
+    word-break: break-word; /* Evita quebrar layout */
+  }
+  .ld-hero-tagline { font-size: 1.15rem; max-width: 100%; margin-bottom: 2.5rem; }
+
+  /* Metas em grid 2x2 para tablet */
+  .ld-hero-metas { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 2rem; }
+  .ld-meta { background: transparent; padding: 0; border: none; margin: 0; min-width: 0; }
+  
+  .ld-hero-scroll { display: none; } /* Oculta scroll indicator no mobile/tablet */
+
+  /* Sobre */
+  .ld-sobre { padding: 5rem 1.5rem; }
+  .ld-sobre-inner { grid-template-columns: 1fr; gap: 1.5rem; }
+  .ld-sobre-label { position: relative; top: 0; }
+  .ld-sobre-text { font-size: 1.4rem; line-height: 1.6; }
+  .ld-sobre::before { display: none; } /* Remove a linha vertical que pode bugar */
+
+  /* Blocos */
+  .ld-block, .ld-block.rev { grid-template-columns: 1fr; min-height: auto; }
+  .ld-block-img { order: -1 !important; }
+  .ld-block-img img { min-height: 350px; max-height: 450px; }
+  .ld-block.rev .ld-block-text, .ld-block-text { 
+    order: 0 !important; 
+    padding: 3rem 1.5rem !important; 
+    border: none !important;
+    border-bottom: 1px solid rgba(255,255,255,0.05) !important;
+  }
+  .ld-block-num { font-size: 4.5rem; top: 1rem; left: 1rem; opacity: 0.05; }
+  .ld-block-title { font-size: 3.2rem; }
+
+  /* Galeria */
+  .ld-gallery { padding: 4rem 1.5rem; }
+  .ld-gallery-grid { grid-template-columns: 1fr 1fr; gap: 6px; }
+  .ld-gallery-item:first-child { grid-column: span 2; }
+  .ld-gallery-head { flex-wrap: wrap; }
+
+  /* CTA */
+  .ld-cta { padding: 6rem 1.5rem; }
+  .ld-cta-title { font-size: 2.8rem; }
+  .ld-cta-sub { font-size: 1rem; }
+  .ld-cta-btns { flex-direction: column; }
+  .ld-btn-fill, .ld-btn-out { width: 100%; justify-content: center; }
+  
+  .ld-back { left: 1.5rem; top: 1.5rem; }
 }
+
+/* ── 480px (Mobile Standard) ─────────────────────────────────────────────── */
+@media (max-width: 480px) {
+  /* Hero */
+  .ld-hero-content { 
+    width: calc(100% - 2rem); 
+    left: 50%; transform: translate(-50%, -50%);
+    padding: 2.5rem 1.5rem; 
+    border-radius: 16px; 
+  }
+  
+  .ld-hero-eyebrow { margin-bottom: 1.2rem; }
+  .ld-hero-pill { font-size: 0.65rem; padding: 0.35rem 1rem; }
+  .ld-hero-location { font-size: 0.75rem; }
+  .ld-hero-sep { width: 20px; }
+  
+  .ld-hero-title { font-size: 3.2rem; margin-bottom: 0.75rem; letter-spacing: -0.01em; }
+  .ld-hero-tagline { font-size: 1.05rem; line-height: 1.5; padding-left: 0.75rem; margin-bottom: 2rem; }
+
+  /* Metas - volta para grid 2 cols menores */
+  .ld-hero-metas { gap: 1.5rem; padding-top: 1.5rem; }
+  .ld-meta { padding: 0; }
+  .ld-meta-val { font-size: 1.4rem; }
+  .ld-meta-key { font-size: 0.65rem; }
+
+  /* Sobre */
+  .ld-sobre { padding: 4rem 1.25rem; }
+  .ld-sobre-text { font-size: 1.15rem; }
+  .ld-sobre-label { font-size: 0.5rem; }
+
+  /* Blocos */
+  .ld-block-text { padding: 2.5rem 1.25rem !important; }
+  .ld-block-title { font-size: 2.6rem; }
+  .ld-block-body { font-size: 1rem; }
+  .ld-block-num { font-size: 3.5rem; top: 0.75rem; left: 0.75rem; }
+  .ld-block-img img { min-height: 250px; max-height: 300px; }
+
+  /* Galeria */
+  .ld-gallery { padding: 3rem 1.25rem; }
+  .ld-gallery-grid { gap: 4px; }
+  .ld-gallery-head-label { font-size: 0.5rem; }
+
+  /* CTA */
+  .ld-cta { padding: 5rem 1.25rem; }
+  .ld-cta-title { font-size: 2.2rem; }
+  .ld-cta-sub { font-size: 0.9rem; margin-bottom: 2rem; }
+  .ld-btn-fill, .ld-btn-out { padding: 1rem; font-size: 0.65rem; }
+  
+  .ld-back { 
+    left: 1rem; top: 1rem; 
+    padding: 0.35rem 0.8rem 0.35rem 0.6rem; 
+    font-size: 0.55rem; 
+  }
+}
+
+/* ── 360px & 320px (Mobile Small) ─────────────────────────────────────────────── */
+@media (max-width: 380px) {
+  .ld-hero-content { 
+    width: calc(100% - 1.5rem); 
+    left: 50%; transform: translate(-50%, -50%);
+    padding: 2rem 1.25rem; 
+    border-radius: 12px;
+  }
+  
+  .ld-hero-title { font-size: 2.8rem; }
+  .ld-hero-tagline { display: none; } /* Remove tagline em telas muito pequenas para poupar espaço */
+  
+  /* Metas em 1 coluna só (stack) */
+  .ld-hero-metas { grid-template-columns: 1fr; gap: 1rem; padding-top: 1.5rem; }
+  .ld-meta { padding: 0; display: flex; flex-direction: row; justify-content: space-between; align-items: center; }
+  .ld-meta-key { margin-bottom: 0; }
+  
+  .ld-sobre { padding: 3rem 1rem; }
+  .ld-sobre-text { font-size: 1.05rem; }
+  
+  .ld-block-text { padding: 2rem 1rem !important; }
+  .ld-block-title { font-size: 2.2rem; }
+
+  .ld-cta         { padding: 4.5rem 1rem; }
+  .ld-cta-title   { font-size: clamp(1.7rem, 9.5vw, 2.8rem); }
+  .ld-cta-sub     { font-size: 0.85rem; margin-bottom: 2.5rem; }
+  .ld-btn-fill,
+  .ld-btn-out     { padding: 0.95rem 1.5rem; font-size: 0.62rem; }
+}
+
+
 </style>
+
 {% endblock %}
 
 {% block content %}
@@ -544,9 +687,9 @@ main{margin:0!important;padding:0!important;background:transparent!important}
 <style>html,body,main{background:#060810!important;color:#fff!important;margin:0!important;padding:0!important}</style>
 
 {# ── Botão voltar ─────────────────────────────────────── #}
-<a href="{{ url_for('main.lancamentos') }}" class="ld-back">
+<a href="{{ url_for('main.index') }}#lancamentos" class="ld-back">
     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-    Lançamentos
+    Início
 </a>
 
 {# ══ HERO ═══════════════════════════════════════════════ #}
@@ -562,7 +705,6 @@ main{margin:0!important;padding:0!important;background:transparent!important}
     <div class="ld-hero-content">
         <div class="ld-hero-eyebrow">
             {% if lancamento.status %}<span class="ld-hero-pill">{{ lancamento.status }}</span>{% endif %}
-            {% if lancamento.location %}<span class="ld-hero-sep"></span><span class="ld-hero-location">{{ lancamento.location }}</span>{% endif %}
         </div>
 
         <h1 class="ld-hero-title">{{ lancamento.name }}</h1>
@@ -612,23 +754,15 @@ main{margin:0!important;padding:0!important;background:transparent!important}
 </div>
 {% endif %}
 
-{# ══ BLOCOS EDITORIAIS — até 3 fotos com título/texto ═══ #}
+{# ══ BLOCOS EDITORIAIS — apenas para fotos que possuam título ou texto configurados no admin ═══ #}
 {% if gallery %}
 
-{% set default_eyebrows = ['Arquitetura', 'Localização', 'Acabamento'] %}
-{% set default_titles = ['Design & Sofisticação', 'Endereço Privilegiado', 'Excelência nos Detalhes'] %}
-{% set default_bodies = [
-    'Cada detalhe foi meticulosamente concebido para criar uma experiência única — onde estética sofisticada e funcionalidade se encontram em perfeita harmonia.',
-    'Um endereço que une prestígio, conveniência e qualidade de vida. Tudo o que você busca, com a exclusividade que você merece.',
-    'Infraestrutura completa, materiais nobres e acabamentos que definem um novo padrão de sofisticação e requinte.'
-] %}
-
-{% for img in gallery[:3] %}
+{% for img in gallery %}
 {% set img_url   = img.url   if img is mapping else img %}
-{% set img_title = img.title if (img is mapping and img.title and img.title.strip()) else default_titles[loop.index0] %}
-{% set img_text  = img.text  if (img is mapping and img.text  and img.text.strip())  else default_bodies[loop.index0] %}
-{% set img_eye   = default_eyebrows[loop.index0] %}
+{% set img_title = img.title if (img is mapping and img.title) else '' %}
+{% set img_text  = img.text  if (img is mapping and img.text) else '' %}
 
+{% if img_title.strip() or img_text.strip() %}
 <div class="ld-divider"></div>
 <div class="ld-block {% if loop.index is even %}rev{% endif %}">
     <div class="ld-block-img">
@@ -636,9 +770,8 @@ main{margin:0!important;padding:0!important;background:transparent!important}
     </div>
     <div class="ld-block-text">
         <span class="ld-block-num">0{{ loop.index }}</span>
-        <p class="ld-block-eyebrow">{{ img_eye }}</p>
-        <h2 class="ld-block-title">{{ img_title }}</h2>
-        <p class="ld-block-body">{{ img_text }}</p>
+        {% if img_title %}<h2 class="ld-block-title">{{ img_title }}</h2>{% endif %}
+        {% if img_text %}<p class="ld-block-body">{{ img_text }}</p>{% endif %}
         {% if loop.index == 2 %}
         <a href="https://wa.me/{{ whatsapp_number }}?text=Olá!%20Quero%20saber%20mais%20sobre%20{{ lancamento.name | urlencode }}."
            target="_blank" class="ld-block-cta">
@@ -661,6 +794,7 @@ main{margin:0!important;padding:0!important;background:transparent!important}
         {% endif %}
     </div>
 </div>
+{% endif %}
 {% endfor %}
 
 {# ══ GALERIA COMPLETA — TODAS as fotos ═══ #}

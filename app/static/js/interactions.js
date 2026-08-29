@@ -15,64 +15,17 @@ document.addEventListener('DOMContentLoaded', () => {
       com reflexo de luz dourado que segue o cursor
    ══════════════════════════════════════════════════════════════════════════ */
 function initCardTilt() {
-    document.querySelectorAll('.property-card').forEach(card => {
-
-        /* Injeta div de sheen (reflexo) no card */
-        const sheen = document.createElement('div');
-        sheen.className = 'card-sheen';
-        card.appendChild(sheen);
-
-        const MAX_TILT = 10; // graus máximos
-
-        card.addEventListener('mouseenter', () => {
-            // Remove transition para que o mousemove não conflite e fique "gaguejando"
-            card.style.transition = 'none';
-        });
-
-        card.addEventListener('mousemove', e => {
-            const rect = card.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
-
-            /* Normalizado -1 a +1 */
-            const nx = (x / rect.width  - 0.5) * 2;
-            const ny = (y / rect.height - 0.5) * 2;
-
-            const rotX = -ny * MAX_TILT;   // eixo X: inclina frente/trás
-            const rotY =  nx * MAX_TILT;   // eixo Y: inclina esq/dir
-
-            card.style.transform =
-                `perspective(1000px) rotateX(${rotX}deg) rotateY(${rotY}deg) scale3d(1.02, 1.02, 1.02)`;
-
-            /* Reflexo segue o cursor */
-            sheen.style.background =
-                `radial-gradient(circle at ${x}px ${y}px,
-                    rgba(201,172,119,0.15) 0%,
-                    rgba(201,172,119,0.05) 40%,
-                    transparent 70%)`;
-            sheen.style.opacity = '1';
-        });
-
-        card.addEventListener('mouseleave', () => {
-            /* Restaura a transição para voltar suavemente ao normal */
-            card.style.transition = 'transform 0.5s ease-out, box-shadow 0.5s ease';
-            card.style.transform = '';
-            sheen.style.opacity  = '0';
-        });
-
-        card.addEventListener('mousedown',  () => {
-            card.style.transform = card.style.transform.replace('scale3d(1.02, 1.02, 1.02)', 'scale3d(0.98, 0.98, 0.98)');
-        });
-        card.addEventListener('mouseup',    () => {
-            /* restore via mousemove ao continuar */
-        });
-    });
+    // Efeito 3D removido para manter os cards estáticos
 }
 
 /* ══════════════════════════════════════════════════════════════════════════
    2. MAGNETIC BUTTONS — botões .btn-primary se atraem para o cursor
+      Desativado em dispositivos touch (não há hover real)
    ══════════════════════════════════════════════════════════════════════════ */
 function initMagneticButtons() {
+    // Não aplicar em dispositivos sem hover (touch, mobile)
+    if (window.matchMedia('(hover: none)').matches) return;
+
     const STRENGTH = 0.28;   // força de atração (0 = sem efeito, 1 = cursor)
     const RADIUS   = 80;     // px ao redor do botão que ativa o efeito
 

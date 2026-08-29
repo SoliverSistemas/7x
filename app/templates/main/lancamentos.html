@@ -4,6 +4,7 @@
 {% block meta_description %}Conheça os lançamentos imobiliários exclusivos da 7X Patrimonial no Rio de Janeiro. Empreendimentos de alto padrão selecionados por especialistas.{% endblock %}
 
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600;1,700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/pages/lancamentos.css') }}">
 <style>
 .site-header { display: none !important; }
 .top-bar { display: none !important; }
@@ -222,19 +223,86 @@ main { margin: 0 !important; padding: 0 !important; background: transparent !imp
 }
 .lnc-empty-sub { font-family: var(--sans); font-size: 0.9rem; font-weight: 300; }
 
+/* ── Responsive ──────────────────────────────────────────────────────────── */
+
+/* A partir de 992px para baixo: card vira coluna única, imagem 3:5 */
 @media (max-width: 992px) {
-    .lnc-card, .lnc-card:nth-child(even) {
-        grid-template-columns: 1fr;
-        gap: 2.5rem;
+
+    /* Card: coluna única, imagem em cima, texto em baixo */
+    .lnc-card,
+    .lnc-card:nth-child(even) {
+        display: flex;
+        flex-direction: column;
+        gap: 0;
     }
-    .lnc-card:nth-child(even) .lnc-card-cover { order: -1; aspect-ratio: 4/5; }
-    .lnc-list { gap: 6rem; }
-    .lnc-card-info { padding: 0 1rem; }
+
+    /* Imagem: sempre 3:5, sempre no topo, sem order invertida */
+    .lnc-card-cover,
+    .lnc-card:nth-child(odd)  .lnc-card-cover,
+    .lnc-card:nth-child(even) .lnc-card-cover {
+        width: 100%;
+        aspect-ratio: 3 / 5;
+        order: 0;
+    }
+
+    /* Seta sempre visível (sem hover em touch) */
+    .lnc-card-arrow {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    /* Texto abaixo da imagem */
+    .lnc-card-info {
+        order: 1;
+        padding: 1.5rem 0.5rem 0;
+    }
+
+    .lnc-list { gap: 5rem; }
 }
+
+/* 768px */
 @media (max-width: 768px) {
-    .lnc-hero-title { font-size: clamp(3rem, 12vw, 4rem); }
+    .lnc-hero-content { padding: 9rem 1.5rem 6rem; }
+    .lnc-hero-title   { font-size: clamp(3rem, 10vw, 4.5rem); }
+    .lnc-hero-sub     { font-size: 0.93rem; }
+    .lnc-container    { padding: 1.5rem 1.5rem 8rem; }
+    .lnc-list         { gap: 4rem; }
+    .lnc-card-name    { font-size: clamp(2rem, 7vw, 3rem); margin-bottom: 1rem; }
+    .lnc-card-arrow   { width: 48px; height: 48px; bottom: 1.5rem; right: 1.5rem; }
+}
+
+/* 480px */
+@media (max-width: 480px) {
+    .lnc-hero-content { padding: 7.5rem 1rem 4.5rem; }
+    .lnc-hero-title   { font-size: clamp(2.2rem, 9.5vw, 3rem); }
+    .lnc-container    { padding: 1.25rem 1rem 7rem; }
+    .lnc-list         { gap: 3.5rem; }
+    .lnc-card-name    { font-size: clamp(1.8rem, 9vw, 2.5rem); }
+    .lnc-card-tagline { font-size: 0.88rem; }
+    .lnc-card-arrow   { width: 44px; height: 44px; }
+}
+
+/* 360px */
+@media (max-width: 360px) {
+    .lnc-hero-content { padding: 7rem 0.85rem 4rem; }
+    .lnc-hero-title   { font-size: clamp(1.9rem, 10vw, 2.5rem); }
+    .lnc-container    { padding: 1rem 0.85rem 6rem; }
+    .lnc-list         { gap: 3rem; }
+    .lnc-card-name    { font-size: clamp(1.7rem, 10vw, 2.2rem); }
+    .lnc-card-tagline { font-size: 0.85rem; }
+    .lnc-card-arrow   { width: 40px; height: 40px; bottom: 1rem; right: 1rem; }
+}
+
+/* 320px */
+@media (max-width: 320px) {
+    .lnc-hero-title   { font-size: clamp(1.7rem, 10.5vw, 2rem); }
+    .lnc-container    { padding: 0.85rem 0.75rem 5rem; }
+    .lnc-list         { gap: 2.5rem; }
+    .lnc-card-name    { font-size: clamp(1.5rem, 10vw, 1.9rem); line-height: 1.1; }
+    .lnc-card-tagline { font-size: 0.82rem; }
 }
 </style>
+
 {% endblock %}
 
 {% block content %}

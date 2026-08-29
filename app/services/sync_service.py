@@ -159,7 +159,9 @@ class SyncService:
 
             # Remove properties that are no longer in Tecimob (exclusão física)
             if synced_ids:
-                to_delete = Property.query.filter(Property.id.notin_(synced_ids)).all()
+                # Otimização: buscar apenas IDs para não baixar os JSONs pesados do banco
+                from sqlalchemy.orm import load_only
+                to_delete = Property.query.options(load_only(Property.id)).filter(Property.id.notin_(synced_ids)).all()
                 for p in to_delete:
                     db.session.delete(p)
 

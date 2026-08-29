@@ -1,3 +1,14 @@
+
+/* ── Viewport Height Fix (iOS Safari) ──────────────────────────────────── */
+(function setVhVar() {
+    function updateVh() {
+        const vh = window.innerHeight * 0.01;
+        document.documentElement.style.setProperty('--vh', vh + 'px');
+    }
+    updateVh();
+    window.addEventListener('resize', updateVh);
+    window.addEventListener('orientationchange', () => setTimeout(updateVh, 150));
+})();
 /* ==========================================================================
    7X Imóveis - Global JavaScript Logic
    ========================================================================== */
@@ -18,15 +29,20 @@ function initMobileNav() {
     const toggleBtn = document.querySelector('.mobile-nav-toggle');
     const navMenu   = document.querySelector('.nav-menu');
     if (!toggleBtn || !navMenu) return;
+    const header = document.querySelector('.site-header');
 
     function openNav() {
         navMenu.classList.add('active');
+        if (header) header.classList.add('menu-open');
+        document.body.classList.add('menu-open');
         toggleBtn.innerHTML = '✕';
         toggleBtn.setAttribute('aria-expanded', 'true');
     }
 
     function closeNav() {
         navMenu.classList.remove('active');
+        if (header) header.classList.remove('menu-open');
+        document.body.classList.remove('menu-open');
         toggleBtn.innerHTML = '☰';
         toggleBtn.setAttribute('aria-expanded', 'false');
     }
@@ -397,11 +413,11 @@ function initPropertySliders() {
 
 /* ── Favorites Side Drawer ──────────────────────────────────────────────── */
 function initFavoritesDrawer() {
-    const btn      = document.getElementById('header-favorites-btn');
+    const btns     = document.querySelectorAll('.header-fav-btn');
     const drawer   = document.getElementById('favDrawer');
     const overlay  = document.getElementById('favDrawerOverlay');
     const closeBtn = document.getElementById('favDrawerClose');
-    if (!btn || !drawer) return;
+    if (!btns.length || !drawer) return;
 
     function openDrawer() {
         renderFavDrawer();
@@ -416,8 +432,10 @@ function initFavoritesDrawer() {
         document.body.style.overflow = '';
     }
 
-    btn.addEventListener('click', () => {
-        drawer.classList.contains('open') ? closeDrawer() : openDrawer();
+    btns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            drawer.classList.contains('open') ? closeDrawer() : openDrawer();
+        });
     });
 
     closeBtn?.addEventListener('click', closeDrawer);
@@ -438,14 +456,28 @@ function initFavoritesDrawer() {
 }
 
 function syncFavBtn() {
-    const btn = document.getElementById('header-favorites-btn');
-    if (!btn) return;
+    const btns = document.querySelectorAll('.header-fav-btn');
+    const mobileToggle = document.querySelector('.mobile-nav-toggle');
     const count = getFavorites().length;
-    if (count > 0) {
-        btn.classList.add('has-favorites');
-    } else {
-        btn.classList.remove('has-favorites');
+    
+    if (btns.length) {
+        btns.forEach(btn => {
+            if (count > 0) {
+                btn.classList.add('has-favorites');
+            } else {
+                btn.classList.remove('has-favorites');
+            }
+        });
     }
+
+    if (mobileToggle) {
+        if (count > 0) {
+            mobileToggle.classList.add('has-favorites');
+        } else {
+            mobileToggle.classList.remove('has-favorites');
+        }
+    }
+
     updateFavoriteBadge();
 }
 

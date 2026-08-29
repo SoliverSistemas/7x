@@ -95,3 +95,9 @@ yarl==1.24.5
 
 
 gunicorn
+
+Flask-Compress
+b o t o 3 = = 1 . 4 3 . 7 9 
+ 
+ 
+ 

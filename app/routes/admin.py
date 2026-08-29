@@ -596,43 +596,129 @@ def categorias_criar_padroes():
     return redirect(url_for('admin.categorias_list'))
 
 
-# ── Corretores ──────────────────────────────────────────────────────────────
-@admin_bp.route('/corretores', methods=['GET'])
+# ── Corretores (CRUD manual, sem API externa) ───────────────────────────────
+
+@admin_bp.route('/corretores')
 @login_required
 def list_agents():
-    agents = PropertyRepository.get_all_agents()
+    agents = (
+        AgentProfile.query
+        .order_by(AgentProfile.display_order.asc(), AgentProfile.name.asc())
+        .all()
+    )
     return render_template('admin/agents.html', agents=agents)
 
-@admin_bp.route('/corretores/<agent_name>', methods=['POST'])
+
+@admin_bp.route('/corretores/novo', methods=['GET', 'POST'])
 @login_required
-def update_agent(agent_name):
+def create_agent():
     from werkzeug.utils import secure_filename
 
-    prof = AgentProfile.query.filter_by(name=agent_name).first()
-    if not prof:
-        prof = AgentProfile(name=agent_name)
-        db.session.add(prof)
-        
-    avatar_file = request.files.get('avatar')
-    if avatar_file and avatar_file.filename:
-        # Upload new avatar
-        if prof.avatar_url:
-            StorageService.delete_agent_avatar(prof.avatar_url)
-            
-        ext = os.path.splitext(avatar_file.filename)[1]
-        filename = f"{uuid.uuid4()}{ext}"
-        file_bytes = avatar_file.read()
-        
-        try:
-            url = StorageService.upload_agent_avatar(file_bytes, filename, avatar_file.content_type)
-            prof.avatar_url = url
-        except Exception as e:
-            flash(f'Erro ao fazer upload da imagem: {e}', 'error')
-            return redirect(url_for('admin.list_agents'))
+    if request.method == 'POST':
+        name = request.form.get('name', '').strip()
+        if not name:
+            flash('O nome do corretor é obrigatório.', 'error')
+            return redirect(url_for('admin.create_agent'))
 
-    prof.instagram = request.form.get('instagram')
-    prof.description = request.form.get('description')
-    
+        # Evita erro de integridade (nome duplicado)
+        existing = AgentProfile.query.filter_by(name=name).first()
+        if existing:
+            flash(f'Já existe um corretor cadastrado com o nome "{name}".', 'error')
+            return redirect(url_for('admin.create_agent'))
+
+        agent = AgentProfile(
+            name          = name,
+            creci         = request.form.get('creci', '').strip() or None,
+            phone         = None,
+            whatsapp      = None,
+            email         = None,
+            instagram     = None,
+            description   = request.form.get('description', '').strip() or None,
+            display_order = int(request.form.get('display_order') or 0),
+            is_active     = request.form.get('is_active') == '1',
+        )
+        db.session.add(agent)
+        db.session.flush()  # para obter o id antes do upload
+
+        avatar_file = request.files.get('avatar')
+        if avatar_file and avatar_file.filename:
+            ext = os.path.splitext(secure_filename(avatar_file.filename))[1]
+            filename = f"agent_{agent.id}{ext}"
+            try:
+                url = StorageService.upload_agent_avatar(avatar_file.read(), filename, avatar_file.content_type)
+                agent.avatar_url = url
+            except Exception as e:
+                flash(f'Corretor criado, mas erro no upload da foto: {e}', 'warning')
+
+        db.session.commit()
+        flash(f'Corretor "{name}" criado com sucesso!', 'success')
+        return redirect(url_for('admin.list_agents'))
+
+    return render_template('admin/agent_form.html', agent=None, action='create')
+
+
+@admin_bp.route('/corretores/<int:agent_id>/editar', methods=['GET', 'POST'])
+@login_required
+def edit_agent(agent_id):
+    from werkzeug.utils import secure_filename
+
+    agent = AgentProfile.query.get_or_404(agent_id)
+
+    if request.method == 'POST':
+        agent.name          = request.form.get('name', '').strip() or agent.name
+        agent.creci         = request.form.get('creci', '').strip() or None
+        agent.phone         = None
+        agent.whatsapp      = None
+        agent.email         = None
+        agent.instagram     = None
+        agent.description   = request.form.get('description', '').strip() or None
+        agent.display_order = int(request.form.get('display_order') or 0)
+        agent.is_active     = request.form.get('is_active') == '1'
+
+        avatar_file = request.files.get('avatar')
+        if avatar_file and avatar_file.filename:
+            if agent.avatar_url:
+                try:
+                    StorageService.delete_agent_avatar(agent.avatar_url)
+                except Exception:
+                    pass
+            ext = os.path.splitext(secure_filename(avatar_file.filename))[1]
+            filename = f"agent_{agent.id}{ext}"
+            try:
+                url = StorageService.upload_agent_avatar(avatar_file.read(), filename, avatar_file.content_type)
+                agent.avatar_url = url
+            except Exception as e:
+                flash(f'Erro no upload da foto: {e}', 'warning')
+
+        db.session.commit()
+        flash(f'Corretor "{agent.name}" atualizado com sucesso!', 'success')
+        return redirect(url_for('admin.list_agents'))
+
+    return render_template('admin/agent_form.html', agent=agent, action='edit')
+
+
+@admin_bp.route('/corretores/<int:agent_id>/excluir', methods=['POST'])
+@login_required
+def delete_agent(agent_id):
+    agent = AgentProfile.query.get_or_404(agent_id)
+    if agent.avatar_url:
+        try:
+            StorageService.delete_agent_avatar(agent.avatar_url)
+        except Exception:
+            pass
+    name = agent.name
+    db.session.delete(agent)
     db.session.commit()
-    flash(f'Perfil de {agent_name} atualizado com sucesso!', 'success')
+    flash(f'Corretor "{name}" excluído.', 'success')
+    return redirect(url_for('admin.list_agents'))
+
+
+@admin_bp.route('/corretores/<int:agent_id>/toggle-ativo', methods=['POST'])
+@login_required
+def toggle_agent_active(agent_id):
+    agent = AgentProfile.query.get_or_404(agent_id)
+    agent.is_active = not agent.is_active
+    db.session.commit()
+    status = 'ativado' if agent.is_active else 'desativado'
+    flash(f'Corretor "{agent.name}" {status}.', 'success')
     return redirect(url_for('admin.list_agents'))

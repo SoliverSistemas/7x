@@ -332,3 +332,36 @@
         height: 36px;
     }
 }
+
+
+/* =========================================================================
+   Responsividade Extra — Links Hub
+   ========================================================================= */
+
+/* ── Área de toque mínima de 44px (WCAG) ─────────────────────────────── */
+.link-action-card,
+.links-hub-page a {
+    min-height: 52px;
+    display: flex;
+    align-items: center;
+}
+
+/* ── Ocultar header na página de links (standalone) ─────────────────── */
+.links-hub-page ~ footer,
+body:has(.links-hub-page) .site-header {
+    display: none;
+}
+
+@media (max-width: 480px) {
+    .links-hub-page {
+        padding: 2rem 1rem;
+        min-height: 100svh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+    .link-action-card {
+        padding: 1rem 1.25rem;
+        font-size: 0.9rem;
+    }
+}

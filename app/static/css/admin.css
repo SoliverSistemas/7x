@@ -1175,3 +1175,344 @@ input, select, textarea { font-family: inherit; }
   border: none; background: transparent; cursor: default; color: var(--adm-text-3);
 }
 
+
+/* =========================================================================
+   RESPONSIVIDADE COMPLETA — Painel Admin 7X
+   320px → 480px → 640px → 768px → 1024px → 1280px → 1440px+
+   ========================================================================= */
+
+/* ── 1440px+ — Ultra-wide ─────────────────────────────────────────────────── */
+@media (min-width: 1440px) {
+    :root { --adm-sidebar-w: 280px; }
+    .admin-content { padding: 2.5rem 2rem; max-width: 1500px; }
+    .kpi-grid { grid-template-columns: repeat(4, 1fr); }
+    .dash-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+/* ── 1280px ───────────────────────────────────────────────────────────────── */
+@media (max-width: 1280px) {
+    .admin-content { padding: 1.75rem 1.5rem; }
+    .kpi-grid { grid-template-columns: repeat(4, 1fr); }
+}
+
+/* ── 1024px — Tablet landscape ───────────────────────────────────────────── */
+@media (max-width: 1024px) {
+    /* Sidebar colapsa para rail (só ícones) */
+    :root { --adm-sidebar-w: 64px; }
+    .admin-sidebar { width: 64px; overflow: visible; }
+    .admin-sidebar-inner { padding: 1.5rem 0.5rem; }
+    .admin-brand-name,
+    .admin-brand-sub,
+    .admin-nav-section,
+    .admin-nav-item .nav-text,
+    .admin-user-info,
+    .admin-logout-btn .logout-text { display: none; }
+    .admin-brand { justify-content: center; padding: 0 0 1.25rem; }
+    .admin-nav-item {
+        justify-content: center;
+        padding: 0.65rem 0;
+        border-radius: 8px;
+    }
+    .admin-nav-item[title]:hover::after {
+        content: attr(title);
+        position: absolute;
+        left: calc(var(--adm-sidebar-w) + 0.5rem);
+        top: 50%;
+        transform: translateY(-50%);
+        background: var(--adm-surface-3);
+        color: var(--adm-text);
+        padding: 0.4rem 0.75rem;
+        border-radius: 6px;
+        font-size: 0.8rem;
+        white-space: nowrap;
+        z-index: 999;
+        border: 1px solid var(--adm-border-2);
+        pointer-events: none;
+    }
+    .admin-sidebar-footer { justify-content: center; }
+    .admin-logout-btn { width: 36px; height: 36px; }
+    .admin-menu-btn { display: flex; }
+    .admin-content { padding: 1.5rem 1.25rem; }
+    .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+    .dash-grid { grid-template-columns: 1fr; }
+}
+
+/* ── 768px — Tablet portrait (sidebar vira drawer) ──────────────────────── */
+@media (max-width: 768px) {
+    /* Sidebar volta ao estilo completo mas fica oculta como drawer */
+    :root { --adm-sidebar-w: 256px; }
+    .admin-sidebar {
+        width: 256px;
+        transform: translateX(-100%);
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        z-index: 300;
+    }
+    .admin-sidebar.sidebar--open {
+        transform: translateX(0);
+    }
+    .admin-sidebar-inner { padding: 1.5rem 1rem; }
+    .admin-brand-name,
+    .admin-brand-sub,
+    .admin-nav-section,
+    .admin-nav-item .nav-text,
+    .admin-user-info,
+    .admin-logout-btn .logout-text { display: block; }
+    .admin-nav-item { justify-content: flex-start; padding: 0.6rem 0.75rem; }
+    .admin-brand { justify-content: flex-start; }
+    .admin-sidebar-footer { justify-content: flex-start; }
+    .admin-user-info { display: flex; }
+    .admin-logout-btn { width: 30px; height: 30px; }
+
+    /* Main ocupa toda a largura */
+    .admin-main { margin-left: 0; }
+
+    /* Topbar: mostrar hamburger */
+    .admin-menu-btn { display: flex; }
+    .admin-topbar { padding: 0 1rem; height: 52px; }
+    .admin-topbar-title { font-size: 0.88rem; }
+    .admin-topbar-link { display: none; }
+
+    /* Overlay */
+    .admin-overlay { display: block; }
+
+    /* Content */
+    .admin-content { padding: 1.25rem 1rem; }
+
+    /* KPI grid */
+    .kpi-grid { grid-template-columns: repeat(2, 1fr); gap: 0.85rem; }
+    .stat-value { font-size: 1.6rem; }
+
+    /* Dash grid */
+    .dash-grid { grid-template-columns: 1fr; }
+
+    /* Tabelas: scroll horizontal */
+    .admin-table-wrap { overflow-x: auto; }
+    .admin-table { min-width: 700px; }
+
+    /* Toolbar */
+    .admin-toolbar,
+    .admin-search-form { flex-direction: column; gap: 0.65rem; }
+    .admin-search-wrap { width: 100%; }
+    .admin-select-wrap { width: 100%; }
+    .admin-select { width: 100%; }
+    .admin-btn-primary,
+    .admin-btn-ghost { width: 100%; justify-content: center; }
+}
+
+/* ── 640px ────────────────────────────────────────────────────────────────── */
+@media (max-width: 640px) {
+    .admin-content { padding: 1rem 0.85rem; }
+    .kpi-grid { grid-template-columns: repeat(2, 1fr); gap: 0.75rem; }
+    .stat-value { font-size: 1.5rem; }
+    .stat-label { font-size: 0.65rem; }
+    .dash-card { padding: 1.25rem; }
+    .dash-card:hover { border-color: var(--adm-border-2); }
+
+    /* Table compacta */
+    .admin-table th { font-size: 0.58rem; padding: 0.7rem 0.9rem; }
+    .admin-table td { font-size: 0.82rem; padding: 0.85rem 0.9rem; }
+    .td-thumb { width: 36px; height: 36px; }
+
+    /* Paginação */
+    .adm-pagination { flex-direction: column; align-items: flex-start; gap: 0.75rem; }
+    .adm-pagination-info { font-size: 0.75rem; }
+    .adm-page-btn { min-width: 32px; height: 32px; font-size: 0.78rem; }
+    .adm-page-btn:not(.adm-page-btn--active):not(.adm-page-btn--ellipsis):not(:first-child):not(:last-child):not(:nth-child(2)):not(:nth-last-child(2)) {
+        display: none;
+    }
+
+    /* Props toolbar */
+    .props-toolbar { flex-direction: column; }
+    .props-search-wrap { min-width: unset; width: 100%; }
+
+    /* Topbar */
+    .admin-topbar { height: 48px; }
+    .admin-topbar-title { font-size: 0.82rem; }
+}
+
+/* ── 480px ────────────────────────────────────────────────────────────────── */
+@media (max-width: 480px) {
+    .admin-content { padding: 0.85rem 0.75rem; }
+    .kpi-grid { gap: 0.65rem; }
+    .stat-card { padding: 1rem 1.125rem; }
+    .stat-value { font-size: 1.4rem; }
+    .stat-label { font-size: 0.62rem; }
+    .stat-icon { width: 20px; height: 20px; }
+
+    /* Tabela → Cards em mobile pequeno */
+    /* As colunas menos importantes ficam ocultas */
+    .admin-table .col-area,
+    .admin-table .col-dorms,
+    .admin-table .col-cat { display: none; }
+
+    /* Form fields admin */
+    .adm-input, .adm-select, .adm-textarea {
+        font-size: 16px !important;
+        padding: 0.7rem 0.85rem;
+    }
+
+    /* Topbar */
+    .admin-topbar { height: 46px; padding: 0 0.75rem; }
+    .admin-topbar-title { font-size: 0.78rem; }
+    .admin-menu-btn { padding: 0.3rem; }
+
+    /* Sidebar drawer */
+    :root { --adm-sidebar-w: calc(100vw - 2rem); }
+    .admin-sidebar { width: calc(100vw - 2rem); }
+
+    /* Lancamentos grid admin */
+    .lanc-grid { grid-template-columns: repeat(2, 1fr); gap: 1rem; }
+    .lanc-card-name { font-size: 0.85rem; }
+    .lanc-card-loc { font-size: 0.68rem; }
+
+    /* Flash messages */
+    .flash, .adm-alert { font-size: 0.82rem; padding: 0.65rem 0.9rem; }
+}
+
+/* ── 360px ────────────────────────────────────────────────────────────────── */
+@media (max-width: 360px) {
+    .admin-content { padding: 0.75rem 0.65rem; }
+    .kpi-grid { grid-template-columns: repeat(2, 1fr); gap: 0.5rem; }
+    .stat-card { padding: 0.85rem 1rem; }
+    .stat-value { font-size: 1.25rem; }
+    .stat-label { font-size: 0.58rem; letter-spacing: 0.03em; }
+    .stat-sub { font-size: 0.65rem; }
+
+    /* Topbar */
+    .admin-topbar { height: 44px; padding: 0 0.5rem; }
+    .admin-topbar-title { font-size: 0.75rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 150px; }
+
+    /* Lançamentos grid */
+    .lanc-grid { grid-template-columns: repeat(2, 1fr); gap: 0.6rem; }
+    .lanc-card-name { font-size: 0.78rem; }
+    .lanc-card-loc { display: none; }
+    .lanc-card-edit span { display: none; }
+    .lanc-card-edit { padding: 0.35rem; }
+
+    /* Dash card */
+    .dash-card { padding: 1rem; }
+
+    /* Paginação compacta */
+    .adm-page-btn { min-width: 30px; height: 30px; font-size: 0.72rem; }
+
+    /* Inputs admin */
+    .adm-input, .adm-select, .adm-textarea { font-size: 16px !important; padding: 0.6rem 0.75rem; }
+}
+
+/* ── 320px — iPhone SE / Galaxy Fold ─────────────────────────────────────── */
+@media (max-width: 320px) {
+    .admin-content { padding: 0.65rem 0.5rem; }
+    .kpi-grid { gap: 0.4rem; }
+    .stat-card { padding: 0.75rem 0.85rem; }
+    .stat-value { font-size: 1.15rem; }
+    .stat-label { font-size: 0.54rem; }
+
+    /* Topbar */
+    .admin-topbar { height: 42px; padding: 0 0.4rem; }
+    .admin-topbar-title { font-size: 0.7rem; max-width: 120px; }
+
+    /* Lançamentos */
+    .lanc-grid { grid-template-columns: repeat(2, 1fr); gap: 0.5rem; }
+    .lanc-cover { aspect-ratio: 3 / 4; }
+    .lanc-card-name { font-size: 0.72rem; }
+    .lanc-card-body { padding: 0.65rem; }
+
+    /* Dash card */
+    .dash-card { padding: 0.85rem; }
+
+    /* Botões admin */
+    .admin-btn { font-size: 0.78rem; padding: 0.45rem 0.85rem; }
+    .admin-btn--sm { font-size: 0.7rem; padding: 0.3rem 0.6rem; }
+
+    /* Inputs */
+    .adm-input, .adm-select { padding: 0.55rem 0.7rem; font-size: 16px !important; }
+    .adm-textarea { padding: 0.55rem 0.7rem; font-size: 16px !important; min-height: 100px; }
+
+    /* Paginação */
+    .adm-page-btn { min-width: 28px; height: 28px; font-size: 0.68rem; }
+    .adm-pagination-info { font-size: 0.7rem; }
+
+    /* Flash */
+    .flash, .adm-alert { font-size: 0.78rem; padding: 0.55rem 0.75rem; }
+}
+
+/* ── Admin Login ──────────────────────────────────────────────────────────── */
+@media (max-width: 640px) {
+    .login-card {
+        margin: 1.5rem;
+        border-radius: 16px;
+        padding: 2rem 1.5rem;
+    }
+    .login-logo-mark { width: 40px; height: 40px; }
+    .login-title { font-size: 1.25rem; }
+}
+@media (max-width: 480px) {
+    .login-card { margin: 1rem; padding: 1.75rem 1.25rem; }
+}
+@media (max-width: 360px) {
+    .login-card { margin: 0.75rem; padding: 1.5rem 1rem; border-radius: 12px; }
+    .login-logo-mark { width: 36px; height: 36px; font-size: 0.85rem; }
+    .login-title { font-size: 1.15rem; }
+}
+@media (max-width: 320px) {
+    .login-card { margin: 0.5rem; padding: 1.25rem 0.875rem; border-radius: 10px; }
+    .login-input { font-size: 16px !important; padding: 0.65rem 0.85rem 0.65rem 2.5rem; }
+    .login-btn { height: 46px; font-size: 0.9rem; }
+}
+
+/* ── Admin Corretores — Modal Bottom Sheet em mobile ─────────────────────── */
+@media (max-width: 640px) {
+    .modal-backdrop { align-items: flex-end; padding: 0; }
+    .modal-window {
+        width: 100%;
+        max-width: 100%;
+        border-radius: 20px 20px 0 0;
+        max-height: 85vh;
+        overflow-y: auto;
+    }
+    .modal-header { padding: 1rem 1.25rem; }
+    .modal-body { padding: 1.25rem; }
+    .modal-footer { padding: 1rem 1.25rem; }
+}
+@media (max-width: 360px) {
+    .modal-body { padding: 1rem; }
+    .modal-footer { gap: 0.75rem; }
+    .btn { padding: 0.55rem 1rem; font-size: 0.82rem; }
+}
+@media (max-width: 320px) {
+    .modal-header { padding: 0.85rem 1rem; }
+    .modal-body { padding: 0.85rem; }
+    .form-group { margin-bottom: 1rem; }
+    .form-control { font-size: 16px !important; padding: 0.55rem 0.7rem; }
+}
+
+/* ── Admin Edit Form (lancamento_edit.html) ───────────────────────────────── */
+@media (max-width: 768px) {
+    .edit-layout { grid-template-columns: 1fr !important; }
+    .cover-sidebar { position: static; }
+    .cover-wrap { aspect-ratio: 16/9; max-height: 280px; }
+    .edit-panel-head { font-size: 0.65rem; }
+    .edit-panel-body { padding: 1rem; }
+    .form-row { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 480px) {
+    .edit-page-title { font-size: 1.25rem; }
+    .edit-panel-body { padding: 0.85rem; }
+    .form-row { grid-template-columns: 1fr; }
+    .form-group textarea { min-height: 120px; }
+    .back-link { font-size: 0.65rem; margin-bottom: 1.25rem; }
+}
+@media (max-width: 360px) {
+    .edit-page-title { font-size: 1.1rem; }
+    .edit-panel-body { padding: 0.75rem; }
+    .form-group label { font-size: 0.62rem; }
+    .form-group input,
+    .form-group select,
+    .form-group textarea { font-size: 16px !important; padding: 0.6rem 0.75rem; }
+}
+@media (max-width: 320px) {
+    .edit-page-title { font-size: 1rem; }
+    .back-link { font-size: 0.6rem; }
+    .edit-panel-head { padding: 0.75rem 1rem; }
+    .edit-panel-body { padding: 0.65rem; }
+}

@@ -167,3 +167,20 @@ function initShareButtons() {
         });
     }
 }
+
+/* Mobile Initialization */
+document.addEventListener('DOMContentLoaded', () => {
+  if (window.innerWidth <= 992) {
+    if (typeof Swiper !== 'undefined') {
+      new Swiper('.mobile-gallery', {
+        loop: true,
+        pagination: { el: '.swiper-pagination', clickable: true },
+        navigation: {
+          nextEl: '.swiper-button-next',
+          prevEl: '.swiper-button-prev',
+        },
+        grabCursor: true,
+      });
+    }
+  }
+});

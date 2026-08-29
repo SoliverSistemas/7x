@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block extra_head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/pages/property.css') }}">
+{% endblock %}
+{% block content %}
+<section class="property-page">
+  <header class="property-header">
+    <h1 class="property-title">{{ property.title }}</h1>
+    <p class="property-price">{{ property.price|currency }}</p>
+  </header>
+
+  <figure class="property-gallery">
+    <div class="swiper-container">
+      <div class="swiper-wrapper">
+        {% for img in property.images %}
+        <div class="swiper-slide">
+          <img src="{{ url_for('static', filename='img/property/' + img) }}" alt="Foto {{ loop.index }}" />
+        </div>
+        {% endfor %}
+      </div>
+      <div class="swiper-button-prev" aria-label="Anterior"></div>
+      <div class="swiper-button-next" aria-label="Próximo"></div>
+      <div class="swiper-pagination"></div>
+    </div>
+  </figure>
+
+  <article class="property-info">
+    <section class="info-summary">
+      <h2>Resumo</h2>
+      <p>{{ property.description }}</p>
+    </section>
+    <section class="info-specs" id="specs-toggle">
+      <button class="toggle-btn" aria-expanded="false">Ver ficha técnica</button>
+      <div class="specs-content" hidden>
+        <ul>
+          <li>Quartos: {{ property.bedrooms }}</li>
+          <li>Banheiros: {{ property.bathrooms }}</li>
+          <li>Área: {{ property.area }} m²</li>
+        </ul>
+      </div>
+    </section>
+  </article>
+
+  <nav class="property-actions">
+    <button class="cta-contact" aria-label="Contato via WhatsApp">📞</button>
+    <button class="cta-fav" aria-label="Favoritar">❤️</button>
+    <button class="cta-share" aria-label="Compartilhar">🔗</button>
+  </nav>
+
+  <script src="{{ url_for('static', filename='js/property.js') }}"></script>
+</section>
+{% endblock %}

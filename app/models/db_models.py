@@ -179,6 +179,38 @@ class Property(db.Model):
             'is_exclusive': self.is_exclusive,
         }
 
+    def to_dict_summary(self):
+        """
+        Retorna apenas os campos necessários para renderizar o card de imóvel.
+        Ignora propositalmente os campos text/JSON pesados (description, gallery, amenities)
+        para economizar egress no banco de dados quando carregar listagens.
+        """
+        return {
+            'id': self.id,
+            'reference': self.reference,
+            'title': self.title,
+            'slug': self.slug,
+            'type': self.type,
+            'subtype': self.subtype,
+            'purpose': self.purpose,
+            'price': self.price,
+            'area': self.area,
+            'bedrooms': self.bedrooms,
+            'suites': self.suites,
+            'bathrooms': self.bathrooms,
+            'garage': self.garage,
+            'city': self.city,
+            'state': self.state,
+            'neighborhood': self.neighborhood,
+            'address': self.address,
+            'featured': self.featured,
+            'status': self.status,
+            'badge': self.badge,
+            'image': self.image,
+            'calculated_category': self.calculated_category,
+            'is_exclusive': self.is_exclusive,
+        }
+
 
 class ExclusiveCollection(db.Model):
     """
@@ -399,18 +431,39 @@ class ChatLead(db.Model):
 
 class AgentProfile(db.Model):
     """
-    Overrides para o perfil do corretor (nome, avatar, instagram, descrição).
-    O campo 'name' atua como chave, combinando com o nome retornado pela Tecimob.
+    Perfil de corretor gerenciado pelo admin.
+    Totalmente independente da API externa.
     """
     __tablename__ = 'agent_profiles'
 
-    id          = db.Column(db.Integer, primary_key=True)
-    name        = db.Column(db.String(150), unique=True, nullable=False, index=True)
-    avatar_url  = db.Column(db.String(500))
-    instagram   = db.Column(db.String(150))
-    description = db.Column(db.Text)
-    created_at  = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_at  = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    id            = db.Column(db.Integer, primary_key=True)
+    name          = db.Column(db.String(150), nullable=False, index=True)
+    creci         = db.Column(db.String(50))
+    avatar_url    = db.Column(db.String(500))
+    phone         = db.Column(db.String(30))      # ex: +55 47 9 9999-9999
+    whatsapp      = db.Column(db.String(30))      # se diferente do phone
+    email         = db.Column(db.String(150))
+    instagram     = db.Column(db.String(150))     # sem @
+    description   = db.Column(db.Text)
+    is_active     = db.Column(db.Boolean, default=True, nullable=False)
+    display_order = db.Column(db.Integer, default=0, nullable=False)
+    created_at    = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at    = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    def to_dict(self):
+        return {
+            'id':            self.id,
+            'name':          self.name,
+            'creci':         self.creci,
+            'avatar_url':    self.avatar_url,
+            'phone':         self.phone,
+            'whatsapp':      self.whatsapp or self.phone,
+            'email':         self.email,
+            'instagram':     self.instagram,
+            'description':   self.description,
+            'is_active':     self.is_active,
+            'display_order': self.display_order,
+        }
 
     def __repr__(self):
         return f'<AgentProfile {self.name}>'

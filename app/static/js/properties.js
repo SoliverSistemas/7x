@@ -69,10 +69,6 @@ function renderProperties(properties, container) {
                     <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
                 </button>
                 <img src="/static/img/${p.image}" alt="${p.title}" loading="lazy">
-                <div class="card-price-overlay">
-                    <span class="card-price-label">${p.purpose === 'Aluguel' ? 'Aluguel / mês' : 'Valor'}</span>
-                    <span class="card-price-val">${formatCurrency(p.price)}</span>
-                </div>
             </div>
             <div class="card-body">
                 <div class="card-location">
@@ -82,6 +78,12 @@ function renderProperties(properties, container) {
                 <h3 class="card-title">
                     <a href="/imoveis/${p.id}">${p.title}</a>
                 </h3>
+                
+                <div class="card-price-box" style="margin-bottom: 1rem;">
+                    <span class="card-price-label">${p.purpose === 'Aluguel' ? 'Aluguel / mês' : 'Valor Total'}</span>
+                    <span class="card-price-val">${formatCurrency(p.price)}</span>
+                </div>
+
                 <div class="card-specs">
                     ${p.area ? `
                     <div class="card-spec-item">

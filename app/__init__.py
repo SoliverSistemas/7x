@@ -1,10 +1,13 @@
+import os
 from flask import Flask, render_template
 from config import config_by_name
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
+from flask_compress import Compress
 
 db = SQLAlchemy()
 migrate = Migrate()
+compress = Compress()
 
 def create_app(config_name='dev'):
     """
@@ -21,6 +24,8 @@ def create_app(config_name='dev'):
     # Initialize Database
     db.init_app(app)
     migrate.init_app(app, db)
+    # Compressão HTTP automática (Gzip/Brotli) — reduz ~60-80% no tamanho das respostas
+    compress.init_app(app)
     
     # Register Custom Template Filters
     @app.template_filter('currency')
@@ -56,6 +61,7 @@ def create_app(config_name='dev'):
             'whatsapp_url': wa_url,
             'whatsapp_url_2': app.config.get('LINK_WHATSAPP_URL_2', ''),
             'whatsapp_number': wa_number,
+            'r2_public_url': os.getenv('R2_PUBLIC_URL') or app.config.get('R2_PUBLIC_URL', ''),
         }
 
     # Register Blueprints

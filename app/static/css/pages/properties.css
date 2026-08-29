@@ -1,10 +1,10 @@
 /* ==========================================================================
-   7X Patrimonial — /imoveis  ·  Sidebar Catalog  Premium
+   7X Patrimonial â€” /imoveis  Â·  Sidebar Catalog  Premium
    ========================================================================== */
 
-/* ══════════════════════════════════════════════════════════════════════════
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
    PAGE HERO
-   ══════════════════════════════════════════════════════════════════════════ */
+   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 
 .prop-hero-premium {
     position: relative;
@@ -20,7 +20,8 @@
 .prop-hero-bg-img {
     position: absolute;
     inset: 0;
-    background-image: url('../img/hero-poster.jpg'); /* Reusing existing image */
+    background-image: url('../img/hero-poster.jpg');
+    /* Reusing existing image */
     background-size: cover;
     background-position: center;
     opacity: 0.15;
@@ -31,7 +32,7 @@
     position: absolute;
     inset: 0;
     background: linear-gradient(to top, #050b14 0%, transparent 100%),
-                radial-gradient(ellipse at center, rgba(201, 172, 119, 0.1) 0%, transparent 70%);
+        radial-gradient(ellipse at center, rgba(201, 172, 119, 0.1) 0%, transparent 70%);
     z-index: 2;
 }
 
@@ -92,64 +93,471 @@
     font-weight: 700;
 }
 
-/* ══════════════════════════════════════════════════════════════════════════
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
    CATALOG LAYOUT
-   ══════════════════════════════════════════════════════════════════════════ */
+   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 
 .prop-catalog-section {
     background: var(--bg-main);
-    padding: 0 0 6rem;
+    padding: 2rem 0 6rem;
 }
 
 .catalog-layout {
     display: grid;
-    grid-template-columns: 280px 1fr;
-    gap: 2.5rem;
+    grid-template-columns: 1fr;
+    gap: 0;
     align-items: start;
 }
 
-/* ══════════════════════════════════════════════════════════════════════════
-   FILTER SIDEBAR
-   ══════════════════════════════════════════════════════════════════════════ */
+/* Layout com sidebar a esquerda -- desktop */
+.catalog-layout--with-sidebar {
+    grid-template-columns: 300px 1fr;
+    gap: 2rem;
+    align-items: start;
+}
 
-.filter-sidebar {
-    position: sticky;
-    top: 100px; /* Space for the fixed header */
-    max-height: calc(100vh - 120px);
+/* Breakpoint intermediario: ~1024-1280px (sidebar mais estreita) */
+@media (min-width: 1024px) and (max-width: 1280px) {
+    .catalog-layout--with-sidebar {
+        grid-template-columns: 240px 1fr;
+        gap: 1.5rem;
+    }
+}
+
+/* =====================================================================
+   FILTER TOGGLE BUTTON (desktop sidebar)
+   ===================================================================== */
+
+.filter-toggle-btn {
+    display: none;
+    align-items: center;
+    gap: 0.45rem;
+    height: 34px;
+    padding: 0 1rem;
     background: var(--bg-surface);
     border: 1px solid var(--border-color);
-    border-radius: var(--radius-lg);
-    padding: 1.25rem;
-    overflow-y: auto;
-    transition: box-shadow 0.3s ease;
+    border-radius: var(--radius-sm);
+    color: var(--text-secondary);
+    font-size: 0.82rem;
+    font-weight: 600;
+    font-family: var(--font-body);
+    cursor: pointer;
+    position: relative;
+    transition: border-color 0.2s ease, background 0.2s ease, color 0.2s ease;
+    white-space: nowrap;
 }
 
-.filter-sidebar::-webkit-scrollbar {
+.filter-toggle-btn:hover {
+    border-color: rgba(201, 172, 119, 0.5);
+    color: var(--text-primary);
+}
+
+.filter-toggle-btn--active,
+.mob-btn--active {
+    background: rgba(201, 172, 119, 0.1) !important;
+    border-color: rgba(201, 172, 119, 0.5) !important;
+    color: var(--primary) !important;
+}
+
+.filter-toggle-dot {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    width: 7px;
+    height: 7px;
+    background: var(--primary);
+    border-radius: 50%;
+}
+
+/* =====================================================================
+   MOBILE TOOLBAR -- barra fixa abaixo do header, so no mobile
+   ===================================================================== */
+
+/* Oculto no desktop */
+.mobile-toolbar {
+    display: none;
+}
+
+@media (max-width: 1023px) {
+    /* Barra fixa -- JS seta o top baseado na altura real do header */
+    .mobile-toolbar {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        position: fixed;
+        left: 0;
+        right: 0;
+        z-index: 500;
+        height: 44px;
+        background: transparent;
+        padding: 0 0.75rem;
+        pointer-events: none; /* deixa cliques passarem onde não há botão */
+    }
+
+    /* O botão em si recebe pointer-events normalmente */
+    .mobile-toolbar > * {
+        pointer-events: auto;
+    }
+
+    /* Colecao + Ordem empilhados a direita */
+    .mob-sort-group {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        align-items: flex-end;
+    }
+
+    /* Oculta a toolbar desktop no mobile */
+    .catalog-toolbar {
+        display: none !important;
+    }
+
+    /* Empurra o conteudo para baixo da barra fixa */
+    .catalog-main {
+        padding-top: 52px;
+    }
+
+    /* Mobile: sempre lista */
+    #properties-container {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 0.75rem !important;
+    }
+}
+
+/* Row de Colecao + Ordem no fluxo da pagina (mobile apenas) */
+.mobile-sort-row {
+    display: none; /* oculto no desktop */
+}
+
+@media (max-width: 1023px) {
+    .mobile-sort-row {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    /* Toolbar mobile so tem Filtros agora */
+    .mob-sort-group {
+        display: none;
+    }
+}
+
+/* Botoes da mobile-toolbar */
+.mob-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    height: 26px;
+    padding: 0 0.6rem;
+    background: var(--bg-surface);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    color: var(--text-secondary);
+    font-size: 0.72rem;
+    font-weight: 600;
+    font-family: var(--font-body);
+    cursor: pointer;
+    position: relative;
+    transition: border-color 0.2s ease, background 0.2s ease, color 0.2s ease;
+    white-space: nowrap;
+    line-height: 1;
+}
+
+.mob-btn:hover {
+    border-color: rgba(201, 172, 119, 0.5);
+    color: var(--text-primary);
+}
+
+/* Botao Filtros: maior, flutuante */
+.mob-btn--filtros {
+    height: 36px;
+    font-size: 0.85rem;
+    gap: 0.45rem;
+    padding: 0 0.9rem;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25);
+}
+
+/* Botoes de Colecao e Ordem (na sort-row, no fluxo da pagina) */
+.mob-btn--sort {
+    height: 32px;
+    font-size: 0.78rem;
+    gap: 0.3rem;
+    padding: 0 0.75rem;
+}
+
+/* Dot de filtros ativos */
+.mob-btn-dot {
+    position: absolute;
+    top: 3px;
+    right: 3px;
+    width: 6px;
+    height: 6px;
+    background: var(--primary);
+    border-radius: 50%;
+}
+
+/* Dropdown Panels (Colecao / Ordem) */
+.mobile-dropdown-panel {
+    position: fixed;
+    z-index: 1050;
+    min-width: 180px;
+    background: var(--bg-surface);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg, 10px);
+    box-shadow: 0 10px 36px rgba(0, 0, 0, 0.38);
+    padding: 0.4rem 0;
+    opacity: 0;
+    transform: translateY(-6px);
+    pointer-events: none;
+    transition: opacity 0.22s ease, transform 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.mobile-dropdown-panel.mdd-panel--open {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+
+.mdd-option {
+    display: block;
+    width: 100%;
+    padding: 0.65rem 1rem;
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    font-weight: 500;
+    font-family: var(--font-body);
+    text-align: left;
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease;
+    white-space: nowrap;
+}
+
+.mdd-option:hover {
+    background: rgba(201, 172, 119, 0.07);
+    color: var(--text-primary);
+}
+
+.mdd-option--active {
+    color: var(--primary);
+    font-weight: 700;
+    background: rgba(201, 172, 119, 0.06);
+}
+
+.mdd-option--active::before {
+    content: '✓ ';
+    font-size: 0.75rem;
+}
+
+.mdd-chevron {
+    flex-shrink: 0;
+    transition: transform 0.2s ease;
+}
+
+[aria-expanded="true"] .mdd-chevron {
+    transform: rotate(180deg);
+}
+
+/* FILTER OVERLAY */
+.filter-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+    z-index: 498;
+    opacity: 0;
+    transition: opacity 0.25s ease;
+}
+
+.filter-overlay--active {
+    display: block;
+    opacity: 1;
+}
+
+/* CATALOG SIDEBAR */
+
+/* Desktop: sidebar sempre visível como coluna à esquerda */
+.catalog-sidebar {
+    position: sticky;
+    top: calc(90px + 1.5rem);
+    max-height: calc(100vh - 90px - 3rem);
+    overflow-y: auto;
+    overflow-x: hidden;
+    background: var(--bg-surface);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg, 12px);
+    scrollbar-width: thin;
+    scrollbar-color: var(--border-color) transparent;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12);
+    display: block;
+    visibility: visible;
+    opacity: 1;
+    /* Garante que o sidebar fique acima dos cards com stacking context */
+    z-index: 2;
+    isolation: isolate;
+}
+
+.catalog-sidebar::-webkit-scrollbar {
     width: 4px;
 }
-.filter-sidebar::-webkit-scrollbar-track {
+
+.catalog-sidebar::-webkit-scrollbar-track {
     background: transparent;
 }
-.filter-sidebar::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 4px;
-}
-.filter-sidebar:hover::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.2);
+
+.catalog-sidebar::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 2px;
 }
 
-.filter-sidebar::before {
+/* Linha dourada decorativa no topo */
+.catalog-sidebar::before {
     content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
+    display: block;
     height: 2px;
     background: linear-gradient(90deg, transparent, var(--primary), transparent);
-    opacity: 0.5;
+    opacity: 0.6;
+    flex-shrink: 0;
 }
 
-/* ── Sidebar header ───────────────────────────────────────────────────── */
+/* ── Mobile/Tablet (< 1024px): dropdown abaixo do botão Filtros ── */
+@media (max-width: 1023px) {
+    /* O sidebar vira um dropdown fixo posicionado pelo JS */
+    .catalog-sidebar {
+        position: fixed;
+        /* top/left/right serão setados pelo JS */
+        bottom: auto;
+        width: 340px;
+        max-width: calc(100vw - 2rem);
+        max-height: 75vh;
+        border-radius: var(--radius-lg, 12px);
+        border: 1px solid var(--border-color);
+        border-right: 1px solid var(--border-color);
+        z-index: 1050;
+        overflow-y: auto;
+        /* Inicia escondido: transparente + levemente deslocado para cima */
+        opacity: 0;
+        transform: translateY(-8px);
+        pointer-events: none;
+        transition: opacity 0.25s ease, transform 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+        /* Remover sticky/overflow do desktop */
+        top: auto;
+    }
+
+    .catalog-sidebar.sidebar--open {
+        opacity: 1;
+        transform: translateY(0);
+        pointer-events: auto;
+    }
+
+    /* Remove o "::before" dourado no dropdown mobile */
+    .catalog-sidebar::before {
+        display: none;
+    }
+
+    .catalog-layout--with-sidebar {
+        grid-template-columns: 1fr;
+    }
+
+    .catalog-layout {
+        position: static;
+    }
+
+    .catalog-toolbar {
+        position: static;
+    }
+}
+
+.filter-panel-inner {
+    padding: 1.25rem 1.25rem 1.5rem;
+}
+
+
+/* â”€â”€ CabeÃ§alho do painel â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+.filter-panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.filter-panel-header-right {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.filter-panel-close {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    background: transparent;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+
+.filter-panel-close:hover {
+    background: rgba(255, 80, 80, 0.08);
+    border-color: rgba(255, 100, 100, 0.3);
+    color: #ff8080;
+}
+
+
+/* Botao fechar -- so visivel em mobile */
+.filter-panel-close--mobile {
+    display: none;
+}
+
+@media (max-width: 1023px) {
+    .filter-panel-close--mobile {
+        display: flex;
+    }
+}
+/* â”€â”€ Corpo do painel â€” grid compacto â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+.filter-panel-body {
+    /* wrapper do form */
+}
+
+/* Divisor interno */
+.filter-panel-divider {
+    height: 1px;
+    background: var(--border-color);
+    margin: 0.85rem 0;
+}
+
+/* Footer com botão buscar */
+.filter-panel-footer {
+    display: flex;
+    justify-content: stretch;
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--border-color);
+    margin-top: 1rem;
+}
+
+.filter-panel-footer .sidebar-submit-btn {
+    width: 100%;
+    max-width: 100%;
+}
+
+/* â”€â”€ Sidebar header (reutilizado dentro do painel) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+
+/* â”€â”€ Sidebar header â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .sidebar-header {
     display: flex;
     align-items: center;
@@ -173,7 +581,9 @@
     margin: 0;
 }
 
-.sidebar-title-row svg { color: var(--primary); }
+.sidebar-title-row svg {
+    color: var(--primary);
+}
 
 .sidebar-clear-btn {
     font-size: 0.75rem;
@@ -185,9 +595,11 @@
     white-space: nowrap;
 }
 
-.sidebar-clear-btn:hover { color: rgba(255, 100, 100, 0.8); }
+.sidebar-clear-btn:hover {
+    color: rgba(255, 100, 100, 0.8);
+}
 
-/* ── Active tags ──────────────────────────────────────────────────────── */
+/* â”€â”€ Active tags â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .sidebar-active-tags {
     display: flex;
     flex-wrap: wrap;
@@ -218,7 +630,7 @@
     color: #ff8080;
 }
 
-/* ── Sidebar groups ───────────────────────────────────────────────────── */
+/* â”€â”€ Sidebar groups â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .sidebar-group {
     margin-bottom: 0.9rem;
 }
@@ -233,7 +645,7 @@
     margin-bottom: 0.4rem;
 }
 
-/* ── Search ───────────────────────────────────────────────────────────── */
+/* â”€â”€ Search â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .sidebar-search-wrap {
     position: relative;
     display: flex;
@@ -265,14 +677,16 @@
     padding: 0 0.75rem 0 2.1rem;
 }
 
-.sidebar-input::placeholder { color: var(--text-muted); }
+.sidebar-input::placeholder {
+    color: var(--text-muted);
+}
 
 .sidebar-input:focus {
     border-color: rgba(201, 172, 119, 0.45);
     box-shadow: 0 0 0 3px rgba(201, 172, 119, 0.08);
 }
 
-/* ── Chips ────────────────────────────────────────────────────────────── */
+/* â”€â”€ Chips â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .sidebar-chips {
     display: flex;
     flex-wrap: wrap;
@@ -315,7 +729,7 @@
     font-size: 0.72rem;
 }
 
-/* ── Select ───────────────────────────────────────────────────────────── */
+/* â”€â”€ Select â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .sidebar-select-wrap {
     position: relative;
     display: flex;
@@ -360,7 +774,7 @@
     color: var(--text-primary);
 }
 
-/* ── Price row ────────────────────────────────────────────────────────── */
+/* â”€â”€ Price row â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .sidebar-price-row {
     display: flex;
     align-items: center;
@@ -374,7 +788,7 @@
     gap: 0.3rem;
 }
 
-.sidebar-price-input-wrap > span {
+.sidebar-price-input-wrap>span {
     font-size: 0.65rem;
     font-weight: 600;
     letter-spacing: 0.06em;
@@ -407,14 +821,14 @@
     flex-shrink: 0;
 }
 
-/* ── Section divider ──────────────────────────────────────────────────── */
+/* â”€â”€ Section divider â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .sidebar-section-divider {
     height: 1px;
     background: var(--border-color);
     margin: 0 0 0.9rem;
 }
 
-/* ── Toggle switches (Financiável / Troca / Mobiliado) ─────────────────── */
+/* â”€â”€ Toggle switches (FinanciÃ¡vel / Troca / Mobiliado) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .sidebar-toggles {
     display: flex;
     flex-direction: column;
@@ -457,15 +871,15 @@
     border-radius: 50%;
     background: var(--text-muted);
     transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1),
-                background 0.25s ease;
+        background 0.25s ease;
 }
 
-.sidebar-toggle input:checked + .sidebar-toggle-track {
+.sidebar-toggle input:checked+.sidebar-toggle-track {
     background: rgba(201, 172, 119, 0.2);
     border-color: var(--primary);
 }
 
-.sidebar-toggle input:checked + .sidebar-toggle-track::after {
+.sidebar-toggle input:checked+.sidebar-toggle-track::after {
     transform: translateX(13px);
     background: var(--primary);
 }
@@ -476,10 +890,16 @@
     transition: color 0.2s ease;
 }
 
-.sidebar-toggle:hover .sidebar-toggle-label { color: var(--text-primary); }
-.sidebar-toggle input:checked ~ .sidebar-toggle-label { color: var(--text-primary); font-weight: 600; }
+.sidebar-toggle:hover .sidebar-toggle-label {
+    color: var(--text-primary);
+}
 
-/* ── Submit button ────────────────────────────────────────────────────── */
+.sidebar-toggle input:checked~.sidebar-toggle-label {
+    color: var(--text-primary);
+    font-weight: 600;
+}
+
+/* â”€â”€ Submit button â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .sidebar-submit-btn {
     width: 100%;
     height: 38px;
@@ -510,15 +930,15 @@
     transform: translateY(0);
 }
 
-/* ══════════════════════════════════════════════════════════════════════════
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
    CATALOG MAIN
-   ══════════════════════════════════════════════════════════════════════════ */
+   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 
 .catalog-main {
     min-width: 0;
 }
 
-/* ── Toolbar ──────────────────────────────────────────────────────────── */
+/* â”€â”€ Toolbar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .catalog-toolbar {
     display: flex;
     align-items: center;
@@ -546,7 +966,7 @@
     gap: 0.75rem;
 }
 
-/* ── Sort control ─────────────────────────────────────────────────────────── */
+/* â”€â”€ Sort control â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .sort-control {
     display: flex;
     align-items: center;
@@ -590,7 +1010,7 @@
     box-shadow: 0 0 0 2px var(--primary-glow);
 }
 
-/* Tema claro — dropdown nativo precisa de background explícito */
+/* Tema claro â€” dropdown nativo precisa de background explÃ­cito */
 .sort-control select option {
     background-color: var(--bg-surface);
     color: var(--text-primary);
@@ -599,7 +1019,7 @@
 [data-theme="light"] .sort-control select {
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b6560' stroke-width='2.5'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
     background-color: #f2f5f7;
-    border-color: rgba(23,26,28,.12);
+    border-color: rgba(23, 26, 28, .12);
     color: #000000;
 }
 
@@ -608,7 +1028,7 @@
     color: #000000;
 }
 
-/* ── View toggle ──────────────────────────────────────────────────────── */
+/* â”€â”€ View toggle â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .view-toggle {
     display: flex;
     background: var(--bg-surface);
@@ -630,10 +1050,16 @@
     transition: background 0.2s ease, color 0.2s ease;
 }
 
-.view-btn:hover { color: var(--text-secondary); }
-.view-btn--active { background: rgba(201, 172, 119, 0.1); color: var(--primary); }
+.view-btn:hover {
+    color: var(--text-secondary);
+}
 
-/* ── Category Navigation Tabs ───────────────────────────────────────────── */
+.view-btn--active {
+    background: rgba(201, 172, 119, 0.1);
+    color: var(--primary);
+}
+
+/* â”€â”€ Category Navigation Tabs â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .category-nav {
     display: flex;
     gap: 0.5rem;
@@ -666,7 +1092,7 @@
     font-weight: 600;
 }
 
-/* ── Mobile filter button ─────────────────────────────────────────────── */
+/* â”€â”€ Mobile filter button â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .mobile-filter-btn {
     display: none;
     align-items: center;
@@ -685,7 +1111,10 @@
     transition: border-color 0.2s ease;
 }
 
-.mobile-filter-btn:hover { border-color: rgba(201, 172, 119, 0.4); color: var(--text-primary); }
+.mobile-filter-btn:hover {
+    border-color: rgba(201, 172, 119, 0.4);
+    color: var(--text-primary);
+}
 
 .mobile-filter-dot {
     position: absolute;
@@ -697,46 +1126,211 @@
     border-radius: 50%;
 }
 
-/* ── Properties grid ──────────────────────────────────────────────────── */
+/* â”€â”€ Properties grid â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 #properties-container.properties-grid {
     grid-template-columns: repeat(2, 1fr);
     gap: 1.5rem;
 }
 
-/* ── List view ────────────────────────────────────────────────────────── */
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+   MODO LISTA (OLX-style) â€” imagem quadrada Ã  esquerda, info Ã  direita
+   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+
+/* Container vira flex-column */
 #properties-container.properties-list {
-    grid-template-columns: 1fr;
-    gap: 1rem;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 0.75rem !important;
 }
 
+/* Card: grid 2 colunas. A imagem (col 1) Ã© quadrada â†’ define a altura total */
 #properties-container.properties-list .property-card {
-    display: grid;
-    grid-template-columns: 260px 1fr;
+    display: grid !important;
+    grid-template-columns: 180px 1fr !important;
+    grid-template-rows: auto !important;
+    height: auto !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+    align-items: stretch !important;
+    cursor: pointer;
 }
 
-#properties-container.properties-list .card-img-wrapper {
-    height: 190px;
-    border-radius: var(--radius-md) 0 0 var(--radius-md);
+/* Imagem: 100% da largura da coluna, aspect-ratio 1:1 define a altura */
+#properties-container.properties-list .property-card .card-img-wrapper {
+    width: 100% !important;
+    height: auto !important;
+    aspect-ratio: 1 / 1 !important;
+    min-height: 0 !important;
+    border-radius: 0 !important;
+    overflow: hidden !important;
+    flex: none !important;
 }
 
-#properties-container.properties-list .card-img-wrapper img {
-    height: 100%;
-    object-fit: cover;
+#properties-container.properties-list .property-card .card-img-wrapper img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    display: block !important;
 }
 
-#properties-container.properties-list .card-body {
-    padding: 1.5rem 1.75rem;
+/* Corpo: ocupa a coluna direita, flex-column */
+#properties-container.properties-list .property-card .card-body {
+    padding: 0.9rem 1.1rem !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+    gap: 0.25rem !important;
+    overflow: hidden !important;
+    min-width: 0 !important;
+}
+
+/* Esconde o que nÃ£o cabe */
+#properties-container.properties-list .property-card .card-badges,
+#properties-container.properties-list .property-card .card-ribbon,
+#properties-container.properties-list .property-card .card-info-chips,
+#properties-container.properties-list .property-card .card-cta-btn,
+#properties-container.properties-list .property-card .card-favorite-btn {
+    display: none !important;
+}
+
+/* LocalizaÃ§Ã£o */
+#properties-container.properties-list .property-card .card-location {
+    font-size: 0.7rem !important;
+    margin-bottom: 0 !important;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* TÃ­tulo */
+#properties-container.properties-list .property-card .card-title {
+    font-size: 0.92rem !important;
+    font-weight: 700 !important;
+    margin-bottom: 0 !important;
+    display: -webkit-box !important;
+    -webkit-line-clamp: 2 !important;
+    -webkit-box-orient: vertical !important;
+    overflow: hidden !important;
+    line-height: 1.4 !important;
+    letter-spacing: 0.04em !important;
+    word-spacing: 0.15em !important;
+}
+
+/* Specs inline */
+#properties-container.properties-list .property-card .card-specs {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 0.3rem 0.6rem !important;
+    padding: 0 !important;
+    border-top: none !important;
+    margin-bottom: 0 !important;
+}
+
+#properties-container.properties-list .property-card .card-spec-item {
+    font-size: 0.68rem !important;
+    gap: 0.2rem !important;
+    border-left: none !important;
+    padding-left: 0 !important;
+    margin-left: 0 !important;
+}
+
+#properties-container.properties-list .property-card .card-spec-item + .card-spec-item {
+    border-left: none !important;
+    padding-left: 0 !important;
+    margin-left: 0 !important;
+}
+
+#properties-container.properties-list .property-card .card-spec-item svg {
+    width: 11px !important;
+    height: 11px !important;
+}
+
+/* PreÃ§o */
+#properties-container.properties-list .property-card .card-price-box {
+    margin: 0 !important;
+}
+
+#properties-container.properties-list .property-card .card-price-label {
+    font-size: 0.62rem !important;
+}
+
+#properties-container.properties-list .property-card .card-price-val {
+    font-size: 0.95rem !important;
+    font-weight: 800 !important;
+}
+
+/* Footer (condomÃ­nio) */
+#properties-container.properties-list .property-card .card-footer {
+    margin-top: 0 !important;
+    gap: 0 !important;
+}
+
+/* â”€â”€ Tablet (â‰¤768px) â”€â”€ */
+@media (max-width: 768px) {
+    #properties-container.properties-list .property-card {
+        grid-template-columns: 140px 1fr !important;
+    }
+    #properties-container.properties-list .property-card .card-body {
+        padding: 0.75rem 0.85rem !important;
+    }
+}
+
+/* â”€â”€ Mobile (â‰¤480px) â”€â”€ */
+@media (max-width: 480px) {
+    #properties-container.properties-list .property-card {
+        grid-template-columns: 110px 1fr !important;
+    }
+    #properties-container.properties-list .property-card .card-body {
+        padding: 0.6rem 0.7rem !important;
+    }
+    #properties-container.properties-list .property-card .card-title {
+        font-size: 0.82rem !important;
+    }
+    #properties-container.properties-list .property-card .card-price-val {
+        font-size: 0.85rem !important;
+    }
+}
+
+/* â”€â”€ Mobile pequeno (â‰¤360px) â”€â”€ */
+@media (max-width: 360px) {
+    #properties-container.properties-list .property-card {
+        grid-template-columns: 90px 1fr !important;
+    }
+    #properties-container.properties-list .property-card .card-body {
+        padding: 0.5rem 0.55rem !important;
+    }
+    #properties-container.properties-list .property-card .card-title {
+        font-size: 0.75rem !important;
+        -webkit-line-clamp: 1 !important;
+    }
+    #properties-container.properties-list .property-card .card-specs {
+        display: none !important;
+    }
+}
+
+
+/* â”€â”€ Card condo â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+.card-condo {
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    gap: 0.1rem;
 }
 
-/* ── Card condo ───────────────────────────────────────────────────────── */
-.card-condo { display: flex; flex-direction: column; gap: 0.1rem; }
-.card-condo-label { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.07em; color: var(--text-muted); font-weight: 600; }
-.card-condo-val { font-size: 0.82rem; font-weight: 600; color: var(--text-secondary); }
+.card-condo-label {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--text-muted);
+    font-weight: 600;
+}
 
-/* ── Empty state ──────────────────────────────────────────────────────── */
+.card-condo-val {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+/* â”€â”€ Empty state â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .empty-state {
     grid-column: 1 / -1;
     text-align: center;
@@ -760,82 +1354,26 @@
     margin-bottom: 0.5rem;
 }
 
-.empty-state h3 { font-size: 1.25rem; color: var(--text-primary); font-weight: 700; }
-.empty-state p { color: var(--text-secondary); font-size: 0.93rem; }
-
-/* ══════════════════════════════════════════════════════════════════════════
-   MOBILE SIDEBAR DRAWER
-   ══════════════════════════════════════════════════════════════════════════ */
-
-.sidebar-overlay {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.6);
-    backdrop-filter: blur(4px);
-    z-index: 299;
-    opacity: 0;
-    transition: opacity 0.3s ease;
+.empty-state h3 {
+    font-size: 1.25rem;
+    color: var(--text-primary);
+    font-weight: 700;
 }
 
-.sidebar-overlay.overlay--active {
-    display: block;
-    opacity: 1;
+.empty-state p {
+    color: var(--text-secondary);
+    font-size: 0.93rem;
 }
 
-/* ══════════════════════════════════════════════════════════════════════════
-   RESPONSIVE
-   ══════════════════════════════════════════════════════════════════════════ */
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+
+/* ==========================================================================
+   RESPONSIVE -- Ajustes do grid de imoveis
+   ========================================================================== */
 
 @media (max-width: 1024px) {
-    .catalog-layout {
-        grid-template-columns: 250px 1fr;
-    }
     #properties-container.properties-grid {
         grid-template-columns: repeat(2, 1fr);
-    }
-}
-
-@media (max-width: 800px) {
-    .catalog-layout {
-        grid-template-columns: 1fr;
-    }
-
-    /* Sidebar vira drawer lateral */
-    .filter-sidebar {
-        position: fixed;
-        top: 0;
-        left: -100%;
-        width: min(320px, 90vw);
-        height: 100vh;
-        z-index: 300;
-        border-radius: 0;
-        border: none;
-        border-right: 1px solid var(--border-color);
-        overflow-y: auto;
-        transition: left 0.35s cubic-bezier(0.22, 1, 0.36, 1);
-        padding-top: 4rem;
-    }
-
-    .filter-sidebar.sidebar--open {
-        left: 0;
-    }
-
-    .mobile-filter-btn {
-        display: flex;
-    }
-
-    #properties-container.properties-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-
-    #properties-container.properties-list .property-card {
-        grid-template-columns: 1fr;
-    }
-
-    #properties-container.properties-list .card-img-wrapper {
-        border-radius: var(--radius-md) var(--radius-md) 0 0;
-        height: 210px;
     }
 }
 
@@ -843,4 +1381,116 @@
     #properties-container.properties-grid {
         grid-template-columns: 1fr;
     }
+}
+
+.filter-fab { display: none; }
+
+/* Nota: o layout de lista horizontal jÃ¡ Ã© definido acima com especificidade alta,
+   os blocos abaixo mantÃªm apenas ajustes secundÃ¡rios de tipografia etc. */
+
+/* â”€â”€ Sort controls â€” esconder em mobile pequeno â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+@media (max-width: 576px) {
+    #properties-container.properties-grid {
+        grid-template-columns: 1fr !important;
+        gap: 1rem;
+    }
+
+    .results-header {
+        flex-direction: column;
+        gap: 0.75rem;
+        align-items: flex-start;
+    }
+
+    .sort-controls {
+        display: none;
+    }
+}
+
+/* =========================================================================
+   RESPONSIVIDADE COMPLETA â€” CatÃ¡logo de ImÃ³veis (Sistema Unificado)
+   ========================================================================= */
+
+/* â”€â”€ 1920px / 1600px â€” Monitores wide â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+@media (min-width: 1600px) {
+    #properties-container.properties-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+/* â”€â”€ 1440px â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+@media (min-width: 1440px) {
+    #properties-container.properties-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+    .prop-hero-content { max-width: 800px; }
+    .prop-hero-title { font-size: clamp(4rem, 6vw, 5.5rem); }
+}
+
+/* â”€â”€ 1280px â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+@media (max-width: 1280px) {
+    #properties-container.properties-grid { grid-template-columns: repeat(2, 1fr); }
+    .prop-hero-title { font-size: clamp(3rem, 5.5vw, 4.5rem); }
+    .prop-hero-desc { font-size: 1rem; }
+}
+
+/* ── 1024px — tablet landscape ── */
+@media (max-width: 1024px) {
+    .prop-hero-title { font-size: clamp(2.5rem, 6vw, 4rem); }
+    .prop-hero-desc { font-size: 0.98rem; }
+    .prop-hero-premium { padding: 8rem 0 5rem; }
+}
+
+/* ── Desktop médio (1024px-1280px): sidebar ligeiramente menor ── */
+@media (min-width: 1024px) and (max-width: 1280px) {
+    .catalog-layout--with-sidebar {
+        grid-template-columns: 260px 1fr;
+        gap: 1.5rem;
+    }
+}
+
+/* ── 768px — tablet portrait ──────────────────────────────────────────────── */
+@media (max-width: 768px) {
+    .prop-hero-premium { padding: 7rem 0 4.5rem; }
+    .prop-hero-title { font-size: clamp(2.2rem, 7vw, 3.5rem); }
+    .prop-hero-desc { font-size: 0.93rem; }
+    .premium-badge { font-size: 0.72rem; }
+    .props-toolbar { flex-direction: column; align-items: stretch; gap: 0.65rem; }
+    .props-search-wrap { min-width: unset; }
+}
+
+/* â”€â”€ 640px â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+@media (max-width: 640px) {
+    .prop-hero-premium { padding: 6.5rem 0 4rem; }
+    .prop-hero-title { font-size: clamp(1.9rem, 8vw, 3rem); }
+    .prop-hero-desc { font-size: 0.88rem; max-width: 100%; }
+    #properties-container.properties-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.85rem;
+    }
+}
+
+/* â”€â”€ 480px â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+@media (max-width: 480px) {
+    .prop-hero-premium { padding: 6rem 0 3.5rem; }
+    .prop-hero-title { font-size: clamp(1.7rem, 9vw, 2.5rem); }
+    .prop-hero-desc { font-size: 0.85rem; }
+    .premium-badge { font-size: 0.68rem; padding: 0.35rem 0.85rem; }
+    .pagination { gap: 0.25rem; }
+    .page-btn { min-width: 36px; height: 36px; font-size: 0.8rem; }
+}
+
+/* â”€â”€ 360px â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+@media (max-width: 360px) {
+    .prop-hero-premium { padding: 5.5rem 0 3rem; }
+    .prop-hero-title { font-size: clamp(1.5rem, 10vw, 2.2rem); line-height: 1.2; }
+    .prop-hero-desc { font-size: 0.82rem; }
+    .premium-badge { font-size: 0.62rem; }
+}
+
+/* â”€â”€ 320px â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+@media (max-width: 320px) {
+    .prop-hero-premium { padding: 5rem 0 2.5rem; }
+    .prop-hero-title { font-size: clamp(1.4rem, 10vw, 1.9rem); line-height: 1.2; }
+    .prop-hero-desc { font-size: 0.8rem; }
+    .premium-badge { font-size: 0.58rem; padding: 0.28rem 0.65rem; gap: 5px; }
 }

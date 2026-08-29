@@ -42,6 +42,8 @@ class Config:
 class DevelopmentConfig(Config):
     DEBUG = True
     ENV = 'development'
+    # Sem cache em desenvolvimento para facilitar iteração
+    SEND_FILE_MAX_AGE_DEFAULT = 0
 
 class TestingConfig(Config):
     TESTING = True
@@ -50,6 +52,8 @@ class TestingConfig(Config):
 class ProductionConfig(Config):
     DEBUG = False
     ENV = 'production'
+    # Cache de 1 ano para assets estáticos (CSS, JS, imagens)
+    SEND_FILE_MAX_AGE_DEFAULT = 31536000
 
 config_by_name = {
     'dev': DevelopmentConfig,

@@ -1147,3 +1147,1007 @@
     .lightbox-nav-prev { left: 0.5rem; }
     .lightbox-nav-next { right: 0.5rem; }
 }
+
+/* ---------- Mobile – Swiper gallery & Actions ---------- */
+@media (max-width: 992px) {
+  .desktop-gallery {
+    display: none !important;
+  }
+  
+  .mobile-gallery {
+    width: 100%;
+    height: calc(100vh * 0.45);
+    margin-bottom: 1.5rem;
+    background: #000;
+  }
+  
+  .mobile-gallery .swiper-slide {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+  }
+  
+  .mobile-gallery .swiper-slide img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  .mobile-gallery .swiper-button-prev,
+  .mobile-gallery .swiper-button-next {
+    color: #fff;
+    opacity: 0.8;
+    transition: opacity .2s;
+    background: rgba(0,0,0,0.3);
+    padding: 24px;
+    border-radius: 50%;
+    transform: scale(0.6);
+  }
+  
+  .mobile-gallery .swiper-button-prev:hover,
+  .mobile-gallery .swiper-button-next:hover {
+    opacity: 1;
+    background: rgba(0,0,0,0.5);
+  }
+  
+  .mobile-gallery .swiper-pagination-bullet {
+    background: #fff;
+    opacity: 0.6;
+  }
+  
+  .mobile-gallery .swiper-pagination-bullet-active {
+    background: var(--primary);
+    opacity: 1;
+  }
+
+  /* ── Glassmorphism sections on mobile ── */
+  .detail-main-col .d-section {
+    background: var(--bg-surface-hover, rgba(255, 255, 255, 0.03));
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-radius: 1rem;
+    padding: 1.25rem;
+    margin-bottom: 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+  }
+}
+
+@media (min-width: 993px) {
+    .mobile-gallery, .mobile-action-bar {
+        display: none !important;
+    }
+}
+
+/* --- 320px / Extra Small Mobile Fixes --- */
+@media (max-width: 480px) {
+    .detail-hero-header {
+        gap: 1rem;
+        padding-bottom: 1rem;
+    }
+    .detail-title {
+        font-size: 1.6rem !important;
+        line-height: 1.2;
+    }
+    .detail-price-main {
+        font-size: 2rem !important;
+    }
+    .detail-specs-ribbon {
+        margin: 1.5rem -1rem;
+        border-left: none;
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+    .spec-item {
+        min-width: 75px !important;
+        padding: 0.8rem 0.5rem !important;
+    }
+    .spec-val {
+        font-size: 0.95rem !important;
+    }
+    .spec-lbl {
+        font-size: 0.6rem !important;
+    }
+    .mobile-gallery {
+        height: 280px !important;
+    }
+    .detail-layout {
+        gap: 2rem;
+    }
+    .d-spec-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.25rem;
+        padding: 0.8rem 0;
+    }
+    .d-spec-key {
+        font-size: 0.75rem;
+        color: var(--text-muted);
+    }
+    .d-spec-val {
+        font-size: 0.95rem;
+        text-align: left;
+    }
+    .sidebar-card {
+        padding: 1.5rem !important;
+    }
+    .sb-agent {
+        flex-direction: column;
+        text-align: center;
+        align-items: center;
+    }
+
+}
+
+@media (max-width: 350px) {
+    .detail-title {
+        font-size: 1.4rem !important;
+    }
+    .detail-price-main {
+        font-size: 1.7rem !important;
+    }
+    .hero-action-btn {
+        padding: 0.35rem 0.5rem;
+        font-size: 0.6rem;
+    }
+    .spec-item {
+        min-width: 70px !important;
+    }
+}
+
+/* =========================================================================
+   Responsividade Extra — Detalhe do Imóvel
+   ========================================================================= */
+
+/* ── Indicador visual de scroll horizontal na Specs Ribbon ──────────────── */
+.specs-ribbon-wrapper {
+    position: relative;
+}
+.specs-ribbon-wrapper::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 40px;
+
+/* =========================================================================
+   Responsividade Extra — Detalhe do Imóvel
+   ========================================================================= */
+
+/* ── Indicador visual de scroll horizontal na Specs Ribbon ──────────────── */
+.specs-ribbon-wrapper {
+    position: relative;
+}
+.specs-ribbon-wrapper::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 40px;
+    background: linear-gradient(to left, var(--bg-main), transparent);
+    pointer-events: none;
+}
+
+/* ── Imóveis Semelhantes: carrossel horizontal em mobile ─────────────────── */
+@media (max-width: 768px) {
+    .related-section .properties-grid {
+        display: flex !important;
+        flex-direction: row !important;
+        overflow-x: auto;
+        scrollbar-width: none;
+        -webkit-overflow-scrolling: touch;
+        gap: 1rem;
+        padding-bottom: 1rem;
+        scroll-snap-type: x mandatory;
+    }
+    .related-section .properties-grid::-webkit-scrollbar {
+        display: none;
+    }
+    .related-section .property-card {
+        flex: 0 0 280px;
+        min-width: 280px;
+        scroll-snap-align: start;
+        display: flex !important;
+        flex-direction: column !important;
+        grid-template-columns: unset !important;
+    }
+    .related-section .property-card .card-img-wrapper {
+        height: 180px;
+        min-height: 180px;
+        width: 100%;
+    }
+    .related-section .property-card .card-img-wrapper img {
+        aspect-ratio: unset;
+        height: 100%;
+        object-fit: cover !important;
+    }
+    .related-section .property-card .card-body {
+        padding: 1rem;
+    }
+}
+
+/* ── Amenidades em grid 3 colunas < 576px ───────────────────────────────── */
+@media (max-width: 576px) {
+    .d-amenities-grid {
+        grid-template-columns: repeat(3, 1fr) !important;
+        gap: 0.75rem;
+    }
+    .amenity-item {
+        font-size: 0.75rem;
+        padding: 0.6rem 0.5rem;
+        text-align: center;
+    }
+    .amenity-item svg {
+        width: 18px;
+        height: 18px;
+    }
+}
+
+/* ── Botões flutuantes — afasta da sticky bar ─────────────────────── */
+
+
+/* ── Sidebar de contato — garante que aparece acima do padding da sticky ── */
+@media (max-width: 992px) {
+    .detail-sidebar {
+        margin-bottom: 100px;
+    }
+}
+
+/* =========================================================================
+   RESPONSIVIDADE COMPLETA — Detalhe do Imóvel (Breakpoints Superiores)
+   Complementa as regras existentes com cobertura 1024px → 1920px
+   e refinamentos para 320px-480px
+   ========================================================================= */
+
+/* ── 1920px / 1600px+ — Ultra-wide ───────────────────────────────────────── */
+@media (min-width: 1600px) {
+    .detail-layout {
+        gap: 3.5rem;
+    }
+    .detail-sidebar-col {
+        width: 420px;
+    }
+    .detail-gallery-wrapper {
+        height: 680px;
+    }
+    .gallery-side-grid {
+        width: 260px;
+    }
+}
+
+/* ── 1440px ───────────────────────────────────────────────────────────────── */
+@media (min-width: 1440px) {
+    .detail-layout { gap: 3rem; }
+    .detail-sidebar-col { width: 380px; }
+    .detail-gallery-wrapper { height: 640px; }
+    .detail-title { font-size: clamp(2.5rem, 3.5vw, 3.5rem); }
+}
+
+/* ── 1280px ───────────────────────────────────────────────────────────────── */
+@media (max-width: 1280px) {
+    .detail-layout {
+        gap: 2rem;
+    }
+    .detail-gallery-wrapper {
+        height: 520px;
+    }
+    .gallery-side-grid {
+        width: 180px;
+    }
+    .detail-title {
+        font-size: clamp(1.8rem, 3vw, 2.8rem);
+    }
+    .detail-price-main {
+        font-size: clamp(1.8rem, 3vw, 2.8rem);
+    }
+    .sidebar-card { padding: 1.5rem; }
+}
+
+/* ── 1024px — Tablet landscape ───────────────────────────────────────────── */
+@media (max-width: 1024px) {
+    /* Ocultar gallery desktop, mostrar gallery mobile */
+    .detail-gallery-wrapper {
+        grid-template-columns: 1fr 160px;
+        height: 440px;
+    }
+    .gallery-side-grid {
+        width: 160px;
+    }
+    .gallery-side-item:nth-child(n+3) {
+        display: none;
+    }
+    .detail-layout {
+        grid-template-columns: 1fr 300px;
+        gap: 1.75rem;
+    }
+    .detail-title { font-size: clamp(1.6rem, 2.8vw, 2.4rem); }
+    .detail-price-main { font-size: clamp(1.6rem, 2.8vw, 2.4rem); }
+
+    /* Breadcrumb: mostrar apenas Início › Título */
+    .detail-breadcrumb .bc-full-path { display: none; }
+}
+
+/* ── 768px — Tablet portrait ─────────────────────────────────────────────── */
+@media (max-width: 768px) {
+    .detail-hero-header {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+        padding-bottom: 1.5rem;
+    }
+    .detail-hero-right {
+        align-items: flex-start;
+    }
+    .detail-title {
+        font-size: clamp(1.5rem, 5vw, 2.2rem) !important;
+        line-height: 1.15;
+    }
+    .detail-price-main {
+        font-size: clamp(1.8rem, 5vw, 2.5rem) !important;
+    }
+    .detail-eyebrow { gap: 0.4rem; flex-wrap: wrap; }
+    .eyebrow-pill { font-size: 0.62rem; padding: 0.24rem 0.65rem; }
+
+    /* Layout colapsa */
+    .detail-layout {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+    .detail-sidebar-col {
+        width: 100%;
+    }
+
+    /* Galeria */
+    .detail-gallery-wrapper {
+        height: 340px;
+    }
+    .gallery-side-grid { display: none; }
+    .detail-gallery-wrapper:has(.gallery-side-grid) {
+        grid-template-columns: 1fr;
+    }
+
+    /* Breadcrumb compacto */
+    .detail-breadcrumb { font-size: 0.7rem; padding: 1.25rem 0 1rem; }
+
+    /* D-section padding */
+    .d-section { padding: 1.5rem 0; }
+    .d-section-title { font-size: 1rem; }
+
+    /* Specs ribbon — scroll horizontal */
+    .detail-specs-ribbon {
+        overflow-x: auto;
+        scrollbar-width: none;
+        flex-wrap: nowrap !important;
+    }
+    .detail-specs-ribbon::-webkit-scrollbar { display: none; }
+    .spec-item { flex: 0 0 auto; min-width: 80px; }
+}
+
+/* ── 640px ────────────────────────────────────────────────────────────────── */
+@media (max-width: 640px) {
+    .detail-breadcrumb { font-size: 0.65rem; padding: 1rem 0 0.75rem; }
+    .detail-title {
+        font-size: clamp(1.3rem, 5.5vw, 2rem) !important;
+    }
+    .detail-price-main {
+        font-size: clamp(1.6rem, 5.5vw, 2.2rem) !important;
+    }
+    .detail-location-line { font-size: 0.82rem; }
+    .hero-action-btn { font-size: 0.65rem; padding: 0.3rem 0.65rem; }
+
+    /* Gallery */
+    .detail-gallery-wrapper { height: 280px; }
+
+    /* Amenidades grid */
+    .d-amenities-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 0.5rem;
+    }
+    .amenity-item { font-size: 0.78rem; padding: 0.65rem 0.4rem; }
+    .amenity-item svg { width: 16px; height: 16px; }
+
+    /* Related cards */
+    .related-section .property-card { flex: 0 0 240px; min-width: 240px; }
+    .related-section .property-card .card-img-wrapper { height: 150px; }
+}
+
+/* ── 480px ────────────────────────────────────────────────────────────────── */
+@media (max-width: 480px) {
+    .detail-gallery-wrapper { height: 250px; }
+    .detail-title { font-size: clamp(1.2rem, 6vw, 1.8rem) !important; line-height: 1.2; }
+    .detail-price-main { font-size: clamp(1.4rem, 6vw, 2rem) !important; }
+    .detail-price-sqm { font-size: 0.75rem; }
+    .detail-price-label { font-size: 0.6rem; }
+
+    /* Hero actions compactos */
+    .detail-hero-actions { gap: 0.3rem; }
+    .hero-action-btn { font-size: 0.6rem; padding: 0.28rem 0.6rem; gap: 0.3rem; }
+
+    /* Spec items */
+    .spec-item { min-width: 72px !important; padding: 0.75rem 0.4rem !important; }
+    .spec-val { font-size: 0.9rem !important; }
+    .spec-lbl { font-size: 0.55rem !important; }
+
+    /* D-spec rows */
+    .d-spec-row { flex-direction: column; align-items: flex-start; gap: 0.2rem; padding: 0.75rem 0; }
+    .d-spec-key { font-size: 0.7rem; }
+    .d-spec-val { font-size: 0.9rem; }
+
+    /* Sidebar card */
+    .sidebar-card { padding: 1.25rem !important; }
+    .sb-agent { flex-direction: column; text-align: center; align-items: center; }
+
+    /* Mobile gallery height */
+    .mobile-gallery { height: 260px !important; }
+
+    /* Mobile action bar */
+    /* Mobile action bar overrides removed */
+}
+
+/* ── 360px ────────────────────────────────────────────────────────────────── */
+@media (max-width: 360px) {
+    .detail-gallery-wrapper { height: 220px; }
+    .mobile-gallery { height: 220px !important; }
+    .detail-title { font-size: clamp(1.1rem, 7vw, 1.6rem) !important; }
+    .detail-price-main { font-size: clamp(1.2rem, 7vw, 1.8rem) !important; }
+    .eyebrow-pill { font-size: 0.58rem; padding: 0.2rem 0.55rem; }
+    .hero-action-btn { font-size: 0.58rem; padding: 0.25rem 0.5rem; }
+    .spec-item { min-width: 65px !important; }
+    .amenity-item { font-size: 0.72rem; }
+
+    /* Related */
+    .related-section .property-card { flex: 0 0 200px; min-width: 200px; }
+}
+
+/* ── 320px ────────────────────────────────────────────────────────────────── */
+@media (max-width: 320px) {
+    .detail-gallery-wrapper { height: 200px; }
+    .mobile-gallery { height: 200px !important; }
+    .detail-breadcrumb { font-size: 0.6rem; }
+    .detail-title { font-size: clamp(1rem, 7vw, 1.4rem) !important; line-height: 1.25; }
+    .detail-price-main { font-size: clamp(1.1rem, 7.5vw, 1.6rem) !important; }
+    .detail-price-sqm { font-size: 0.7rem; }
+    .eyebrow-pill { font-size: 0.54rem; }
+    .hero-action-btn { display: none; }
+
+    .spec-item { min-width: 60px !important; padding: 0.6rem 0.3rem !important; }
+    .spec-val { font-size: 0.82rem !important; }
+    .spec-lbl { font-size: 0.5rem !important; }
+
+    .amenity-item { font-size: 0.68rem; padding: 0.5rem 0.3rem; }
+    .amenity-item svg { width: 14px; height: 14px; }
+
+    .sidebar-card { padding: 1rem !important; }
+
+    .related-section .property-card { flex: 0 0 180px; min-width: 180px; }
+    .related-section .property-card .card-img-wrapper { height: 120px; }
+}
+
+/* =============================================================================
+   MOBILE ACTION BAR � Barra inferior fixa (apenas na pagina do imovel)
+   ============================================================================= */
+
+.mobile-action-bar {
+    display: none;
+}
+
+@media (max-width: 992px) {
+    .mobile-action-bar {
+        display: flex !important;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 64px;
+        align-items: stretch;
+        background: var(--bg-surface);
+        border-top: 2px solid var(--border-color);
+        box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.25);
+        z-index: 8000;
+        padding-bottom: env(safe-area-inset-bottom);
+    }
+
+    .mobile-action-bar button,
+    .mobile-action-bar a {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: transparent;
+        border: none;
+        border-right: 1px solid var(--border-color);
+        color: var(--text-secondary);
+        cursor: pointer;
+        font-size: 0;
+        text-decoration: none;
+        transition: background 0.2s ease, color 0.2s ease;
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    .mobile-action-bar button:last-child,
+    .mobile-action-bar a:last-child {
+        border-right: none;
+    }
+
+    .mobile-action-bar .cta-contact {
+        color: var(--primary);
+    }
+
+    .mobile-action-bar .cta-fav.favorited {
+        color: #ef4444;
+    }
+
+    .mobile-action-bar button:active,
+    .mobile-action-bar a:active {
+        background: rgba(255, 255, 255, 0.06);
+    }
+
+    .mobile-action-bar svg {
+        width: 24px;
+        height: 24px;
+        flex-shrink: 0;
+        pointer-events: none;
+    }
+
+    .detail-page {
+        padding-bottom: calc(64px + env(safe-area-inset-bottom) + 1rem);
+    }
+
+    a.whatsapp-float {
+        bottom: calc(64px + env(safe-area-inset-bottom) + 1rem) !important;
+        right: 1rem !important;
+        width: 48px !important;
+        min-width: 48px !important;
+        max-width: 48px !important;
+        height: 48px !important;
+    }
+
+    a.whatsapp-float .wa-label {
+        display: none !important;
+    }
+
+    .theme-toggle-mobile {
+        bottom: calc(64px + env(safe-area-inset-bottom) + 1rem) !important;
+    }
+}
+
+/* =============================================================================
+   MOBILE REDESIGN � Elegante, Minimalista, Organizado
+   Aplica apenas em < 993px
+   ============================================================================= */
+
+@media (max-width: 992px) {
+
+  /* -- Container global --------------------------------------------------- */
+  .detail-page {
+    background: var(--bg-main);
+  }
+  .detail-page .container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  /* -- Breadcrumb --------------------------------------------------------- */
+  .detail-breadcrumb {
+    font-size: 0.7rem;
+    padding: 0.75rem 0 0.5rem;
+    opacity: 0.6;
+  }
+
+  /* -- Hero: t�tulo + localiza��o + pre�o � tudo em coluna --------------- */
+  .detail-hero-header {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    padding-bottom: 0;
+  }
+
+  /* Eyebrow pills no topo */
+  .detail-eyebrow {
+    display: flex;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+    margin-bottom: 0.5rem;
+  }
+
+  .eyebrow-pill {
+    font-size: 0.6rem;
+    padding: 0.2rem 0.6rem;
+    letter-spacing: 0.08em;
+    font-weight: 600;
+    text-transform: uppercase;
+  }
+
+  /* T�tulo compacto */
+  .detail-title {
+    font-size: clamp(1.25rem, 5.5vw, 1.7rem) !important;
+    line-height: 1.25;
+    margin-bottom: 0.4rem;
+    letter-spacing: -0.01em;
+  }
+
+  /* Localiza��o */
+  .detail-location-line {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    margin-bottom: 0;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.35rem;
+  }
+  .detail-location-line svg {
+    flex-shrink: 0;
+    margin-top: 2px;
+    opacity: 0.6;
+  }
+
+  /* -- Bloco de pre�o � logo abaixo do t�tulo ----------------------------- */
+  .detail-hero-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.15rem;
+    border-top: 1px solid var(--border-color);
+    margin-top: 1rem;
+    padding-top: 0.75rem;
+  }
+
+  .detail-price-label {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+    font-weight: 500;
+  }
+
+  .detail-price-main {
+    font-size: clamp(1.6rem, 6vw, 2.2rem) !important;
+    font-weight: 700;
+    color: var(--primary) !important;
+    line-height: 1;
+    letter-spacing: -0.02em;
+  }
+
+  .detail-price-sqm {
+    font-size: 0.72rem;
+    color: var(--text-muted);
+  }
+
+  /* Bot�es de a��o hero � ocultos no mobile (substitu�dos pela barra) */
+  .detail-hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-top: 0.6rem;
+  }
+
+  .hero-action-btn {
+    font-size: 0.65rem;
+    padding: 0.3rem 0.65rem;
+    border-radius: 4px;
+  }
+
+  /* -- Galeria Mobile ----------------------------------------------------- */
+  .mobile-gallery {
+    height: 260px;
+    margin-top: 1rem;
+    margin-bottom: 0;
+    border-radius: 0;
+  }
+
+  /* -- Specs Ribbon ------------------------------------------------------- */
+  .specs-ribbon-wrapper {
+    margin-top: 0;
+    border-top: 1px solid var(--border-color);
+    border-bottom: 1px solid var(--border-color);
+    background: var(--bg-surface);
+  }
+
+  .detail-specs-ribbon {
+    display: flex;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    padding: 0;
+    gap: 0;
+  }
+  .detail-specs-ribbon::-webkit-scrollbar { display: none; }
+
+  .spec-item {
+    flex: 0 0 auto;
+    min-width: 72px;
+    padding: 0.75rem 0.6rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+    border-right: 1px solid var(--border-color);
+    text-align: center;
+  }
+  .spec-item:last-child { border-right: none; }
+
+  .spec-item svg {
+    width: 16px;
+    height: 16px;
+    opacity: 0.5;
+  }
+
+  .spec-val {
+    font-size: 0.95rem !important;
+    font-weight: 700;
+    color: var(--text-primary);
+    line-height: 1;
+  }
+
+  .spec-lbl {
+    font-size: 0.55rem !important;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-weight: 500;
+  }
+
+  /* -- Layout: oculta sidebar no mobile ---------------------------------- */
+  .detail-layout {
+    grid-template-columns: 1fr !important;
+    gap: 0;
+  }
+
+  .detail-sidebar-col {
+    display: none !important;
+  }
+
+  /* -- Se��es do conte�do principal -------------------------------------- */
+  .detail-main-col {
+    padding-top: 0;
+  }
+
+  .detail-main-col .d-section {
+    background: transparent;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    border-radius: 0;
+    padding: 1.25rem 0;
+    margin-bottom: 0;
+    border: none;
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  .detail-main-col .d-section:last-child {
+    border-bottom: none;
+  }
+
+  /* Cabe�alho de se��o */
+  .d-section-header {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin-bottom: 0.9rem;
+  }
+
+  .d-section-num {
+    font-size: 0.55rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    color: var(--primary);
+    opacity: 0.7;
+    font-family: var(--font-heading);
+  }
+
+  .d-section-title {
+    font-size: 0.88rem !important;
+    font-weight: 600;
+    color: var(--text-primary);
+    letter-spacing: 0;
+  }
+
+  .d-section-tag {
+    font-size: 0.55rem;
+    padding: 0.15rem 0.5rem;
+    margin-left: auto;
+    opacity: 0.5;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  /* Descri��o */
+  .d-description {
+    font-size: 0.85rem;
+    line-height: 1.75;
+    color: var(--text-secondary);
+  }
+
+  /* Ficha t�cnica � duas colunas lado a lado */
+  .d-specs-table {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+  }
+
+  .d-spec-row {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+    padding: 0.6rem 0.5rem;
+    border-bottom: 1px solid var(--border-color);
+    border-right: 1px solid var(--border-color);
+  }
+
+  /* �ltima coluna sem borda direita */
+  .d-spec-row:nth-child(2n) {
+    border-right: none;
+  }
+
+  .d-spec-key {
+    font-size: 0.62rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-weight: 500;
+  }
+
+  .d-spec-val {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+
+  .d-spec-val.gold { color: var(--primary); }
+  .d-spec-val.green { color: #22c55e; }
+
+  /* Amenidades � pain�is verticais */
+  .d-amenities-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .d-amenity-panel {
+    background: transparent;
+  }
+
+  .d-amenity-panel-title {
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-muted);
+    margin-bottom: 0.6rem;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .d-amenity-list {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.3rem 0.75rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .d-amenity-list li {
+    font-size: 0.78rem;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: flex-start;
+    gap: 0.4rem;
+    line-height: 1.4;
+  }
+
+  .d-amenity-list li svg {
+    flex-shrink: 0;
+    margin-top: 2px;
+    color: var(--primary);
+    opacity: 0.7;
+  }
+
+  /* Localiza��o */
+  .d-location-header {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .d-location-address {
+    font-size: 0.88rem;
+    display: block;
+  }
+
+  .d-location-sub {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    display: block;
+    margin-top: 0.15rem;
+  }
+
+  .d-map-link {
+    font-size: 0.72rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    color: var(--primary);
+    font-weight: 500;
+    align-self: flex-start;
+  }
+
+  .d-map-embed {
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .d-map-embed iframe {
+    height: 220px;
+    width: 100%;
+    border: none;
+  }
+
+  /* Financiamento */
+  .d-fin-intro {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin-bottom: 0.75rem;
+    line-height: 1.6;
+  }
+
+  .d-banks-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+  }
+
+  .d-bank-card {
+    padding: 0.75rem;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    background: var(--bg-surface);
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    text-decoration: none;
+  }
+
+  .d-bank-name {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+
+  .d-bank-desc {
+    font-size: 0.62rem;
+    color: var(--text-muted);
+  }
+
+  .d-bank-card svg {
+    align-self: flex-end;
+    color: var(--primary);
+    opacity: 0.7;
+  }
+
+  .d-fin-footer {
+    margin-top: 0.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    align-items: flex-start;
+  }
+
+  .d-fin-footer span {
+    font-size: 0.78rem;
+    color: var(--text-secondary);
+  }
+
+  .d-fin-cta {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--primary);
+    text-decoration: none;
+    border: 1px solid var(--primary);
+    padding: 0.4rem 0.9rem;
+    border-radius: 4px;
+  }
+}
+

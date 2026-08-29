@@ -3,23 +3,29 @@
 {% block title %}Início | {{ site_name }} - {{ site_slogan }}{% endblock %}
 
 {% block extra_css %}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,800;1,700;1,800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/pages/home.css') }}">
 {% endblock %}
+
 
 {% block content %}
 
 <!-- ══ Hero Section ══════════════════════════════════════════════════════ -->
 <section class="hero-section" id="hero-slider">
     <div class="hero-video-wrapper">
+        <!-- Vídeo 1: baixa imediatamente e toca -->
         <video class="hero-video active" autoplay muted playsinline preload="auto" data-index="0"
                poster="{{ url_for('static', filename='img/hero-poster.jpg') }}">
-            <source src="{{ url_for('static', filename='video/hero.mp4') }}" type="video/mp4">
+            <source src="{{ r2_public_url ~ '/video/hero.mp4' if r2_public_url else url_for('static', filename='video/hero.mp4') }}" type="video/mp4">
         </video>
-        <video class="hero-video" muted playsinline preload="auto" data-index="1">
-            <source src="{{ url_for('static', filename='video/hero2.mp4') }}" type="video/mp4">
+        <!-- Vídeos 2 e 3: sem src inicial. O JS popula o src durante o slide anterior -->
+        <video class="hero-video" muted playsinline preload="none" data-index="1"
+               data-src-mp4="{{ r2_public_url ~ '/video/hero2.mp4' if r2_public_url else url_for('static', filename='video/hero2.mp4') }}">
         </video>
-        <video class="hero-video" muted playsinline preload="auto" data-index="2">
-            <source src="{{ url_for('static', filename='video/hero3.mp4') }}" type="video/mp4">
+        <video class="hero-video" muted playsinline preload="none" data-index="2"
+               data-src-mp4="{{ r2_public_url ~ '/video/hero3.mp4' if r2_public_url else url_for('static', filename='video/hero3.mp4') }}">
         </video>
     </div>
 
@@ -52,7 +58,7 @@
                     <div class="hero-field">
                         <label>Tipo</label>
                         <select name="type">
-                            <option value="">Qualquer tipo</option>
+                            <option value="">Qualquer</option>
                             {% for t in types %}
                                 <option value="{{ t }}">{{ t }}</option>
                             {% endfor %}
@@ -156,35 +162,41 @@
 
 
 <!-- ══ Lançamentos ═══════════════════════════════════════════════════════ -->
-<section class="section lancamentos-section" id="lancamentos">
+<section class="section lc-section" id="lancamentos">
     <div class="container">
-        <div class="lancamentos-header">
-            <div class="lancamentos-header-text">
+
+        <!-- Cabeçalho -->
+        <div class="lc-header reveal">
+            <div class="lc-header-left">
                 <div class="section-eyebrow">
                     <span class="eyebrow-line"></span>
                     <span>CURADORIA EXCLUSIVA</span>
                 </div>
-                <h2 class="lancamentos-title">Lançamentos</h2>
-                <p class="lancamentos-subtitle">Empreendimentos selecionados com atenção extrema para uma clientela que não aceita menos que o extraordinário.</p>
+                <h2 class="lc-title">Lançamentos</h2>
+                <p class="lc-subtitle">Empreendimentos selecionados com atenção extrema para uma clientela que não aceita menos que o extraordinário.</p>
             </div>
-            <a href="{{ url_for('main.lancamentos') }}" class="lancamentos-all-link">
+            <a href="{{ url_for('main.lancamentos') }}" class="lc-all-link">
                 Ver todos
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
             </a>
         </div>
 
-        <div class="lancamentos-slider-wrapper properties-slider-wrapper">
-            <button class="slider-nav-btn prev" aria-label="Anterior">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"></polyline></svg>
+        <!-- Slider -->
+        <div class="lc-slider-outer" id="lcSliderOuter">
+
+            <!-- Botão Anterior -->
+            <button class="lc-arrow lc-arrow--prev" id="lcPrev" aria-label="Lançamento anterior">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
             </button>
-            
-            <div class="lancamentos-grid properties-slider">
+
+            <!-- Track deslizante -->
+            <div class="lc-track" id="lcTrack">
                 {% for item in lancamentos %}
                 <a href="{{ url_for('main.lancamento_detail', slug=item.slug) }}"
-                   class="lancamento-card property-card"
-                   data-delay="{{ loop.index0 * 120 }}">
+                   class="lc-card"
+                   data-lc-index="{{ loop.index0 }}">
 
-                    <div class="lancamento-cover">
+                    <div class="lc-cover">
                         {% if item.cover_url and (item.cover_url.startswith('http') or item.cover_url.startswith('/static')) %}
                         <img src="{{ item.cover_url }}" alt="{{ item.name }}" loading="lazy">
                         {% elif item.cover %}
@@ -192,26 +204,34 @@
                         {% else %}
                         <img src="{{ url_for('static', filename='img/placeholder.jpg') }}" alt="{{ item.name }}" loading="lazy">
                         {% endif %}
-                        <div class="lancamento-cover-overlay"></div>
 
-                        <!-- Tudo posicionado DENTRO da cover (overflow:hidden correto) -->
-                        <div class="lancamento-status-pill">{{ item.status }}</div>
+                        <div class="lc-overlay"></div>
 
-                        <div class="lancamento-info">
-                            <div class="lancamento-location">
-                                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                        <span class="lc-pill">{{ item.status }}</span>
+
+                        <div class="lc-info">
+                            <span class="lc-location">
+                                <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
                                 {{ item.location }}
-                            </div>
-                            <h3 class="lancamento-name">{{ item.name }}</h3>
-                            <p class="lancamento-tagline">{{ item.tagline }}</p>
-                            <div class="lancamento-footer">
-                                <span class="lancamento-type">{{ item.type }}</span>
-                                <span class="lancamento-units">{{ item.units }}</span>
+                            </span>
+
+                            <h3 class="lc-name">{{ item.name }}</h3>
+
+
+                            <p class="lc-tagline">{{ item.tagline }}</p>
+
+                            <div class="lc-meta">
+                                <span class="lc-type-badge">{{ item.type }}</span>
+                                <div class="lc-units-block">
+                                    <span class="lc-units-num">{{ item.units.split()[0] }}</span>
+                                    <span class="lc-units-label">unidades</span>
+                                </div>
                             </div>
                         </div>
 
-                        <div class="lancamento-arrow">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+
+                        <div class="lc-cta">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
                         </div>
                     </div>
 
@@ -219,10 +239,19 @@
                 {% endfor %}
             </div>
 
-            <button class="slider-nav-btn next" aria-label="Próximo">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
+            <!-- Botão Próximo -->
+            <button class="lc-arrow lc-arrow--next" id="lcNext" aria-label="Próximo lançamento">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
             </button>
         </div>
+
+        <!-- Dots -->
+        <div class="lc-dots" id="lcDots">
+            {% for item in lancamentos %}
+            <button class="lc-dot {% if loop.first %}active{% endif %}" data-lc-dot="{{ loop.index0 }}" aria-label="Lançamento {{ loop.index }}"></button>
+            {% endfor %}
+        </div>
+
     </div>
 </section>
 
@@ -451,14 +480,94 @@
 
 
 {% block extra_js %}
-<script src="{{ url_for('static', filename='js/hero_slider.js') }}"></script>
+<!-- GSAP: carregado apenas nas p\u00e1ginas que usam anima\u00e7\u00f5es avan\u00e7adas -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" defer></script>
+<script src="{{ url_for('static', filename='js/hero_slider.js') }}?v=4" defer></script>
 <script src="{{ url_for('static', filename='js/cinematic_scroll.js') }}" defer></script>
-<script>
+<script defer>
 function setSearchPurpose(purposeLabel, btnElement) {
     document.querySelectorAll('.purpose-btn').forEach(btn => btn.classList.remove('active'));
     btnElement.classList.add('active');
     document.getElementById('search-purpose').value = purposeLabel === 'Comprar' ? 'Venda' : 'Aluguel';
 }
+
+/* ── Lançamentos Slider ─────────────────────────────────────────────── */
+(function() {
+    'use strict';
+
+    const track   = document.getElementById('lcTrack');
+    const btnPrev = document.getElementById('lcPrev');
+    const btnNext = document.getElementById('lcNext');
+    const dotsEl  = document.getElementById('lcDots');
+    if (!track) return;
+
+    const cards   = Array.from(track.querySelectorAll('.lc-card'));
+    const dots    = dotsEl ? Array.from(dotsEl.querySelectorAll('.lc-dot')) : [];
+    let current   = 0;
+
+    function getCardWidth() {
+        if (!cards[0]) return 0;
+        const style = getComputedStyle(cards[0]);
+        return cards[0].offsetWidth + parseFloat(style.marginRight || 0);
+    }
+
+    function goTo(index) {
+        const max = cards.length - 1;
+        current = Math.max(0, Math.min(index, max));
+        const offset = cards[current].offsetLeft - track.parentElement.offsetLeft;
+        track.scrollTo({ left: offset, behavior: 'smooth' });
+        updateDots();
+        updateArrows();
+    }
+
+    function updateDots() {
+        dots.forEach((d, i) => d.classList.toggle('active', i === current));
+    }
+
+    function updateArrows() {
+        if (btnPrev) btnPrev.classList.toggle('lc-arrow--hidden', current === 0);
+        if (btnNext) btnNext.classList.toggle('lc-arrow--hidden', current === cards.length - 1);
+    }
+
+    /* Detectar posição atual via scrollend / fallback com scroll + debounce */
+    let scrollTimer;
+    track.addEventListener('scroll', function() {
+        clearTimeout(scrollTimer);
+        scrollTimer = setTimeout(function() {
+            let closest = 0, minDist = Infinity;
+            cards.forEach(function(card, i) {
+                const dist = Math.abs(card.offsetLeft - track.scrollLeft - track.parentElement.offsetLeft);
+                if (dist < minDist) { minDist = dist; closest = i; }
+            });
+            if (closest !== current) { current = closest; updateDots(); updateArrows(); }
+        }, 80);
+    }, { passive: true });
+
+    if (btnPrev) btnPrev.addEventListener('click', function() { goTo(current - 1); });
+    if (btnNext) btnNext.addEventListener('click', function() { goTo(current + 1); });
+    dots.forEach(function(dot, i) { dot.addEventListener('click', function() { goTo(i); }); });
+
+    /* Reveal: observer com root no track para funcionar dentro de scroll container */
+    /* Em mobile, revela imediatamente (CSS já faz opacity:1, mas garante a classe) */
+    if (window.innerWidth <= 768) {
+        cards.forEach(function(card) { card.classList.add('lc-visible'); });
+    } else {
+        const observer = new IntersectionObserver(function(entries) {
+            entries.forEach(function(entry) {
+                if (entry.isIntersecting) {
+                    const delay = parseInt(entry.target.dataset.lcIndex || 0, 10) * 110;
+                    setTimeout(function() { entry.target.classList.add('lc-visible'); }, delay);
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { root: track, threshold: 0 });
+        cards.forEach(function(card) { observer.observe(card); });
+    }
+
+    updateArrows();
+})();
 </script>
 {% endblock %}
+
 
