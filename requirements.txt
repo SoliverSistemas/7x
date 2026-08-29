@@ -97,6 +97,7 @@ yarl==1.24.5
 gunicorn
 
 Flask-Compress
+Flask-Caching==2.3.0
 boto3==1.43.79
 
  

@@ -4,10 +4,12 @@ from config import config_by_name
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_compress import Compress
+from flask_caching import Cache
 
 db = SQLAlchemy()
 migrate = Migrate()
 compress = Compress()
+cache = Cache()
 
 def create_app(config_name='dev'):
     """
@@ -26,6 +28,11 @@ def create_app(config_name='dev'):
     migrate.init_app(app, db)
     # Compressão HTTP automática (Gzip/Brotli) — reduz ~60-80% no tamanho das respostas
     compress.init_app(app)
+    # Cache em memória RAM — evita queries repetidas ao Supabase
+    cache.init_app(app, config={
+        'CACHE_TYPE': 'SimpleCache',
+        'CACHE_DEFAULT_TIMEOUT': 300,  # 5 minutos
+    })
     
     # Register Custom Template Filters
     @app.template_filter('currency')
@@ -69,13 +76,10 @@ def create_app(config_name='dev'):
     from app.routes.properties import properties_bp
     from app.routes.api import api_bp
     from app.routes.admin import admin_bp
-    from app.routes.agents import agents_bp
-
     app.register_blueprint(main_bp)
     app.register_blueprint(properties_bp, url_prefix='/imoveis')
     app.register_blueprint(api_bp, url_prefix='/api')
     app.register_blueprint(admin_bp, url_prefix='/admin')
-    app.register_blueprint(agents_bp)
 
     # Register Error Handlers
     @app.errorhandler(404)

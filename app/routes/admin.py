@@ -8,7 +8,7 @@ from flask import (
 )
 from app.models.property_model import PropertyRepository
 from app.models.db_models import ExclusiveCollection, Property, Lancamento, PropertyCategory, AgentProfile
-from app import db
+from app import db, cache
 from app.services.sync_service import SyncService
 from app.services.storage_service import StorageService
 
@@ -150,6 +150,7 @@ def property_detail(property_id):
 def toggle_exclusive(property_id):
     status = PropertyRepository.toggle_exclusive(property_id)
     if status is not None:
+        cache.clear()  # invalida cache de listagem
         flash(f'Status de exclusividade atualizado para o imóvel #{property_id}.', 'success')
     else:
         flash('Imóvel não encontrado.', 'error')
@@ -161,6 +162,7 @@ def toggle_exclusive(property_id):
 @login_required
 def sync_properties():
     result = SyncService.sync_all_properties()
+    cache.clear()  # sync atualiza tudo — invalida todo o cache
     if result.get("success"):
         flash(result.get("message"), 'success')
     else:
@@ -542,7 +544,7 @@ def categoria_save():
     cat.is_exclusive_flag = is_exclusive_flag
     cat.is_featured_flag  = is_featured_flag
     db.session.commit()
-
+    cache.clear()  # categoria alterada afeta classificação de todos os imóveis
     flash(f'Categoria "{name}" salva.', 'success')
     return redirect(url_for('admin.categorias_list'))
 
@@ -554,6 +556,7 @@ def categoria_delete(cat_id):
     name = cat.name
     db.session.delete(cat)
     db.session.commit()
+    cache.clear()  # categoria removida afeta classificação de imóveis
     flash(f'Categoria "{name}" excluída.', 'success')
     return redirect(url_for('admin.categorias_list'))
 
@@ -570,6 +573,7 @@ def categorias_recalcular():
             p.calculated_category = nova
             count += 1
     db.session.commit()
+    cache.clear()  # recálculo muda categorias de todos os imóveis
     flash(f'Recálculo concluído — {count} imóvel(is) atualizado(s).', 'success')
     return redirect(url_for('admin.categorias_list'))
 
@@ -592,6 +596,7 @@ def categorias_criar_padroes():
     for p in padroes:
         db.session.add(p)
     db.session.commit()
+    cache.clear()  # novas categorias afetam todos os imóveis
     flash('Categorias padrão criadas com sucesso!', 'success')
     return redirect(url_for('admin.categorias_list'))
 

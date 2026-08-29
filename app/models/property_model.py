@@ -1,5 +1,5 @@
 from app.models.db_models import Property, PropertyCategory, AgentProfile
-from app import db
+from app import db, cache
 import math
 
 class PropertyRepository:
@@ -8,6 +8,7 @@ class PropertyRepository:
     """
 
     @classmethod
+    @cache.cached(timeout=300, key_prefix='properties_all')
     def get_all(cls):
         from sqlalchemy.orm import defer
         # Retorna todos os imóveis ativos
@@ -99,6 +100,7 @@ class PropertyRepository:
         return None
 
     @classmethod
+    @cache.cached(timeout=300, key_prefix='properties_featured')
     def get_featured(cls, limit=3):
         from sqlalchemy.orm import defer
         base_query = Property.query.options(
@@ -117,15 +119,24 @@ class PropertyRepository:
 
     @classmethod
     def get_by_id(cls, property_id):
+        cache_key = f'property_{property_id}'
+        cached = cache.get(cache_key)
+        if cached is not None:
+            return cached
+
         prop = Property.query.get(str(property_id))
         if prop:
-            return prop.to_dict()
+            result = prop.to_dict()
+            cache.set(cache_key, result, timeout=600)  # 10 min
+            return result
             
         # Fallback para string reference ou slug
         s_id = str(property_id).strip()
         prop = Property.query.filter((Property.reference == s_id) | (Property.slug == s_id)).first()
         if prop:
-            return prop.to_dict()
+            result = prop.to_dict()
+            cache.set(cache_key, result, timeout=600)
+            return result
         return None
 
     @classmethod
