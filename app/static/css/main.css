@@ -1826,7 +1826,7 @@ a.whatsapp-float:hover::before {
 
     .site-header {
 
-        position: fixed;
+        position: sticky;
 
         top: 0;
 
@@ -3707,7 +3707,7 @@ body.menu-open {
 /* ── Hamburger / nav-menu — regra consolidada ───────────────────────────── */
 @media (max-width: 992px) {
     .site-header {
-        position: fixed;
+        position: sticky;
         top: 0;
         left: 0;
         right: 0;

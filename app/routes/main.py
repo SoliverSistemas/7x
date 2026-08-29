@@ -86,6 +86,10 @@ def index():
 def about():
     return render_template('main/about.html')
 
+@main_bp.route('/consorcio')
+def consorcio():
+    return render_template('main/consorcio.html')
+
 @main_bp.route('/contato', methods=['GET', 'POST'])
 def contact():
     if request.method == 'POST':
