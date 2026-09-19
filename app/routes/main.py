@@ -202,6 +202,16 @@ Sitemap: https://7xpatrimonial.com.br/sitemap.xml
     return response
 
 
+# ══ SEO: Google Search Console — verificação de propriedade ══════════════════
+@main_bp.route('/google8bdd11708dfd999b.html')
+def google_site_verification():
+    """Serve o arquivo de verificação do Google Search Console."""
+    content = 'google-site-verification: google8bdd11708dfd999b.html'
+    response = make_response(content)
+    response.headers['Content-Type'] = 'text/html; charset=utf-8'
+    return response
+
+
 # ══ SEO: sitemap.xml ═════════════════════════════════════════════════════════
 @main_bp.route('/sitemap.xml')
 def sitemap_xml():
