@@ -1,5 +1,6 @@
-from flask import Blueprint, render_template, request, flash, redirect, url_for, abort, jsonify
+from flask import Blueprint, render_template, request, flash, redirect, url_for, abort, jsonify, Response, make_response
 import os
+from datetime import datetime
 from app.models.property_model import PropertyRepository
 from app.models.db_models import ExclusiveCollection, Lancamento, ChatLead
 from app.services.tecimobi_service import TecimobService
@@ -181,3 +182,91 @@ def chatbot_lead():
     db.session.add(lead)
     db.session.commit()
     return jsonify({'ok': True, 'id': lead.id})
+
+
+# ══ SEO: robots.txt ══════════════════════════════════════════════════════════
+@main_bp.route('/robots.txt')
+def robots_txt():
+    """Serve o arquivo robots.txt permitindo indexação completa pelo Google."""
+    content = """User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /admin
+Disallow: /chatbot/lead
+
+Sitemap: https://7xpatrimonial.com.br/sitemap.xml
+"""
+    response = make_response(content)
+    response.headers['Content-Type'] = 'text/plain; charset=utf-8'
+    response.headers['Cache-Control'] = 'public, max-age=86400'
+    return response
+
+
+# ══ SEO: sitemap.xml ═════════════════════════════════════════════════════════
+@main_bp.route('/sitemap.xml')
+def sitemap_xml():
+    """Gera o sitemap.xml dinamicamente com todas as URLs públicas do site."""
+    base_url = 'https://7xpatrimonial.com.br'
+    today = datetime.utcnow().strftime('%Y-%m-%d')
+
+    # Páginas estáticas
+    static_pages = [
+        ('/', '1.0', 'daily'),
+        ('/imoveis/', '0.9', 'daily'),
+        ('/sobre', '0.7', 'monthly'),
+        ('/contato', '0.7', 'monthly'),
+        ('/lancamentos', '0.8', 'weekly'),
+        ('/publique-seu-imovel', '0.6', 'monthly'),
+        ('/consorcio', '0.6', 'monthly'),
+        ('/links', '0.4', 'monthly'),
+    ]
+
+    urls = []
+    for path, priority, changefreq in static_pages:
+        urls.append(f"""  <url>
+    <loc>{base_url}{path}</loc>
+    <lastmod>{today}</lastmod>
+    <changefreq>{changefreq}</changefreq>
+    <priority>{priority}</priority>
+  </url>""")
+
+    # Imóveis individuais
+    try:
+        from app.models.property_model import PropertyRepository
+        all_props = PropertyRepository.get_all()
+        for prop in all_props:
+            prop_id = getattr(prop, 'id', None) or (prop.get('id') if isinstance(prop, dict) else None)
+            if prop_id:
+                urls.append(f"""  <url>
+    <loc>{base_url}/imoveis/{prop_id}</loc>
+    <lastmod>{today}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>""")
+    except Exception:
+        pass
+
+    # Lançamentos individuais
+    try:
+        lancamentos = _get_lancamentos()
+        for item in lancamentos:
+            slug = item.get('slug') if isinstance(item, dict) else getattr(item, 'slug', None)
+            if slug:
+                urls.append(f"""  <url>
+    <loc>{base_url}/lancamentos/{slug}</loc>
+    <lastmod>{today}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>""")
+    except Exception:
+        pass
+
+    xml_content = '<?xml version="1.0" encoding="UTF-8"?>\n'
+    xml_content += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
+    xml_content += '\n'.join(urls)
+    xml_content += '\n</urlset>'
+
+    response = make_response(xml_content)
+    response.headers['Content-Type'] = 'application/xml; charset=utf-8'
+    response.headers['Cache-Control'] = 'public, max-age=3600'
+    return response
